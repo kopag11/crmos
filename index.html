@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Laporan Sales (Cloud & GPS)</title>
+    <style>
+        /* --- CSS Global --- */
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; margin: 0; padding: 0; }
+        .container { max-width: 500px; margin: 20px auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); min-height: 80vh; }
+        
+        /* --- LOGIN SCREEN --- */
+        #loginScreen { text-align: center; padding-top: 50px; }
+        .login-box input { font-size: 2rem; width: 150px; text-align: center; letter-spacing: 5px; padding: 10px; border-radius: 10px; border: 2px solid #007bff; text-transform: uppercase; }
+        .btn-login { background: #007bff; color: white; border: none; padding: 12px 30px; border-radius: 25px; font-size: 1.1rem; cursor: pointer; margin-top: 20px; width: 100%; max-width: 200px; }
+
+        /* --- DASHBOARD (FORM) --- */
+        #dashboard { display: none; } 
+        .header-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
+        .store-badge { background: #007bff; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold; font-size: 0.9rem; }
+        
+        /* --- History Section (Sekarang Draf Status) --- */
+        .history-box { background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ffeeba; display: none; }
+        .history-item { padding: 5px 0; font-size: 0.9rem; }
+
+        /* --- Form Elements (Calculator Style) --- */
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; color: #444; font-size: 0.9rem; }
+        input[type="text"], input[type="date"], input[type="number"] { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
+        
+        .input-group { display: flex; gap: 5px; }
+        .btn-calc { background: #17a2b8; color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-size: 1.2rem; }
+
+        /* --- Summary --- */
+        .summary { background: #e8f4fc; padding: 15px; border-radius: 8px; margin-top: 20px; }
+        .balance-ok { color: green; font-weight: bold; }
+        .balance-err { color: red; font-weight: bold; }
+
+        /* --- Buttons --- */
+        .btn-action { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 1rem; }
+        .btn-save { background: #28a745; color: white; }
+        .btn-wa { background: #25D366; color: white; display: none; }
+
+        /* --- Modal Calculator --- */
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 20px; border-radius: 10px; width: 90%; max-width: 400px; }
+        .calc-row { display: flex; gap: 5px; margin-bottom: 5px; }
+        .calc-row input { flex:1; padding: 8px;}
+        .btn-remove { background: #dc3545; color: white; border: none; border-radius: 5px; width: 30px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <div id="loginScreen">
+        <h2>🔒 Login Toko</h2>
+        <p>Masukkan 4 digit kode toko:</p>
+        <div class="login-box">
+            <input type="text" id="inputKode" maxlength="4" placeholder="ABCD">
+        </div>
+        <button class="btn-login" onclick="doLogin()">MASUK</button>
+        <p id="loginError" style="color:red; display:none;">Kode harus 4 karakter!</p>
+    </div>
+
+    <div id="dashboard">
+        <div class="header-bar">
+            <div>
+                <span class="store-badge" id="displayKode">CODE</span>
+                <span id="displayNama" style="font-weight:bold; margin-left:5px;">Laporan Sales</span> 
+            </div>
+            <button onclick="logout()" style="background:none; border:none; color:red; cursor:pointer;">Keluar</button>
+        </div>
+
+        <button type="button" onclick="deleteDraft()" style="background:#dc3545; color:white; border:none; padding:8px 15px; border-radius:5px; width:100%; margin-bottom:10px; cursor:pointer;">🗑️ HAPUS/RESET DRAF CLOUD</button>
+        
+        <div id="historyPanel" class="history-box">
+            <strong>Status Draf Cloud:</strong>
+            <div id="historyList">Loading...</div>
+        </div>
+
+        <form id="salesForm">
+            <input type="hidden" name="Kode Toko" id="formKode">
+            
+            <div class="form-group">
+                <label>Tanggal</label>
+                <input type="date" name="Tanggal" id="tgl" required onchange="autoSaveDraft()">
+            </div>
+            <div class="form-group">
+                <label>Nama Toko</label>
+                <input type="text" name="Nama Toko" id="nama_toko" placeholder="Nama Toko Diisi Otomatis" required readonly style="background:#f8f9fa;"> 
+            </div>
+
+            <div class="form-group">
+                <label>TOTAL SALES SYSTEM (Rp)</label>
+                <input type="text" name="Total Sales" id="total_sales" placeholder="0" onkeyup="formatRibuan(this); hitungGlobal();" style="background:#fff3cd; font-weight:bold;">
+            </div>
+
+            <div id="dynamicInputs"></div>
+
+            <div class="summary">
+                <div>Total Fisik: <span id="disp_total_fisik">Rp 0</span></div>
+                <div>Total Potongan: <span id="disp_total_potong">Rp 0</span></div>
+                <hr>
+                <div>Balance: <span id="disp_balance">0</span></div>
+            </div>
+
+            <input type="hidden" name="Setor Sore" id="h_setor_sore" value="0">
+            <input type="hidden" name="Setor Malam" id="h_setor_malam" value="0">
+            <input type="hidden" name="Setor Pagi" id="h_setor_pagi" value="0">
+            <input type="hidden" name="Ekor Sales" id="h_ekor_sales" value="0">
+            <input type="hidden" name="Potongan BA" id="h_pot_ba" value="0">
+            <input type="hidden" name="Potongan Lebih" id="h_pot_lebih" value="0">
+            <input type="hidden" name="Potongan Virtual" id="h_pot_virtual" value="0">
+            <input type="hidden" name="Total Setor Fisik" id="h_total_fisik" value="0">
+            <input type="hidden" id="val_nama_ekor">
+
+            <button type="button" class="btn-action btn-save" id="btn-submit" onclick="submitForm()">💾 SIMPAN DATABSE</button>
+            <button type="button" class="btn-action btn-wa" id="btn-wa" onclick="kirimWA()">📲 KIRIM WA</button>
+            <p id="status" style="text-align:center; margin-top:5px;"></p>
+        </form>
+    </div>
+</div>
+
+<div id="calcModal" class="modal">
+    <div class="modal-content">
+        <h3 id="modalTitle">Rincian</h3>
+        <div id="calcList" style="max-height:200px; overflow-y:auto; margin-bottom:10px;"></div>
+        <button onclick="addCalcRow()" style="background:#6c757d; color:white; border:none; padding:5px; cursor:pointer;">+ Tambah Nominal</button>
+        <div style="text-align:right; margin-top:10px;">Total: <strong id="modalTotal">0</strong></div>
+        <button onclick="saveCalculator()" style="width:100%; background:#007bff; color:white; padding:10px; margin-top:10px; border:none; border-radius:5px; cursor:pointer;">Simpan</button>
+        <button onclick="document.getElementById('calcModal').style.display='none'" style="width:100%; background:transparent; border:none; margin-top:5px; color:#666; cursor:pointer;">Batal</button>
+    </div>
+</div>
+
+<script>
+    // === KONFIGURASI ===
+    // !!! GANTI LINK INI DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA !!!
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzX8YNW9U6fyuCzBOWB_lcu7FDJS5ivTOI5RU2QBAVQz-sW_ov4ys_CSuqxQNnYDQLT/exec'; 
+
+    // Konfigurasi Geofencing
+    const MAX_RADIUS_METERS = 30; 
+
+    // === VARIABEL GLOBAL ===
+    let currentStoreCode = "";
+    let dataStore = {}; 
+    let activeField = "";
+
+    // === UTILS: HAVERSINE FORMULA ===
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371000; // Radius Bumi dalam meter
+        const toRad = (x) => x * Math.PI / 180;
+        
+        const dLat = toRad(lat2 - lat1);
+        const dLon = toRad(lon2 - lon1);
+        
+        const a = 
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        
+        return R * c; // Jarak dalam meter
+    }
+
+    // === UTILS: FORMAT RIBUAN & CLEAN NUMBER ===
+    function formatRibuan(element) {
+        let val = element.value;
+        let number_string = val.replace(/[^,\d]/g, '').toString();
+        let split = number_string.split(',');
+        let sisa = split[0].length % 3;
+        let rupiah = split[0].substr(0, sisa);
+        let ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+        if (ribuan) {
+            separator = sisa ? '.' : '';
+            rupiah += separator + ribuan.join('.');
+        }
+
+        rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+        element.value = rupiah;
+        
+        if (element.id === 'total_sales') autoSaveDraft(); 
+    }
+
+    function getCleanNumber(val) {
+        if (!val) return 0;
+        return Number(val.toString().replace(/\./g, '')) || 0; 
+    }
+
+    // --- LOGIC DRAFT/AUTOSAVE (DARI GOOGLE SHEETS) ---
+    function collectDraftData() {
+        return {
+            tgl: document.getElementById('tgl').value,
+            nama_toko: document.getElementById('nama_toko').value,
+            total_sales: document.getElementById('total_sales').value,
+            dataStore: dataStore,
+            ekor_note: document.getElementById('val_nama_ekor').value,
+            h_setor_sore: document.getElementById('h_setor_sore').value,
+            h_setor_malam: document.getElementById('h_setor_malam').value,
+            h_setor_pagi: document.getElementById('h_setor_pagi').value,
+            h_ekor_sales: document.getElementById('h_ekor_sales').value,
+            h_pot_ba: document.getElementById('h_pot_ba').value,
+            h_pot_lebih: document.getElementById('h_pot_lebih').value,
+            h_pot_virtual: document.getElementById('h_pot_virtual').value,
+        };
+    }
+
+    function autoSaveDraft() {
+        if (!currentStoreCode) return;
+        const draftData = collectDraftData();
+        
+        const formData = new FormData();
+        formData.append('action', 'save_draft');
+        formData.append('Kode Toko', currentStoreCode);
+        formData.append('draft_data', JSON.stringify(draftData));
+        
+        fetch(scriptURL, { method: 'POST', body: formData })
+            .then(res => {
+                document.getElementById('status').innerText = "Draft tersimpan di Cloud.";
+                setTimeout(() => document.getElementById('status').innerText = "", 2000);
+            })
+            .catch(err => {
+                document.getElementById('status').innerText = "Gagal menyimpan draft!";
+            });
+    }
+
+    function loadDraft() {
+        const historyPanel = document.getElementById('historyPanel');
+        const historyList = document.getElementById('historyList');
+
+        historyPanel.style.display = 'block';
+        historyList.innerHTML = `Mengecek draf di Cloud...`;
+
+        fetch(scriptURL + "?action=load_draft&kode=" + currentStoreCode)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    historyList.innerHTML = `Tidak ada draf tersimpan. Mulai input baru.`;
+                    initForm();
+                } else {
+                    const draft = data;
+                    
+                    document.getElementById('tgl').value = draft.tgl || new Date().toISOString().substring(0, 10);
+                    // document.getElementById('nama_toko').value sudah diisi di doLogin
+                    document.getElementById('total_sales').value = draft.total_sales || '';
+                    document.getElementById('val_nama_ekor').value = draft.ekor_note || '';
+                    document.getElementById('note_ekor').value = draft.ekor_note || ''; 
+                    
+                    dataStore = draft.dataStore || {};
+
+                    document.getElementById('h_setor_sore').value = draft.h_setor_sore || 0;
+                    document.getElementById('h_setor_malam').value = draft.h_setor_malam || 0;
+                    document.getElementById('h_setor_pagi').value = draft.h_setor_pagi || 0;
+                    document.getElementById('h_ekor_sales').value = draft.h_ekor_sales || 0;
+                    document.getElementById('h_pot_ba').value = draft.h_pot_ba || 0;
+                    document.getElementById('h_pot_lebih').value = draft.h_pot_lebih || 0;
+                    document.getElementById('h_pot_virtual').value = draft.h_pot_virtual || 0;
+
+                    initForm(); 
+                    updateAllViewFields();
+                    
+                    historyList.innerHTML = `<span style="color:red; font-weight:bold;">DRAF tersimpan (${draft.tgl}) ditemukan di Cloud.</span>`;
+                }
+            })
+            .catch(err => {
+                 historyList.innerHTML = `Gagal memuat draf dari Cloud. Cek koneksi Anda.`;
+            });
+    }
+
+    function deleteDraft() {
+        if (!confirm("Apakah Anda yakin ingin MENGHAPUS DRAF yang tersimpan di Cloud? Data akan hilang di semua perangkat.")) return;
+
+        const formData = new FormData();
+        formData.append('action', 'delete_draft');
+        formData.append('Kode Toko', currentStoreCode);
+        
+        fetch(scriptURL, { method: 'POST', body: formData })
+            .then(res => res.json())
+            .then(data => {
+                alert("Draf berhasil direset/dihapus dari Cloud. Silakan login kembali untuk mulai dari awal.");
+                location.reload(); 
+            })
+            .catch(err => {
+                alert("Gagal menghapus draf: Cek koneksi.");
+            });
+    }
+
+    // --- UTILS PENDUKUNG ---
+    function updateAllViewFields() {
+        const fields = ['setor_sore', 'setor_malam', 'setor_pagi', 'ekor_sales', 'pot_ba', 'pot_lebih', 'pot_virtual'];
+        fields.forEach(id => {
+            let total = Number(document.getElementById('h_' + id).value) || 0;
+            document.getElementById('view_' + id).value = "Rp " + total.toLocaleString('id-ID');
+        });
+        hitungGlobal();
+    }
+    
+
+    // === LOGIC LOGIN (GEOLOCATION & SHOP INFO) ===
+    document.getElementById('inputKode').addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            doLogin();
+        }
+    });
+
+    async function doLogin() {
+        const input = document.getElementById('inputKode');
+        const code = input.value.toUpperCase().trim();
+
+        if (!code) { alert("⚠️ Kode toko tidak boleh kosong!"); return; }
+        if (code.length !== 4) { alert("⚠️ Kode Toko harus 4 karakter."); return; }
+        
+        document.getElementById('status').innerText = "Mengecek data toko...";
+
+        // 1. Fetch Shop Info dari Google Sheets
+        let shopData;
+        try {
+            const shopInfoResponse = await fetch(scriptURL + "?action=get_shop_info&kode=" + code);
+            shopData = await shopInfoResponse.json();
+
+            if (shopData.error) {
+                document.getElementById('status').innerText = "";
+                alert("⚠️ Login Gagal. " + shopData.error);
+                return;
+            }
+        } catch (e) {
+             document.getElementById('status').innerText = "";
+             alert("⚠️ Gagal terhubung ke Apps Script. Cek koneksi internet Anda.");
+             return;
+        }
+
+        const requiredLat = parseFloat(shopData.lat);
+        const requiredLon = parseFloat(shopData.lon);
+        
+        if (isNaN(requiredLat) || isNaN(requiredLon)) {
+             document.getElementById('status').innerText = "";
+             alert("⚠️ Koordinat toko tidak valid di sheet Shops. Harap periksa data Latitude/Longitude.");
+             return;
+        }
+
+        // 2. Geolocation Check
+        document.getElementById('status').innerText = "Mendapatkan lokasi Anda (GPS)...";
+        
+        if (!navigator.geolocation) {
+             document.getElementById('status').innerText = "";
+             alert("⚠️ Perangkat Anda tidak mendukung fitur Geolocation. Akses ditolak.");
+             return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                document.getElementById('status').innerText = "";
+                const userLat = position.coords.latitude;
+                const userLon = position.coords.longitude;
+                
+                // Hitung jarak
+                const distance = calculateDistance(userLat, userLon, requiredLat, requiredLon);
+                const roundedDistance = Math.round(distance);
+
+                if (distance > MAX_RADIUS_METERS) {
+                    alert(`⚠️ Akses Ditolak! Anda berada ${roundedDistance} meter dari lokasi toko (${shopData.nama}). Maksimal: ${MAX_RADIUS_METERS} meter.`);
+                    return;
+                }
+
+                // 3. Login Berhasil (Lulus Geofencing)
+                currentStoreCode = code;
+                
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                document.getElementById('displayKode').innerText = code;
+                document.getElementById('formKode').value = code;
+                document.getElementById('displayNama').innerText = shopData.nama; 
+                
+                // Auto-fill shop name
+                document.getElementById('nama_toko').value = shopData.nama; 
+                localStorage.setItem('name_' + code, shopData.nama);
+                
+                loadDraft(); 
+            },
+            (error) => {
+                document.getElementById('status').innerText = "";
+                if (error.code === 1) {
+                    alert("⚠️ Akses Lokasi Ditolak. Harap izinkan akses lokasi (GPS) di browser/pengaturan Anda.");
+                } else {
+                    alert("⚠️ Gagal mendapatkan lokasi Anda. Pastikan GPS aktif dan sinyal bagus. Error code: " + error.code);
+                }
+            },
+            // Opsi Geolocation: Akurasi Tinggi, Timeout 10 detik
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 } 
+        );
+    }
+
+    function logout() { location.reload(); }
+
+    // === RENDER FORM INPUTS ===
+    function initForm() {
+        const fields = [
+            {id:'setor_sore', label:'Setor Sore ☀️'},
+            {id:'setor_malam', label:'Setor Malam 🌙'},
+            {id:'setor_pagi', label:'Setor Pagi (H+1) 🌅'},
+            {id:'ekor_sales', label:'Ekor Sales / Receh 🪙', hasNote: true},
+            {id:'pot_ba', label:'Potongan BA Var ⚠️'},
+            {id:'pot_lebih', label:'Potongan Lebih ➕'},
+            {id:'pot_virtual', label:'Potongan Virtual (QRIS) 💳'}
+        ];
+
+        let html = "";
+        fields.forEach(f => {
+            if (!dataStore[f.id]) dataStore[f.id] = [];
+            let ekorNoteVal = (f.id === 'ekor_sales' && document.getElementById('val_nama_ekor')) ? document.getElementById('val_nama_ekor').value : '';
+
+            html += `
+            <div class="form-group">
+                <label>${f.label}</label>
+                <div class="input-group">
+                    <input type="text" id="view_${f.id}" value="Rp 0" readonly style="background:#fff;">
+                    <button type="button" class="btn-calc" onclick="openCalc('${f.id}', '${f.label}')">➕</button>
+                </div>
+                ${f.hasNote ? '<input type="text" id="note_ekor" placeholder="A.n Siapa?" value="'+ekorNoteVal+'" onchange="document.getElementById(`val_nama_ekor`).value=this.value; autoSaveDraft();" style="margin-top:5px; font-size:0.8rem;">' : ''}
+            </div>`;
+        });
+        document.getElementById('dynamicInputs').innerHTML = html;
+        document.getElementById('tgl').addEventListener('change', autoSaveDraft);
+        
+        // Pastikan tanggal terisi hari ini jika belum ada draft
+        if (!document.getElementById('tgl').value) {
+            document.getElementById('tgl').valueAsDate = new Date();
+        }
+        
+        updateAllViewFields();
+    }
+
+    // === LOGIC CALCULATOR ===
+    function openCalc(id, title) {
+        activeField = id;
+        document.getElementById('modalTitle').innerText = title;
+        document.getElementById('calcModal').style.display = 'flex';
+        renderCalcRows();
+        updateModalTotal();
+    }
+
+    function renderCalcRows() {
+        const container = document.getElementById('calcList');
+        container.innerHTML = "";
+        let values = dataStore[activeField];
+        
+        if(values.length === 0) values.push(0);
+
+        values.forEach((val, index) => {
+            let div = document.createElement('div');
+            div.className = 'calc-row';
+            let displayVal = val === 0 ? '' : val.toLocaleString('id-ID');
+            
+            div.innerHTML = `
+                <input type="text" inputmode="numeric" class="calc-input" value="${displayVal}" placeholder="0" onkeyup="formatRibuan(this); updateModalTotal();">
+                <button class="btn-remove" onclick="removeRow(${index})">&times;</button>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function addCalcRow() {
+        saveTempValues();
+        dataStore[activeField].push(0);
+        renderCalcRows();
+    }
+
+    function removeRow(idx) {
+        saveTempValues();
+        dataStore[activeField].splice(idx, 1);
+        renderCalcRows();
+        updateModalTotal();
+    }
+
+    function saveTempValues() {
+        let inputs = document.querySelectorAll('.calc-input');
+        dataStore[activeField] = Array.from(inputs).map(i => getCleanNumber(i.value));
+        autoSaveDraft(); 
+    }
+
+    function updateModalTotal() {
+        let inputs = document.querySelectorAll('.calc-input');
+        let total = 0;
+        inputs.forEach(i => total += getCleanNumber(i.value));
+        document.getElementById('modalTotal').innerText = "Rp " + total.toLocaleString('id-ID');
+    }
+
+    function saveCalculator() {
+        saveTempValues();
+        let total = dataStore[activeField].reduce((a, b) => a + b, 0);
+        
+        document.getElementById('view_' + activeField).value = "Rp " + total.toLocaleString('id-ID');
+        document.getElementById('h_' + activeField).value = total;
+        
+        document.getElementById('calcModal').style.display = 'none';
+        hitungGlobal();
+        autoSaveDraft();
+    }
+
+    // === LOGIC GLOBAL CALCULATION ===
+    function hitungGlobal() {
+        let sales = getCleanNumber(document.getElementById('total_sales').value);
+        
+        let fisik = Number(document.getElementById('h_setor_sore').value) +
+                    Number(document.getElementById('h_setor_malam').value) +
+                    Number(document.getElementById('h_setor_pagi').value) +
+                    Number(document.getElementById('h_ekor_sales').value);
+        
+        let potong = Number(document.getElementById('h_pot_ba').value) +
+                     Number(document.getElementById('h_pot_lebih').value) +
+                     Number(document.getElementById('h_pot_virtual').value);
+
+        document.getElementById('disp_total_fisik').innerText = "Rp " + fisik.toLocaleString('id-ID');
+        document.getElementById('disp_total_potong').innerText = "Rp " + potong.toLocaleString('id-ID');
+        document.getElementById('h_total_fisik').value = fisik;
+
+        let balance = sales - (fisik + potong);
+        let elBal = document.getElementById('disp_balance');
+        if(balance === 0) {
+            elBal.innerText = "BALANCE OK ✅";
+            elBal.className = "balance-ok";
+        } else {
+            elBal.innerText = "SELISIH: " + balance.toLocaleString('id-ID');
+            elBal.className = "balance-err";
+        }
+        
+        autoSaveDraft();
+    }
+
+    // === SUBMIT & WA ===
+    function submitForm() {
+        const btn = document.getElementById('btn-submit');
+        const status = document.getElementById('status');
+        
+        let realSales = getCleanNumber(document.getElementById('total_sales').value);
+        
+        let balance = realSales - (Number(document.getElementById('h_total_fisik').value) + 
+                                   Number(document.getElementById('h_pot_ba').value) +
+                                   Number(document.getElementById('h_pot_lebih').value) +
+                                   Number(document.getElementById('h_pot_virtual').value));
+        
+        if (balance !== 0) {
+            if (!confirm(`Terdapat SELISIH ${balance.toLocaleString('id-ID')}. Apakah Anda yakin ingin tetap menyimpan?`)) {
+                return;
+            }
+        }
+        
+        localStorage.setItem('name_' + currentStoreCode, document.getElementById('nama_toko').value);
+
+        btn.disabled = true;
+        btn.innerText = "Menyimpan...";
+        
+        const form = document.getElementById('salesForm');
+        const formData = new FormData(form);
+        
+        formData.set('action', 'submit_final'); 
+        formData.set('Total Sales', realSales);
+        formData.set('Tanggal', document.getElementById('tgl').value);
+
+        fetch(scriptURL, { method: 'POST', body: formData })
+            .then(res => res.json())
+            .then(data => {
+                if (data.result === "success") {
+                     status.innerText = "Berhasil Disimpan!";
+                     status.style.color = "green";
+                     btn.style.display = 'none';
+                     document.getElementById('btn-wa').style.display = 'block';
+                     
+                     // Hapus draf di Sheets setelah berhasil submit final
+                     const deleteFormData = new FormData();
+                     deleteFormData.append('action', 'delete_draft');
+                     deleteFormData.append('Kode Toko', currentStoreCode);
+                     fetch(scriptURL, { method: 'POST', body: deleteFormData }); 
+                } else {
+                    throw new Error(data.error || "Submit failed. Cek Apps Script logs.");
+                }
+            })
+            .catch(err => {
+                status.innerText = "Error: Cek Internet atau Script Gagal: " + err.message;
+                btn.disabled = false;
+                btn.innerText = "💾 SIMPAN DATABSE";
+            });
+    }
+
+    function kirimWA() {
+        let getVal = (id) => document.getElementById('view_'+id).value;
+        let kode = currentStoreCode;
+        let nama = document.getElementById('nama_toko').value;
+        let tgl = document.getElementById('tgl').value;
+        let total = document.getElementById('total_sales').value; 
+        
+        let ekorVal = getVal('ekor_sales');
+        let ekorNama = document.getElementById('val_nama_ekor').value;
+        let ekorTxt = ekorNama ? `${ekorVal} (a.n ${ekorNama})` : ekorVal;
+
+        let totalFisik = document.getElementById('disp_total_fisik').innerText;
+        let totalPotong = document.getElementById('disp_total_potong').innerText;
+
+        let text = `*LAPORAN SALES HARIAN*
+*Kode:* ${kode}
+*Nama:* ${nama}
+*Tgl:* ${tgl}
+------------------
+*Omzet: Rp ${total}*
+
+*Fisik:*
+1. Sore: ${getVal('setor_sore')}
+2. Malam: ${getVal('setor_malam')}
+3. Pagi: ${getVal('setor_pagi')}
+4. Ekor: ${ekorTxt}
+------------------ (+)
+*Total Fisik: ${totalFisik}*
+
+*Potongan:*
+1. BA Var: ${getVal('pot_ba')}
+2. Lebih: ${getVal('pot_lebih')}
+3. Virtual: ${getVal('pot_virtual')}
+------------------ (+)
+*Total Potong: ${totalPotong}*
+
+------------------
+*Setor Fisik: ${totalFisik}*`;
+
+        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    }
+</script>
+
+</body>
+</html>
