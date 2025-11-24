@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+   <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Laporan Sales (Auto Plus/Minus)</title>
+    <title>Sistem Laporan Sales</title>
     <style>
         /* --- CSS Global --- */
         body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; margin: 0; padding: 0; }
@@ -25,7 +25,7 @@
         /* --- Form Elements --- */
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: 600; color: #444; font-size: 0.9rem; }
-        input[type="text"], input[type="date"], input[type="number"] { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
+        input[type="text"], input[type="date"], input[type="number"], input[type="tel"] { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
         
         .input-group { display: flex; gap: 5px; }
         .btn-calc { background: #17a2b8; color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-size: 1.2rem; }
@@ -33,7 +33,7 @@
         /* --- Summary --- */
         .summary { background: #e8f4fc; padding: 15px; border-radius: 8px; margin-top: 20px; }
         
-        /* Indikator Balance Baru */
+        /* Indikator Balance */
         .balance-ok { color: green; font-weight: bold; } /* Pas */
         .balance-plus { color: #0056b3; font-weight: bold; } /* Lebih (Biru) */
         .balance-min { color: #dc3545; font-weight: bold; } /* Kurang (Merah) */
@@ -88,9 +88,15 @@
                 <label>Tanggal</label>
                 <input type="date" name="Tanggal" id="tgl" required onchange="autoSaveDraft()">
             </div>
+            
             <div class="form-group">
                 <label>Nama Toko</label>
                 <input type="text" name="Nama Toko" id="nama_toko" placeholder="Nama Toko Diisi Otomatis" required readonly style="background:#f8f9fa;"> 
+            </div>
+
+            <div class="form-group">
+                <label>Nomor WA Pengirim</label>
+                <input type="tel" id="nomor_pengirim" placeholder="Contoh: 0812xxxx" onchange="saveSender(this.value)">
             </div>
 
             <div class="form-group">
@@ -138,7 +144,6 @@
 
 <script>
     // === KONFIGURASI ===
-    // Ganti dengan Link Apps Script Anda
     const scriptURL = 'https://script.google.com/macros/s/AKfycbzX8YNW9U6fyuCzBOWB_lcu7FDJS5ivTOI5RU2QBAVQz-sW_ov4ys_CSuqxQNnYDQLT/exec'; 
     const MAX_RADIUS_METERS = 150; 
 
@@ -146,7 +151,21 @@
     let dataStore = {}; 
     let activeField = "";
 
-    // === UTILS ===
+    // === UTILS & STARTUP ===
+    
+    // Load Nomor Pengirim saat aplikasi dibuka
+    window.addEventListener('load', function() {
+        let savedNum = localStorage.getItem('crm_sender_phone');
+        if(savedNum && document.getElementById('nomor_pengirim')) {
+            document.getElementById('nomor_pengirim').value = savedNum;
+        }
+    });
+
+    // Simpan Nomor Pengirim ke Local Storage HP
+    function saveSender(val) {
+        localStorage.setItem('crm_sender_phone', val);
+    }
+
     function calculateDistance(lat1, lon1, lat2, lon2) {
         const R = 6371000; const toRad = (x) => x * Math.PI / 180;
         const dLat = toRad(lat2 - lat1); const dLon = toRad(lon2 - lon1);
@@ -310,7 +329,7 @@
         document.getElementById('calcModal').style.display='none'; hitungGlobal();
     }
 
-    // === LOGIKA HITUNG (MODIFIKASI: PLUS = AMAN) ===
+    // === LOGIKA HITUNG (PLUS = AMAN) ===
     function hitungGlobal() {
         let sales = getCleanNumber(document.getElementById('total_sales').value);
         let fisik = Number(document.getElementById('h_setor_sore').value) + Number(document.getElementById('h_setor_malam').value) + Number(document.getElementById('h_setor_pagi').value) + Number(document.getElementById('h_ekor_sales').value);
@@ -320,9 +339,6 @@
         document.getElementById('disp_total_potong').innerText = "Rp " + potong.toLocaleString('id-ID');
         document.getElementById('h_total_fisik').value = fisik;
 
-        // RUMUS: (Fisik + Potong) - Sales
-        // Hasil Positif = LEBIH (Aman)
-        // Hasil Negatif = KURANG (Bahaya)
         let selisih = (fisik + potong) - sales;
         document.getElementById('val_selisih').value = selisih;
 
@@ -332,11 +348,9 @@
             elBal.innerText = "BALANCE OK ✅"; 
             elBal.className = "balance-ok";
         } else if (selisih > 0) {
-            // Kondisi LEBIH / PLUS
             elBal.innerText = "LEBIH (+) Rp " + selisih.toLocaleString('id-ID');
             elBal.className = "balance-plus";
         } else {
-            // Kondisi KURANG / MINUS
             elBal.innerText = "KURANG (-) Rp " + Math.abs(selisih).toLocaleString('id-ID');
             elBal.className = "balance-min";
         }
@@ -344,7 +358,7 @@
         autoSaveDraft();
     }
 
-    // === SUBMIT LOGIC (MODIFIKASI: BOLEH PLUS) ===
+    // === SUBMIT LOGIC ===
     function submitForm() {
         const btn = document.getElementById('btn-submit');
         const status = document.getElementById('status');
@@ -352,8 +366,6 @@
         let selisih = Number(document.getElementById('val_selisih').value);
         let realSales = getCleanNumber(document.getElementById('total_sales').value);
 
-        // ATURAN: Hanya tolak jika KURANG (Negatif)
-        // Jika Pas (0) atau Lebih (>0), boleh simpan.
         if (selisih < 0) {
             autoSaveDraft();
             alert(`⚠️ UANG KURANG (Minus Rp ${Math.abs(selisih).toLocaleString('id-ID')}).\n\nData hanya disimpan di DRAF. Tidak bisa Final.`);
@@ -375,6 +387,8 @@
         formData.set('action', 'submit_final'); 
         formData.set('Total Sales', realSales);
         formData.set('Tanggal', document.getElementById('tgl').value);
+        // Tambahkan pengirim ke data yang dikirim ke Google Sheet (jika perlu dicatat di sheet juga)
+        formData.append('Pengirim', document.getElementById('nomor_pengirim').value);
 
         fetch(scriptURL, { method: 'POST', body: formData })
             .then(res => res.json())
@@ -393,23 +407,36 @@
             });
     }
 
+    // === KIRIM WA (UPDATE FINAL) ===
     function kirimWA() {
         let getVal = (id) => document.getElementById('view_'+id).value;
         let selisih = Number(document.getElementById('val_selisih').value);
         
-        // Tentukan teks status untuk WA
+        // Ambil Data Header
+        let kode = document.getElementById('formKode').value || currentStoreCode;
+        let nama = document.getElementById('nama_toko').value;
+        let pengirim = document.getElementById('nomor_pengirim').value || "-"; 
+        
+        // Simpan nomor pengirim (agar besok otomatis muncul)
+        saveSender(pengirim);
+
+        // Status Balance
         let statusTxt = "";
         if (selisih === 0) statusTxt = "BALANCE OK ✅";
         else if (selisih > 0) statusTxt = `LEBIH (+) Rp ${selisih.toLocaleString('id-ID')} ⚠️`;
         else statusTxt = `KURANG (-) Rp ${Math.abs(selisih).toLocaleString('id-ID')} ❌`;
 
+        // Ekor
         let ekorTxt = getVal('ekor_sales');
         if(document.getElementById('val_nama_ekor').value) ekorTxt += ` (a.n ${document.getElementById('val_nama_ekor').value})`;
 
-        let txt = `*LAPORAN SALES HARIAN*\n*Toko:* ${document.getElementById('nama_toko').value}\n*Tgl:* ${document.getElementById('tgl').value}\n------------------\n*Omzet:* Rp ${document.getElementById('total_sales').value}\n\n*Fisik:*\n1. Sore: ${getVal('setor_sore')}\n2. Malam: ${getVal('setor_malam')}\n3. Pagi: ${getVal('setor_pagi')}\n4. Ekor: ${ekorTxt}\n------------------ (+)\n*Total Fisik: ${document.getElementById('disp_total_fisik').innerText}*\n\n*Potongan:*\n1. BA Var: ${getVal('pot_ba')}\n2. Lebih: ${getVal('pot_lebih')}\n3. Virtual: ${getVal('pot_virtual')}\n------------------ (+)\n*Total Potong: ${document.getElementById('disp_total_potong').innerText}*\n\n------------------\n*${statusTxt}*`;
+        // --- FORMAT PESAN WA ---
+        let txt = `*LAPORAN SETOR SALES*\n${kode} - ${nama}\n*Tgl Sales:* ${document.getElementById('tgl').value}\n*Total Sales:* Rp ${document.getElementById('total_sales').value}\n------------------\n*Fisik:*\n1. Sore: ${getVal('setor_sore')}\n2. Malam: ${getVal('setor_malam')}\n3. Pagi: ${getVal('setor_pagi')}\n4. Ekor: ${ekorTxt}\n------------------ (+)\n*Total Fisik: ${document.getElementById('disp_total_fisik').innerText}*\n\n*Potongan:*\n1. BA Var: ${getVal('pot_ba')}\n2. Lebih: ${getVal('pot_lebih')}\n3. Virtual: ${getVal('pot_virtual')}\n------------------ (+)\n*Total Potong: ${document.getElementById('disp_total_potong').innerText}*\n\n------------------\n*${statusTxt}*\n\n*Pengirim:* ${pengirim}`;
         
-        window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
+        // Kirim Langsung
+        window.open(`https://wa.me/6285183347653?text=${encodeURIComponent(txt)}`, '_blank');
     }
 </script>
 </body>
 </html>
+
