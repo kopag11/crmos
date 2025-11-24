@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Laporan Sales (Fixed)</title>
+    <title>Sistem Laporan Sales (Pro)</title>
     <style>
         /* --- CSS Global --- */
         body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; margin: 0; padding: 0; }
@@ -21,7 +21,6 @@
         
         /* --- History Section --- */
         .history-box { background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ffeeba; display: none; }
-        .history-item { padding: 5px 0; font-size: 0.9rem; }
 
         /* --- Form Elements --- */
         .form-group { margin-bottom: 15px; }
@@ -39,7 +38,7 @@
         /* --- Buttons --- */
         .btn-action { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 1rem; }
         .btn-save { background: #28a745; color: white; }
-        .btn-wa { background: #25D366; color: white; display: none; }
+        .btn-wa { background: #25D366; color: white; display: none; } /* Default Hidden */
 
         /* --- Modal Calculator --- */
         .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
@@ -115,7 +114,7 @@
             <input type="hidden" name="Total Setor Fisik" id="h_total_fisik" value="0">
             <input type="hidden" id="val_nama_ekor">
 
-            <button type="button" class="btn-action btn-save" id="btn-submit" onclick="submitForm()">💾 SIMPAN DATABSE</button>
+            <button type="button" class="btn-action btn-save" id="btn-submit" onclick="submitForm()">💾 SIMPAN DATABASE</button>
             <button type="button" class="btn-action btn-wa" id="btn-wa" onclick="kirimWA()">📲 KIRIM WA</button>
             <p id="status" style="text-align:center; margin-top:5px; font-weight:bold;"></p>
         </form>
@@ -134,11 +133,11 @@
 </div>
 
 <script>
-    // === KONFIGURASI PENTING ===
-    // 1. Pastikan scriptURL ini adalah milik Anda sendiri (Deploy as Web App, execute as Me, Who has access: Anyone)
+    // === KONFIGURASI ===
+    // GANTI LINK DI BAWAH INI DENGAN URL APPS SCRIPT ANDA
     const scriptURL = 'https://script.google.com/macros/s/AKfycbzX8YNW9U6fyuCzBOWB_lcu7FDJS5ivTOI5RU2QBAVQz-sW_ov4ys_CSuqxQNnYDQLT/exec'; 
     
-    // 2. Radius Toleransi GPS (dalam meter) - Ditingkatkan ke 150m untuk atasi GPS Drift di HP
+    // Radius Toleransi GPS (meter)
     const MAX_RADIUS_METERS = 150; 
 
     // === VARIABEL GLOBAL ===
@@ -179,7 +178,7 @@
         return Number(val.toString().replace(/\./g, '')) || 0; 
     }
 
-    // === DRAFT & AUTOSAVE (FIXED VERSION) ===
+    // === DRAFT & AUTOSAVE ===
     function collectDraftData() {
         return {
             tgl: document.getElementById('tgl').value,
@@ -204,19 +203,17 @@
         formData.append('action', 'save_draft');
         formData.append('Kode Toko', currentStoreCode);
         formData.append('draft_data', JSON.stringify(draftData));
-        
         fetch(scriptURL, { method: 'POST', body: formData }).catch(e => console.log("Autosave err"));
     }
 
-    // --- FUNGSI LOAD DRAFT YANG SUDAH DIPERBAIKI ---
+    // --- FUNGSI LOAD DRAFT (ANTI CACHE & FIX LOAD) ---
     function loadDraft() {
         const historyPanel = document.getElementById('historyPanel');
         const historyList = document.getElementById('historyList');
-
         historyPanel.style.display = 'block';
         historyList.innerHTML = `Mengecek draf di Cloud...`;
 
-        // ANTI-CACHE: Tambahkan timestamp agar selalu dapat data terbaru
+        // Anti-cache timestamp
         const timestamp = new Date().getTime();
         const fetchURL = scriptURL + "?action=load_draft&kode=" + currentStoreCode + "&tmp=" + timestamp;
 
@@ -224,29 +221,27 @@
             .then(response => response.json())
             .then(data => {
                 if (data.error) {
-                    historyList.innerHTML = `Tidak ada draf tersimpan.`;
+                    historyList.innerHTML = `Tidak ada draf. Mulai baru.`;
                     dataStore = {}; 
                     initForm();
                 } else {
                     const draft = data;
                     
-                    // 1. Load Data Dasar
+                    // 1. Data Input
                     document.getElementById('tgl').value = draft.tgl || new Date().toISOString().substring(0, 10);
                     document.getElementById('total_sales').value = draft.total_sales || '';
                     document.getElementById('val_nama_ekor').value = draft.ekor_note || '';
 
-                    // 2. Load Kalkulator (Handle String vs Object)
+                    // 2. Data Kalkulator (Handle String/Objek)
                     if (draft.dataStore) {
                         if (typeof draft.dataStore === 'string') {
                             try { dataStore = JSON.parse(draft.dataStore); } catch(e) { dataStore = {}; }
                         } else {
                             dataStore = draft.dataStore;
                         }
-                    } else {
-                        dataStore = {};
-                    }
+                    } else { dataStore = {}; }
 
-                    // 3. Load Nilai Terhitung (Hidden Fields)
+                    // 3. Hidden Values
                     document.getElementById('h_setor_sore').value = draft.h_setor_sore || 0;
                     document.getElementById('h_setor_malam').value = draft.h_setor_malam || 0;
                     document.getElementById('h_setor_pagi').value = draft.h_setor_pagi || 0;
@@ -255,22 +250,20 @@
                     document.getElementById('h_pot_lebih').value = draft.h_pot_lebih || 0;
                     document.getElementById('h_pot_virtual').value = draft.h_pot_virtual || 0;
 
-                    // 4. Render Form & Update View
                     initForm(); 
                     
-                    // Set note ekor manual setelah init
+                    // Restore Note
                     const noteEl = document.getElementById('note_ekor');
                     if(noteEl) noteEl.value = draft.ekor_note || '';
 
                     updateAllViewFields(); 
-                    
                     historyList.innerHTML = `<span style="color:green; font-weight:bold;">✅ Draf Cloud Dimuat (${draft.tgl})</span>`;
                 }
             })
             .catch(err => {
                  console.error(err);
                  historyList.innerHTML = `Gagal memuat draf (Cek Koneksi).`;
-                 initForm(); // Tetap init form meski gagal load
+                 initForm(); 
             });
     }
 
@@ -308,7 +301,6 @@
         status.innerText = "Mengecek data toko...";
 
         try {
-            // Anti-cache untuk login info juga
             let ts = new Date().getTime();
             const res = await fetch(scriptURL + "?action=get_shop_info&kode=" + code + "&t=" + ts);
             const shopData = await res.json();
@@ -320,10 +312,7 @@
             }
 
             status.innerText = "Mengecek Lokasi GPS...";
-            if (!navigator.geolocation) {
-                 alert("Browser tidak mendukung GPS.");
-                 return;
-            }
+            if (!navigator.geolocation) { alert("Browser tidak mendukung GPS."); return; }
 
             navigator.geolocation.getCurrentPosition(
                 (position) => {
@@ -333,11 +322,11 @@
 
                     if (dist > MAX_RADIUS_METERS) {
                         status.innerText = "Diluar Jangkauan";
-                        alert(`Akses Ditolak! Jarak Anda: ${Math.round(dist)}m. Maksimal: ${MAX_RADIUS_METERS}m.`);
+                        alert(`Akses Ditolak! Jarak: ${Math.round(dist)}m. Maks: ${MAX_RADIUS_METERS}m.`);
                         return;
                     }
 
-                    // Login Sukses
+                    // Login Success
                     currentStoreCode = code;
                     document.getElementById('loginScreen').style.display = 'none';
                     document.getElementById('dashboard').style.display = 'block';
@@ -357,7 +346,7 @@
 
         } catch (e) {
              status.innerText = "Koneksi Error";
-             alert("Gagal koneksi ke server. Cek internet.");
+             alert("Gagal koneksi ke server.");
         }
     }
 
@@ -393,7 +382,7 @@
         document.getElementById('dynamicInputs').innerHTML = html;
     }
 
-    // === CALCULATOR LOGIC ===
+    // === CALCULATOR ===
     function openCalc(id, title) {
         activeField = id;
         document.getElementById('modalTitle').innerText = title;
@@ -444,7 +433,7 @@
         hitungGlobal();
     }
 
-    // === GLOBAL CALC ===
+    // === GLOBAL CALCULATION ===
     function hitungGlobal() {
         let sales = getCleanNumber(document.getElementById('total_sales').value);
         let fisik = Number(document.getElementById('h_setor_sore').value) +
@@ -469,19 +458,31 @@
         autoSaveDraft();
     }
 
-    // === SUBMIT ===
+    // === SUBMIT LOGIC (UPDATED) ===
     function submitForm() {
         const btn = document.getElementById('btn-submit');
         const status = document.getElementById('status');
+        
         let realSales = getCleanNumber(document.getElementById('total_sales').value);
         let balance = realSales - (Number(document.getElementById('h_total_fisik').value) + 
                                    Number(document.getElementById('h_pot_ba').value) +
                                    Number(document.getElementById('h_pot_lebih').value) +
                                    Number(document.getElementById('h_pot_virtual').value));
         
-        if (balance !== 0) { if (!confirm(`Terdapat SELISIH ${balance.toLocaleString('id-ID')}. Tetap simpan?`)) return; }
+        // JIKA SELISIH -> SAVE DRAFT ONLY
+        if (balance !== 0) {
+            autoSaveDraft();
+            alert(`⚠️ TIDAK BALANCE (Selisih: Rp ${balance.toLocaleString('id-ID')})\n\nData HANYA disimpan sebagai DRAF SEMENTARA di Cloud.\nBELUM masuk Laporan Final.`);
+            status.innerText = "⚠️ Draf Tersimpan (Belum Final)";
+            status.style.color = "#d39e00";
+            return; 
+        }
 
-        btn.disabled = true; btn.innerText = "Menyimpan...";
+        // JIKA BALANCE -> SAVE FINAL
+        if (!confirm("Data sudah BALANCE OK ✅.\nSimpan Laporan Final ke Database?")) return;
+        
+        btn.disabled = true; btn.innerText = "Menyimpan Final...";
+        
         const form = document.getElementById('salesForm');
         const formData = new FormData(form);
         formData.set('action', 'submit_final'); 
@@ -492,21 +493,33 @@
             .then(res => res.json())
             .then(data => {
                 if (data.result === "success") {
-                     status.innerText = "Berhasil Disimpan!"; status.style.color = "green";
-                     btn.style.display = 'none'; document.getElementById('btn-wa').style.display = 'block';
-                     const delData = new FormData(); delData.append('action', 'delete_draft'); delData.append('Kode Toko', currentStoreCode);
+                     status.innerText = "✅ Final Database Tersimpan!";
+                     status.style.color = "green";
+                     btn.style.display = 'none'; 
+                     document.getElementById('btn-wa').style.display = 'block';
+                     
+                     // Hapus Draft
+                     const delData = new FormData();
+                     delData.append('action', 'delete_draft');
+                     delData.append('Kode Toko', currentStoreCode);
                      fetch(scriptURL, { method: 'POST', body: delData }); 
+                     
+                     alert("Laporan Berhasil Disimpan!");
                 } else { throw new Error(data.error); }
             })
             .catch(err => {
                 status.innerText = "Gagal: " + err.message;
-                btn.disabled = false; btn.innerText = "💾 SIMPAN DATABSE";
+                btn.disabled = false; btn.innerText = "💾 SIMPAN DATABASE";
             });
     }
 
     function kirimWA() {
         let getVal = (id) => document.getElementById('view_'+id).value;
-        let txt = `*LAPORAN SALES HARIAN*\n*Kode:* ${currentStoreCode}\n*Toko:* ${document.getElementById('nama_toko').value}\n*Tgl:* ${document.getElementById('tgl').value}\n------------------\n*Omzet:* Rp ${document.getElementById('total_sales').value}\n\n*Fisik:*\n1. Sore: ${getVal('setor_sore')}\n2. Malam: ${getVal('setor_malam')}\n3. Pagi: ${getVal('setor_pagi')}\n4. Ekor: ${getVal('ekor_sales')}\n------------------ (+)\n*Total Fisik: ${document.getElementById('disp_total_fisik').innerText}*\n\n*Potongan:*\n1. BA Var: ${getVal('pot_ba')}\n2. Lebih: ${getVal('pot_lebih')}\n3. Virtual: ${getVal('pot_virtual')}\n------------------ (+)\n*Total Potong: ${document.getElementById('disp_total_potong').innerText}*\n\n------------------\n${document.getElementById('disp_balance').innerText}`;
+        let ekorVal = getVal('ekor_sales');
+        let ekorNama = document.getElementById('val_nama_ekor').value;
+        let ekorTxt = ekorNama ? `${ekorVal} (a.n ${ekorNama})` : ekorVal;
+
+        let txt = `*LAPORAN SALES HARIAN*\n*Kode:* ${currentStoreCode}\n*Toko:* ${document.getElementById('nama_toko').value}\n*Tgl:* ${document.getElementById('tgl').value}\n------------------\n*Omzet:* Rp ${document.getElementById('total_sales').value}\n\n*Fisik:*\n1. Sore: ${getVal('setor_sore')}\n2. Malam: ${getVal('setor_malam')}\n3. Pagi: ${getVal('setor_pagi')}\n4. Ekor: ${ekorTxt}\n------------------ (+)\n*Total Fisik: ${document.getElementById('disp_total_fisik').innerText}*\n\n*Potongan:*\n1. BA Var: ${getVal('pot_ba')}\n2. Lebih: ${getVal('pot_lebih')}\n3. Virtual: ${getVal('pot_virtual')}\n------------------ (+)\n*Total Potong: ${document.getElementById('disp_total_potong').innerText}*\n\n------------------\n${document.getElementById('disp_balance').innerText}`;
         window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
     }
 </script>
