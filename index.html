@@ -1,9 +1,9 @@
-   <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Laporan Sales</title>
+    <title>Laporan Setor Sales CRM</title>
     <style>
         /* --- CSS Global --- */
         body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; margin: 0; padding: 0; }
@@ -56,8 +56,12 @@
 <div class="container">
     
     <div id="loginScreen">
-        <h2>🔒 Login Toko</h2>
-        <p>Masukkan 4 digit kode toko:</p>
+        <h2 style="margin-bottom: 5px;">Laporan Setor Sales CRM</h2>
+        <p style="color: #dc3545; font-size: 0.9rem; font-weight: bold; margin-top: 0;">
+            📍 Pastikan penginputan berada di lokasi toko
+        </p>
+
+        <p style="margin-top: 30px;">Masukkan 4 digit kode toko:</p>
         <div class="login-box">
             <input type="text" id="inputKode" maxlength="4" placeholder="ABCD">
         </div>
@@ -121,7 +125,9 @@
             <input type="hidden" name="Potongan Lebih" id="h_pot_lebih" value="0">
             <input type="hidden" name="Potongan Virtual" id="h_pot_virtual" value="0">
             <input type="hidden" name="Total Setor Fisik" id="h_total_fisik" value="0">
-            <input type="hidden" id="val_nama_ekor">
+            
+            <input type="hidden" name="Ket Ekor" id="val_nama_ekor">
+            
             <input type="hidden" id="val_selisih" value="0">
 
             <button type="button" class="btn-action btn-save" id="btn-submit" onclick="submitForm()">💾 SIMPAN FINAL</button>
@@ -164,6 +170,14 @@
     // Simpan Nomor Pengirim ke Local Storage HP
     function saveSender(val) {
         localStorage.setItem('crm_sender_phone', val);
+    }
+
+    // FUNGSI BARU: Mengubah format YYYY-MM-DD menjadi DD-MM-YYYY
+    function formatDateIndo(dateString) {
+        if (!dateString) return "";
+        let parts = dateString.split('-'); // Memisah [yyyy, mm, dd]
+        if (parts.length !== 3) return dateString;
+        return `${parts[2]}-${parts[1]}-${parts[0]}`; // Menggabung dd-mm-yyyy
     }
 
     function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -246,7 +260,10 @@
                     initForm(); 
                     if(document.getElementById('note_ekor')) document.getElementById('note_ekor').value = draft.ekor_note || '';
                     updateAllViewFields(); 
-                    historyList.innerHTML = `<span style="color:green; font-weight:bold;">✅ Draf Cloud (${draft.tgl})</span>`;
+                    
+                    // Format tampilan tanggal di notif draf
+                    let tglIndo = formatDateIndo(draft.tgl);
+                    historyList.innerHTML = `<span style="color:green; font-weight:bold;">✅ Draf Cloud (${tglIndo})</span>`;
                 }
             }).catch(e => { historyList.innerHTML = "Gagal Load."; initForm(); });
     }
@@ -358,13 +375,14 @@
         autoSaveDraft();
     }
 
-    // === SUBMIT LOGIC ===
+    // === SUBMIT LOGIC (FIXED) ===
     function submitForm() {
         const btn = document.getElementById('btn-submit');
         const status = document.getElementById('status');
         
         let selisih = Number(document.getElementById('val_selisih').value);
         let realSales = getCleanNumber(document.getElementById('total_sales').value);
+        let rawTgl = document.getElementById('tgl').value; // Masih yyyy-mm-dd
 
         if (selisih < 0) {
             autoSaveDraft();
@@ -386,8 +404,12 @@
         const formData = new FormData(form);
         formData.set('action', 'submit_final'); 
         formData.set('Total Sales', realSales);
-        formData.set('Tanggal', document.getElementById('tgl').value);
-        // Tambahkan pengirim ke data yang dikirim ke Google Sheet (jika perlu dicatat di sheet juga)
+        
+        // FIX: Ubah format tanggal jadi dd-mm-yyyy sebelum dikirim ke Sheet
+        formData.set('Tanggal', formatDateIndo(rawTgl)); 
+        
+        // FIX: Pastikan Ket Ekor dan Pengirim terkirim
+        formData.append('Ket Ekor', document.getElementById('val_nama_ekor').value);
         formData.append('Pengirim', document.getElementById('nomor_pengirim').value);
 
         fetch(scriptURL, { method: 'POST', body: formData })
@@ -398,7 +420,7 @@
                      btn.style.display = 'none'; document.getElementById('btn-wa').style.display = 'block';
                      const delData = new FormData(); delData.append('action', 'delete_draft'); delData.append('Kode Toko', currentStoreCode);
                      fetch(scriptURL, { method: 'POST', body: delData }); 
-                     alert("Berhasil!");
+                     alert("Berhasil disimpan!");
                 } else { throw new Error(data.error); }
             })
             .catch(err => {
@@ -407,36 +429,34 @@
             });
     }
 
-    // === KIRIM WA (UPDATE FINAL) ===
+    // === KIRIM WA (FIXED) ===
     function kirimWA() {
         let getVal = (id) => document.getElementById('view_'+id).value;
         let selisih = Number(document.getElementById('val_selisih').value);
         
-        // Ambil Data Header
         let kode = document.getElementById('formKode').value || currentStoreCode;
         let nama = document.getElementById('nama_toko').value;
         let pengirim = document.getElementById('nomor_pengirim').value || "-"; 
+        let rawTgl = document.getElementById('tgl').value;
+        let tglIndo = formatDateIndo(rawTgl); // Pakai format dd-mm-yyyy
         
-        // Simpan nomor pengirim (agar besok otomatis muncul)
         saveSender(pengirim);
 
-        // Status Balance
         let statusTxt = "";
         if (selisih === 0) statusTxt = "BALANCE OK ✅";
         else if (selisih > 0) statusTxt = `LEBIH (+) Rp ${selisih.toLocaleString('id-ID')} ⚠️`;
         else statusTxt = `KURANG (-) Rp ${Math.abs(selisih).toLocaleString('id-ID')} ❌`;
 
-        // Ekor
         let ekorTxt = getVal('ekor_sales');
         if(document.getElementById('val_nama_ekor').value) ekorTxt += ` (a.n ${document.getElementById('val_nama_ekor').value})`;
 
-        // --- FORMAT PESAN WA ---
-        let txt = `*LAPORAN SETOR SALES*\n${kode} - ${nama}\n*Tgl Sales:* ${document.getElementById('tgl').value}\n*Total Sales:* Rp ${document.getElementById('total_sales').value}\n------------------\n*Fisik:*\n1. Sore: ${getVal('setor_sore')}\n2. Malam: ${getVal('setor_malam')}\n3. Pagi: ${getVal('setor_pagi')}\n4. Ekor: ${ekorTxt}\n------------------ (+)\n*Total Fisik: ${document.getElementById('disp_total_fisik').innerText}*\n\n*Potongan:*\n1. BA Var: ${getVal('pot_ba')}\n2. Lebih: ${getVal('pot_lebih')}\n3. Virtual: ${getVal('pot_virtual')}\n------------------ (+)\n*Total Potong: ${document.getElementById('disp_total_potong').innerText}*\n\n------------------\n*${statusTxt}*\n\n*Pengirim:* ${pengirim}`;
+        let txt = `*LAPORAN SETOR SALES*\n${kode} - ${nama}\n*Tgl Sales:* ${tglIndo}\n*Total Sales:* Rp ${document.getElementById('total_sales').value}\n------------------\n*Fisik:*\n1. Sore: ${getVal('setor_sore')}\n2. Malam: ${getVal('setor_malam')}\n3. Pagi: ${getVal('setor_pagi')}\n4. Ekor: ${ekorTxt}\n------------------ (+)\n*Total Fisik: ${document.getElementById('disp_total_fisik').innerText}*\n\n*Potongan:*\n1. BA Var: ${getVal('pot_ba')}\n2. Lebih: ${getVal('pot_lebih')}\n3. Virtual: ${getVal('pot_virtual')}\n------------------ (+)\n*Total Potong: ${document.getElementById('disp_total_potong').innerText}*\n\n------------------\n*${statusTxt}*\n\n*Pengirim:* ${pengirim}`;
         
-        // Kirim Langsung
         window.open(`https://wa.me/6285183347653?text=${encodeURIComponent(txt)}`, '_blank');
     }
 </script>
 </body>
 </html>
+
+
 
