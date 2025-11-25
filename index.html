@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sales Report CRM</title>
+    <title>Report Sales CRM</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -109,7 +109,7 @@
         .store-badge { background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 8px; font-size: 0.8rem; margin-right: 5px; }
         .btn-logout { background: white; color: var(--danger); border: none; padding: 8px 15px; border-radius: 20px; font-weight: 600; font-size: 0.8rem; cursor: pointer; }
 
-        
+        /* --- FORM STYLING --- */
         .card {
             background: var(--card-bg);
             border-radius: var(--radius);
@@ -189,7 +189,7 @@
         .btn-modal-save { flex: 2; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 600; cursor: pointer; }
         .btn-modal-cancel { flex: 1; background: transparent; color: var(--text-gray); border: 1px solid #e5e7eb; border-radius: 10px; cursor: pointer; }
         
-        
+        /* Helper */
         .hidden { display: none; }
         #historyList { font-size: 0.85rem; color: #4b5563; padding: 10px; background: #fffbeb; border-radius: 8px; margin-bottom: 15px; border: 1px solid #fcd34d; display: none;}
     </style>
@@ -203,7 +203,7 @@
             <div style="width: 60px; height: 60px; background: #e0e7ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
                 <span style="font-size: 30px;">🏪</span>
             </div>
-            <h2>Sales Report CRM</h2>
+            <h2>Report Sales Metode CRM</h2>
             <p style="color: var(--text-gray); margin: 0;">Silakan masuk dengan Kode Toko</p>
         </div>
 
@@ -252,14 +252,14 @@
                 </div>
 
                 <div class="form-group">
-                    <label>📱 WA Anda</label>
+                    <label>📱 WA Pengirim</label>
                     <input type="tel" id="nomor_pengirim" placeholder="Contoh: 0812xxxx" onchange="saveSender(this.value)">
                 </div>
             </div>
 
             <div class="card" style="border-left: 5px solid var(--primary);">
                 <div class="form-group" style="margin-bottom:0;">
-                    <label style="color:var(--primary);">💰 TOTAL SALES TUTUPAN HARIAN (Rp)</label>
+                    <label style="color:var(--primary);">💰 TOTAL SALES SYSTEM (Rp)</label>
                     <input type="text" inputmode="numeric" name="Total Sales" id="total_sales" placeholder="0" onkeyup="formatRibuan(this); hitungGlobal();">
                 </div>
             </div>
@@ -308,7 +308,7 @@
         
         <div id="calcList" style="max-height:200px; overflow-y:auto; margin-bottom:15px;"></div>
         
-        <button onclick="addCalcRow()" style="background:#f3f4f6; color:var(--text-dark); border:1px dashed #ccc; padding:8px; width:100%; border-radius:8px; cursor:pointer;">+ Tambah Baris</button>
+        <button onclick="addCalcRow()" style="background:#f3f4f6; color:var(--text-dark); border:1px dashed #ccc; padding:8px; width:100%; border-radius:8px; cursor:pointer;">+ Tambah Struk</button>
         
         <div style="text-align:right; margin-top:15px; font-size:1.1rem;">
             Total: <strong id="modalTotal" style="color:var(--primary);">0</strong>
@@ -322,9 +322,9 @@
 </div>
 
 <script>
-    
+    // === KONFIGURASI ===
     const scriptURL = 'https://script.google.com/macros/s/AKfycbzX8YNW9U6fyuCzBOWB_lcu7FDJS5ivTOI5RU2QBAVQz-sW_ov4ys_CSuqxQNnYDQLT/exec'; 
-    const MAX_RADIUS_METERS = 150; 
+    const MAX_RADIUS_METERS = 100; 
 
     let currentStoreCode = "";
     let dataStore = {}; 
@@ -634,14 +634,15 @@
         saveSender(pengirim);
 
         let statusTxt = "";
-        if (selisih === 0) statusTxt = "BALANCE OK ✅";
-        else if (selisih > 0) statusTxt = `LEBIH (+) Rp ${selisih.toLocaleString('id-ID')} ⚠️`;
-        else statusTxt = `KURANG (-) Rp ${Math.abs(selisih).toLocaleString('id-ID')} ❌`;
+        if (selisih === 0) statusTxt = "BALANCE OK"; // Bersih tanpa emoji
+        else if (selisih > 0) statusTxt = `LEBIH (+) Rp ${selisih.toLocaleString('id-ID')}`;
+        else statusTxt = `KURANG (-) Rp ${Math.abs(selisih).toLocaleString('id-ID')}`;
 
         let ekorTxt = getVal('ekor_sales');
-        if(document.getElementById('val_nama_ekor').value) ekorTxt += ` (Ket: ${document.getElementById('val_nama_ekor').value})`;
+        if(document.getElementById('val_nama_ekor').value) ekorTxt += ` (a.n ${document.getElementById('val_nama_ekor').value})`;
 
-        let txt = `*LAPORAN SALES HARIAN*\n🏢 ${kode} - ${nama}\n📅 ${tglIndo}\n💰 *Sales System:* Rp ${document.getElementById('total_sales').value}\n\n*FISIK:*\n☀️ Sore: ${getVal('setor_sore')}\n🌙 Malam: ${getVal('setor_malam')}\n🌅 Pagi: ${getVal('setor_pagi')}\n🪙 Ekor: ${ekorTxt}\n------------------ (+)\n*Total Fisik: ${document.getElementById('disp_total_fisik').innerText}*\n\n*POTONGAN:*\n⚠️ BA: ${getVal('pot_ba')}\n➕ Lebih: ${getVal('pot_lebih')}\n💳 Virtual: ${getVal('pot_virtual')}\n------------------ (+)\n*Total Potong: ${document.getElementById('disp_total_potong').innerText}*\n\n------------------\n*STATUS: ${statusTxt}*\n\n👤 Pengirim: ${pengirim}`;
+        
+        let txt = `*LAPORAN SETOR SALES*\n*${kode} - ${nama}*\n*Tgl Sales:* ${tglIndo}\n*Total Sales:* Rp ${document.getElementById('total_sales').value}\n------------------\n*Fisik:*\n1. Sore: ${getVal('setor_sore')}\n2. Malam: ${getVal('setor_malam')}\n3. Pagi: ${getVal('setor_pagi')}\n4. Ekor: ${ekorTxt}\n------------------ (+)\n*Total Fisik: ${document.getElementById('disp_total_fisik').innerText}*\n\n*Potongan:*\n1. BA Var: ${getVal('pot_ba')}\n2. Lebih: ${getVal('pot_lebih')}\n3. Virtual: ${getVal('pot_virtual')}\n------------------ (+)\n*Total Potong: ${document.getElementById('disp_total_potong').innerText}*\n\n------------------\n*${statusTxt}*\n\n*Pengirim:* ${pengirim}`;
         
         window.open(`https://wa.me/6285183347653?text=${encodeURIComponent(txt)}`, '_blank');
     }
