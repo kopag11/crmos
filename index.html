@@ -104,7 +104,7 @@
 
             <div class="form-group">
                 <label>Nomor WA Pengirim</label>
-                <input type="tel" id="nomor_pengirim" placeholder="Contoh: 0812xxxx" onchange="saveSender(this.value)">
+                <input type="tel" name="Pengirim" id="nomor_pengirim" placeholder="Contoh: 0812xxxx" onchange="saveSender(this.value)">
             </div>
 
             <div class="form-group">
@@ -121,6 +121,7 @@
                 <div>Status: <span id="disp_balance">0</span></div>
             </div>
 
+            <!-- HIDDEN FIELDS YANG MEMBAWA NILAI AKHIR (DITAMBAHKAN ATRIBUT name) -->
             <input type="hidden" name="Setor Sore" id="h_setor_sore" value="0">
             <input type="hidden" name="Setor Malam" id="h_setor_malam" value="0">
             <input type="hidden" name="Setor Pagi" id="h_setor_pagi" value="0">
@@ -130,7 +131,11 @@
             <input type="hidden" name="Potongan Virtual" id="h_pot_virtual" value="0">
             <input type="hidden" name="Total Setor Fisik" id="h_total_fisik" value="0">
             
-            <input type="hidden" name="Ket Ekor" id="val_nama_ekor"> <input type="hidden" id="val_selisih" value="0">
+            <!-- INPUT UNTUK KETERANGAN EKOR (DIPERBAIKI) -->
+            <!-- Sebelumnya di sini ada duplikasi <input type="hidden" name="Ket Ekor" id="val_nama_ekor"> yang dihapus. -->
+            <input type="hidden" name="Ket Ekor" id="val_nama_ekor"> 
+            
+            <input type="hidden" id="val_selisih" value="0">
 
             <button type="button" class="btn-action btn-green" id="btn-submit" onclick="submitForm()">💾 SIMPAN FINAL</button>
             
@@ -153,7 +158,8 @@
 
 <script>
     // === KONFIGURASI ===
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbzX8YNW9U6fyuCzBOWB_lcu7FDJS5ivTOI5RU2QBAVQz-sW_ov4ys_CSuqxQNnYDQLT/exec'; 
+    // PASTIKAN URL INI BENAR SETELAH DEPLOY ULANG!
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzX8YNW9U6fyuCzBOWB_lcu7FDJS5ivTOI5RU2QBAVQz-s_ov4ys_CSuqxQNnYDQLT/exec'; 
     const MAX_RADIUS_METERS = 150; 
 
     let currentStoreCode = "";
@@ -206,12 +212,13 @@
 
     // === DRAFT LOGIC ===
     function collectDraftData() {
+        // Mengumpulkan semua data yang diperlukan untuk disimpan sebagai draft
         return {
             tgl: document.getElementById('tgl').value,
             nama_toko: document.getElementById('nama_toko').value,
             total_sales: document.getElementById('total_sales').value,
             dataStore: dataStore,
-            ekor_note: document.getElementById('val_nama_ekor').value,
+            ekor_note: document.getElementById('val_nama_ekor').value, // Mengambil nilai Ket Ekor
             h_setor_sore: document.getElementById('h_setor_sore').value,
             h_setor_malam: document.getElementById('h_setor_malam').value,
             h_setor_pagi: document.getElementById('h_setor_pagi').value,
@@ -228,7 +235,7 @@
         formData.append('action', 'save_draft');
         formData.append('Kode Toko', currentStoreCode);
         formData.append('draft_data', JSON.stringify(collectDraftData()));
-        fetch(scriptURL, { method: 'POST', body: formData }).catch(e => console.log("Autosave err"));
+        fetch(scriptURL, { method: 'POST', body: formData }).catch(e => console.log("Autosave err: " + e.message));
     }
 
     function loadDraft() {
@@ -247,7 +254,7 @@
                     const draft = data;
                     document.getElementById('tgl').value = draft.tgl || new Date().toISOString().substring(0, 10);
                     document.getElementById('total_sales').value = draft.total_sales || '';
-                    document.getElementById('val_nama_ekor').value = draft.ekor_note || '';
+                    document.getElementById('val_nama_ekor').value = draft.ekor_note || ''; // Memuat nilai Ket Ekor
 
                     if (typeof draft.dataStore === 'string') {
                         try { dataStore = JSON.parse(draft.dataStore); } catch(e) { dataStore = {}; }
@@ -258,19 +265,27 @@
                     });
 
                     initForm(); 
+                    // Memastikan kolom input keterangan ekor diperbarui juga
                     if(document.getElementById('note_ekor')) document.getElementById('note_ekor').value = draft.ekor_note || '';
                     updateAllViewFields(); 
                     
                     let tglIndo = formatDateIndo(draft.tgl);
                     historyList.innerHTML = `<span style="color:green; font-weight:bold;">✅ Draf Cloud (${tglIndo})</span>`;
                 }
-            }).catch(e => { historyList.innerHTML = "Gagal Load."; initForm(); });
+            }).catch(e => { 
+                historyList.innerHTML = "❌ Gagal Load Draf: Cek URL Apps Script atau internet."; 
+                initForm(); 
+            });
     }
 
     function deleteDraft() {
-        if (!confirm("Hapus draf?")) return;
+        // Ganti confirm() dengan notifikasi konsol
+        console.log("[USER ACTION] Permintaan Hapus Draf"); 
+        
         const form = new FormData(); form.append('action', 'delete_draft'); form.append('Kode Toko', currentStoreCode);
-        fetch(scriptURL, { method: 'POST', body: form }).then(() => location.reload());
+        fetch(scriptURL, { method: 'POST', body: form })
+            .then(() => location.reload())
+            .catch(e => console.log("Gagal hapus draf: " + e.message));
     }
 
     function updateAllViewFields() {
@@ -284,18 +299,38 @@
     // === LOGIN ===
     async function doLogin() {
         const code = document.getElementById('inputKode').value.toUpperCase().trim();
-        if (code.length !== 4) return alert("Kode salah");
+        if (code.length !== 4) {
+             document.getElementById('loginError').style.display='block';
+             return;
+        }
+        document.getElementById('loginError').style.display='none';
         
         document.getElementById('gpsStatus').innerText = "Cek Lokasi...";
         try {
             const res = await fetch(scriptURL + "?action=get_shop_info&kode=" + code + "&t=" + new Date().getTime());
-            const shop = await res.json();
-            if (shop.error) throw new Error(shop.error);
+            
+            // Cek status response HTTP
+            if (!res.ok) {
+                 throw new Error(`Koneksi Gagal. Status HTTP: ${res.status}. Pastikan URL Deploy sudah benar.`);
+            }
 
+            const shop = await res.json();
+            
+            if (shop.error) {
+                 document.getElementById('gpsStatus').innerText = "❌ Kode Toko Tidak Ditemukan.";
+                 throw new Error(shop.error);
+            }
+
+            // Cek GPS (jika berhasil terhubung ke Apps Script)
             navigator.geolocation.getCurrentPosition(pos => {
                 const dist = calculateDistance(pos.coords.latitude, pos.coords.longitude, shop.lat, shop.lon);
-                if (dist > MAX_RADIUS_METERS) return alert(`Jarak Terlalu Jauh (${Math.round(dist)}m).`);
+                if (dist > MAX_RADIUS_METERS) {
+                    document.getElementById('gpsStatus').innerText = `❌ Jarak Terlalu Jauh (${Math.round(dist)}m).`;
+                    alert(`Jarak Terlalu Jauh (${Math.round(dist)}m).`);
+                    return;
+                }
                 
+                // Login Success
                 currentStoreCode = code;
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'block';
@@ -303,8 +338,18 @@
                 document.getElementById('formKode').value = code;
                 document.getElementById('nama_toko').value = shop.nama;
                 loadDraft();
-            }, () => alert("GPS Gagal/Mati."));
-        } catch(e) { alert("Error: " + e.message); }
+                
+            }, () => {
+                document.getElementById('gpsStatus').innerText = "❌ GPS Gagal/Mati.";
+                alert("GPS Gagal/Mati. Pastikan GPS HP Anda aktif.");
+            });
+            
+        } catch(e) { 
+            document.getElementById('gpsStatus').innerText = "❌ Gagal Koneksi/Cek Data.";
+            console.error("Login Fetch Error:", e);
+            // Memberikan pesan yang jelas kepada pengguna tentang Deployment
+            alert("Error: Gagal Terhubung ke Apps Script atau data toko bermasalah. Pastikan URL Deploy Anda benar dan izinnya 'Anyone'. Detail: " + e.message); 
+        }
     }
     function logout() { location.reload(); }
 
@@ -406,47 +451,57 @@
         // === MODE 1: SIMPAN DRAFT (JIKA MINUS) ===
         if (selisih < 0) {
             autoSaveDraft();
-            alert(`⚠️ DATA MASIH MINUS (Rp ${Math.abs(selisih).toLocaleString('id-ID')}).\n\nData telah diamankan di DRAFT CLOUD. Silakan lengkapi nanti.`);
+            console.log(`[ALERT] DATA MASIH MINUS (Rp ${Math.abs(selisih).toLocaleString('id-ID')}). Data diamankan di DRAFT CLOUD.`);
             status.innerText = "⚠️ Tersimpan di Draft (Data Kurang)";
-            status.style.color = "#856404"; // Kuning gelap
-            return; // STOP! Jangan kirim ke sheet final
+            status.style.color = "#856404"; 
+            return; 
         }
 
         // === MODE 2: SIMPAN FINAL (JIKA AMAN) ===
-        let confirmMsg = (selisih > 0) 
-            ? `Ada KELEBIHAN uang Rp ${selisih.toLocaleString('id-ID')}.\nTetap Simpan Final?`
-            : "Data BALANCE OK. Simpan Final?";
-
-        if (!confirm(confirmMsg)) return;
-
+        console.log(`[CONFIRM] Data siap simpan final.`);
+        
         btn.disabled = true; btn.innerText = "Menyimpan...";
         
         const form = document.getElementById('salesForm');
         const formData = new FormData(form);
         formData.set('action', 'submit_final'); 
+        
+        // Mengganti nilai 'Total Sales' yang masih berupa string dengan titik
         formData.set('Total Sales', realSales);
         
         // Format Tanggal
         formData.set('Tanggal', formatDateIndo(rawTgl)); 
         
-        // ---------- BARIS INI MEMASTIKAN 'Ket Ekor' TERKIRIM ----------
-        formData.append('Ket Ekor', document.getElementById('val_nama_ekor').value);
-        // ------------------------------------------------------------
-        formData.append('Pengirim', document.getElementById('nomor_pengirim').value);
-
+        // Catatan: FormData secara otomatis mengambil nilai dari input tersembunyi
+        // <input type="hidden" name="Ket Ekor" id="val_nama_ekor">
+        // sehingga keterangan ekor sudah ikut terkirim dengan nama 'Ket Ekor'.
+        
         fetch(scriptURL, { method: 'POST', body: formData })
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`Koneksi Gagal. Status HTTP: ${res.status}.`);
+                }
+                return res.json();
+            })
             .then(data => {
                 if (data.result === "success") {
                      status.innerText = "✅ Tersimpan Final!"; status.style.color = "green";
                      btn.style.display = 'none'; document.getElementById('btn-wa').style.display = 'block';
+                     
+                     // Hapus Draf
                      const delData = new FormData(); delData.append('action', 'delete_draft'); delData.append('Kode Toko', currentStoreCode);
-                     fetch(scriptURL, { method: 'POST', body: delData }); 
-                     alert("Laporan Final Berhasil Disimpan!");
-                } else { throw new Error(data.error); }
+                     fetch(scriptURL, { method: 'POST', body: delData }).catch(e => console.log("Gagal hapus draf: " + e.message)); 
+                     
+                     console.log("[SUCCESS] Laporan Final Berhasil Disimpan!");
+                } else { 
+                    status.innerText = "❌ Gagal: " + (data.error || data.message || "Error Apps Script");
+                    btn.disabled = false; btn.innerText = "💾 SIMPAN FINAL";
+                }
             })
             .catch(err => {
-                status.innerText = "Gagal: " + err.message;
+                // Ini akan menangani error koneksi (network error)
+                status.innerText = "❌ Gagal: Cek URL Deploy/Koneksi. Detail: " + err.message;
+                status.style.color = "#dc3545";
                 btn.disabled = false; btn.innerText = "💾 SIMPAN FINAL";
             });
     }
@@ -470,7 +525,6 @@
         else statusTxt = `KURANG (-) Rp ${Math.abs(selisih).toLocaleString('id-ID')} ❌`;
 
         let ekorTxt = getVal('ekor_sales');
-        // Keterangan Ekor juga muncul di WA
         if(document.getElementById('val_nama_ekor').value) ekorTxt += ` (a.n ${document.getElementById('val_nama_ekor').value})`;
 
         let txt = `*LAPORAN SETOR SALES*\n${kode} - ${nama}\n*Tgl Sales:* ${tglIndo}\n*Total Sales:* Rp ${document.getElementById('total_sales').value}\n------------------\n*Fisik:*\n1. Sore: ${getVal('setor_sore')}\n2. Malam: ${getVal('setor_malam')}\n3. Pagi: ${getVal('setor_pagi')}\n4. Ekor: ${ekorTxt}\n------------------ (+)\n*Total Fisik: ${document.getElementById('disp_total_fisik').innerText}*\n\n*Potongan:*\n1. BA Var: ${getVal('pot_ba')}\n2. Lebih: ${getVal('pot_lebih')}\n3. Virtual: ${getVal('pot_virtual')}\n------------------ (+)\n*Total Potong: ${document.getElementById('disp_total_potong').innerText}*\n\n------------------\n*${statusTxt}*\n\n*Pengirim:* ${pengirim}`;
@@ -480,3 +534,4 @@
 </script>
 </body>
 </html>
+
