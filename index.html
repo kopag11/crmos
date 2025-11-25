@@ -39,8 +39,12 @@
         .balance-min { color: #dc3545; font-weight: bold; } /* Kurang (Merah) */
 
         /* --- Buttons --- */
-        .btn-action { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 1rem; }
-        .btn-save { background: #28a745; color: white; }
+        .btn-action { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 1rem; transition: background 0.3s; }
+        
+        /* Button Styles (Dynamic) */
+        .btn-green { background: #28a745; color: white; }
+        .btn-yellow { background: #ffc107; color: black; }
+        
         .btn-wa { background: #25D366; color: white; display: none; } 
 
         /* --- Modal Calculator --- */
@@ -127,10 +131,10 @@
             <input type="hidden" name="Total Setor Fisik" id="h_total_fisik" value="0">
             
             <input type="hidden" name="Ket Ekor" id="val_nama_ekor">
-            
             <input type="hidden" id="val_selisih" value="0">
 
-            <button type="button" class="btn-action btn-save" id="btn-submit" onclick="submitForm()">💾 SIMPAN FINAL</button>
+            <button type="button" class="btn-action btn-green" id="btn-submit" onclick="submitForm()">💾 SIMPAN FINAL</button>
+            
             <button type="button" class="btn-action btn-wa" id="btn-wa" onclick="kirimWA()">📲 KIRIM WA</button>
             <p id="status" style="text-align:center; margin-top:5px; font-weight:bold;"></p>
         </form>
@@ -159,7 +163,6 @@
 
     // === UTILS & STARTUP ===
     
-    // Load Nomor Pengirim saat aplikasi dibuka
     window.addEventListener('load', function() {
         let savedNum = localStorage.getItem('crm_sender_phone');
         if(savedNum && document.getElementById('nomor_pengirim')) {
@@ -167,17 +170,15 @@
         }
     });
 
-    // Simpan Nomor Pengirim ke Local Storage HP
     function saveSender(val) {
         localStorage.setItem('crm_sender_phone', val);
     }
 
-    // FUNGSI BARU: Mengubah format YYYY-MM-DD menjadi DD-MM-YYYY
     function formatDateIndo(dateString) {
         if (!dateString) return "";
-        let parts = dateString.split('-'); // Memisah [yyyy, mm, dd]
+        let parts = dateString.split('-'); 
         if (parts.length !== 3) return dateString;
-        return `${parts[2]}-${parts[1]}-${parts[0]}`; // Menggabung dd-mm-yyyy
+        return `${parts[2]}-${parts[1]}-${parts[0]}`; 
     }
 
     function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -261,7 +262,6 @@
                     if(document.getElementById('note_ekor')) document.getElementById('note_ekor').value = draft.ekor_note || '';
                     updateAllViewFields(); 
                     
-                    // Format tampilan tanggal di notif draf
                     let tglIndo = formatDateIndo(draft.tgl);
                     historyList.innerHTML = `<span style="color:green; font-weight:bold;">✅ Draf Cloud (${tglIndo})</span>`;
                 }
@@ -319,7 +319,13 @@
         fields.forEach(f => {
             if (!dataStore[f.id]) dataStore[f.id] = [];
             let ekorVal = (f.id==='ekor_sales') ? document.getElementById('val_nama_ekor').value : '';
-            html += `<div class="form-group"><label>${f.label}</label><div class="input-group"><input type="text" id="view_${f.id}" value="Rp 0" readonly style="background:#fff;"><button type="button" class="btn-calc" onclick="openCalc('${f.id}', '${f.label}')">➕</button></div>${f.hasNote?'<input type="text" id="note_ekor" placeholder="Ket Ekor" value="'+ekorVal+'" onchange="document.getElementById(`val_nama_ekor`).value=this.value; autoSaveDraft();" style="margin-top:5px;">':''}</div>`;
+            
+            // oninput untuk respon lebih cepat
+            let noteInput = f.hasNote 
+                ? `<input type="text" id="note_ekor" placeholder="Ket Ekor (Contoh: BCA a.n Budi)" value="${ekorVal}" oninput="document.getElementById('val_nama_ekor').value=this.value; autoSaveDraft();" style="margin-top:5px;">` 
+                : '';
+
+            html += `<div class="form-group"><label>${f.label}</label><div class="input-group"><input type="text" id="view_${f.id}" value="Rp 0" readonly style="background:#fff;"><button type="button" class="btn-calc" onclick="openCalc('${f.id}', '${f.label}')">➕</button></div>${noteInput}</div>`;
         });
         document.getElementById('dynamicInputs').innerHTML = html;
     }
@@ -346,7 +352,7 @@
         document.getElementById('calcModal').style.display='none'; hitungGlobal();
     }
 
-    // === LOGIKA HITUNG (PLUS = AMAN) ===
+    // === LOGIKA HITUNG + UBAH TOMBOL ===
     function hitungGlobal() {
         let sales = getCleanNumber(document.getElementById('total_sales').value);
         let fisik = Number(document.getElementById('h_setor_sore').value) + Number(document.getElementById('h_setor_malam').value) + Number(document.getElementById('h_setor_pagi').value) + Number(document.getElementById('h_ekor_sales').value);
@@ -360,38 +366,54 @@
         document.getElementById('val_selisih').value = selisih;
 
         let elBal = document.getElementById('disp_balance');
+        let btn = document.getElementById('btn-submit');
         
-        if (selisih === 0) {
-            elBal.innerText = "BALANCE OK ✅"; 
-            elBal.className = "balance-ok";
-        } else if (selisih > 0) {
-            elBal.innerText = "LEBIH (+) Rp " + selisih.toLocaleString('id-ID');
-            elBal.className = "balance-plus";
-        } else {
+        // --- LOGIKA UBAH TOMBOL & STATUS ---
+        if (selisih < 0) {
+            // JIKA MINUS
             elBal.innerText = "KURANG (-) Rp " + Math.abs(selisih).toLocaleString('id-ID');
             elBal.className = "balance-min";
+            
+            // Ubah Tombol Jadi DRAFT
+            btn.innerText = "⚠️ SIMPAN DRAFT";
+            btn.className = "btn-action btn-yellow";
+        } else {
+            // JIKA BALANCE / LEBIH
+            if (selisih === 0) {
+                elBal.innerText = "BALANCE OK ✅"; 
+                elBal.className = "balance-ok";
+            } else {
+                elBal.innerText = "LEBIH (+) Rp " + selisih.toLocaleString('id-ID');
+                elBal.className = "balance-plus";
+            }
+            
+            // Ubah Tombol Jadi FINAL
+            btn.innerText = "💾 SIMPAN FINAL";
+            btn.className = "btn-action btn-green";
         }
         
         autoSaveDraft();
     }
 
-    // === SUBMIT LOGIC (FIXED) ===
+    // === SUBMIT LOGIC (DUAL MODE) ===
     function submitForm() {
         const btn = document.getElementById('btn-submit');
         const status = document.getElementById('status');
         
         let selisih = Number(document.getElementById('val_selisih').value);
         let realSales = getCleanNumber(document.getElementById('total_sales').value);
-        let rawTgl = document.getElementById('tgl').value; // Masih yyyy-mm-dd
+        let rawTgl = document.getElementById('tgl').value; 
 
+        // === MODE 1: SIMPAN DRAFT (JIKA MINUS) ===
         if (selisih < 0) {
             autoSaveDraft();
-            alert(`⚠️ UANG KURANG (Minus Rp ${Math.abs(selisih).toLocaleString('id-ID')}).\n\nData hanya disimpan di DRAF. Tidak bisa Final.`);
-            status.innerText = "⚠️ Draf Tersimpan (Status: Kurang)";
-            status.style.color = "red";
-            return;
+            alert(`⚠️ DATA MASIH MINUS (Rp ${Math.abs(selisih).toLocaleString('id-ID')}).\n\nData telah diamankan di DRAFT CLOUD. Silakan lengkapi nanti.`);
+            status.innerText = "⚠️ Tersimpan di Draft (Data Kurang)";
+            status.style.color = "#856404"; // Kuning gelap
+            return; // STOP! Jangan kirim ke sheet final
         }
 
+        // === MODE 2: SIMPAN FINAL (JIKA AMAN) ===
         let confirmMsg = (selisih > 0) 
             ? `Ada KELEBIHAN uang Rp ${selisih.toLocaleString('id-ID')}.\nTetap Simpan Final?`
             : "Data BALANCE OK. Simpan Final?";
@@ -405,10 +427,10 @@
         formData.set('action', 'submit_final'); 
         formData.set('Total Sales', realSales);
         
-        // FIX: Ubah format tanggal jadi dd-mm-yyyy sebelum dikirim ke Sheet
+        // Format Tanggal
         formData.set('Tanggal', formatDateIndo(rawTgl)); 
         
-        // FIX: Pastikan Ket Ekor dan Pengirim terkirim
+        // Pastikan Field Tambahan Masuk
         formData.append('Ket Ekor', document.getElementById('val_nama_ekor').value);
         formData.append('Pengirim', document.getElementById('nomor_pengirim').value);
 
@@ -420,7 +442,7 @@
                      btn.style.display = 'none'; document.getElementById('btn-wa').style.display = 'block';
                      const delData = new FormData(); delData.append('action', 'delete_draft'); delData.append('Kode Toko', currentStoreCode);
                      fetch(scriptURL, { method: 'POST', body: delData }); 
-                     alert("Berhasil disimpan!");
+                     alert("Laporan Final Berhasil Disimpan!");
                 } else { throw new Error(data.error); }
             })
             .catch(err => {
@@ -429,7 +451,7 @@
             });
     }
 
-    // === KIRIM WA (FIXED) ===
+    // === KIRIM WA ===
     function kirimWA() {
         let getVal = (id) => document.getElementById('view_'+id).value;
         let selisih = Number(document.getElementById('val_selisih').value);
@@ -438,7 +460,7 @@
         let nama = document.getElementById('nama_toko').value;
         let pengirim = document.getElementById('nomor_pengirim').value || "-"; 
         let rawTgl = document.getElementById('tgl').value;
-        let tglIndo = formatDateIndo(rawTgl); // Pakai format dd-mm-yyyy
+        let tglIndo = formatDateIndo(rawTgl); 
         
         saveSender(pengirim);
 
@@ -457,6 +479,3 @@
 </script>
 </body>
 </html>
-
-
-
