@@ -109,7 +109,7 @@
         .store-badge { background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 8px; font-size: 0.8rem; margin-right: 5px; }
         .btn-logout { background: white; color: var(--danger); border: none; padding: 8px 15px; border-radius: 20px; font-weight: 600; font-size: 0.8rem; cursor: pointer; }
 
-        /* --- FORM STYLING --- */
+        
         .card {
             background: var(--card-bg);
             border-radius: var(--radius);
@@ -370,7 +370,7 @@
         return Number(val.toString().replace(/\./g, '')) || 0; 
     }
 
-    // === DRAFT LOGIC ===
+   
     function collectDraftData() {
         return {
             tgl: document.getElementById('tgl').value,
@@ -448,7 +448,7 @@
         hitungGlobal();
     }
 
-    // === LOGIN ===
+    
     async function doLogin() {
         const code = document.getElementById('inputKode').value.toUpperCase().trim();
         if (code.length !== 4) return alert("Kode harus 4 karakter");
@@ -634,15 +634,15 @@
         saveSender(pengirim);
 
         let statusTxt = "";
-        if (selisih === 0) statusTxt = "BALANCE OK"; // Bersih tanpa emoji
-        else if (selisih > 0) statusTxt = `LEBIH (+) Rp ${selisih.toLocaleString('id-ID')}`;
-        else statusTxt = `KURANG (-) Rp ${Math.abs(selisih).toLocaleString('id-ID')}`;
+        if (selisih === 0) statusTxt = "BALANCE OK ✅"; 
+        else if (selisih > 0) statusTxt = `LEBIH (+) Rp ${selisih.toLocaleString('id-ID')}⚠️`;
+        else statusTxt = `KURANG (-) Rp ${Math.abs(selisih).toLocaleString('id-ID')}⚠️`;
 
         let ekorTxt = getVal('ekor_sales');
         if(document.getElementById('val_nama_ekor').value) ekorTxt += ` (a.n ${document.getElementById('val_nama_ekor').value})`;
 
         
-        let txt = `*LAPORAN SETOR SALES*\n*${kode} - ${nama}*\n*Tgl Sales:* ${tglIndo}\n*Total Sales:* Rp ${document.getElementById('total_sales').value}\n------------------\n*Fisik:*\n1. Sore: ${getVal('setor_sore')}\n2. Malam: ${getVal('setor_malam')}\n3. Pagi: ${getVal('setor_pagi')}\n4. Ekor: ${ekorTxt}\n------------------ (+)\n*Total Fisik: ${document.getElementById('disp_total_fisik').innerText}*\n\n*Potongan:*\n1. BA Var: ${getVal('pot_ba')}\n2. Lebih: ${getVal('pot_lebih')}\n3. Virtual: ${getVal('pot_virtual')}\n------------------ (+)\n*Total Potong: ${document.getElementById('disp_total_potong').innerText}*\n\n------------------\n*${statusTxt}*\n\n*Pengirim:* ${pengirim}`;
+        let txt = `*LAPORAN SETOR SALES*\n*${kode} - ${nama}*\n*Tgl Sales:* ${tglIndo}\n*Total Sales:* Rp ${document.getElementById('total_sales').value}\n------------------\n*Fisik Setor:*\n1. Sore: ${getVal('setor_sore')}\n2. Malam: ${getVal('setor_malam')}\n3. Pagi: ${getVal('setor_pagi')}\n4. Ekor: ${ekorTxt}\n------------------ (+)\n*Total Setor: ${document.getElementById('disp_total_fisik').innerText}*\n\n*Potongan:*\n1. BA Var: ${getVal('pot_ba')}\n2. Lebih: ${getVal('pot_lebih')}\n3. Virtual: ${getVal('pot_virtual')}\n------------------ (+)\n*Total Potong: ${document.getElementById('disp_total_potong').innerText}*\n\n------------------\n*${statusTxt}*\n\n👤 *Pengirim:* ${pengirim}`;
         
         window.open(`https://wa.me/6285183347653?text=${encodeURIComponent(txt)}`, '_blank');
     }
