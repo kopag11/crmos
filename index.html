@@ -2,57 +2,196 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Setor Sales CRM</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sales Report CRM</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        /* --- CSS Global --- */
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; margin: 0; padding: 0; }
-        .container { max-width: 500px; margin: 20px auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); min-height: 80vh; }
-        
-        /* --- LOGIN SCREEN --- */
-        #loginScreen { text-align: center; padding-top: 50px; }
-        .login-box input { font-size: 2rem; width: 150px; text-align: center; letter-spacing: 5px; padding: 10px; border-radius: 10px; border: 2px solid #007bff; text-transform: uppercase; }
-        .btn-login { background: #007bff; color: white; border: none; padding: 12px 30px; border-radius: 25px; font-size: 1.1rem; cursor: pointer; margin-top: 20px; width: 100%; max-width: 200px; }
+        :root {
+            --primary: #4f46e5; 
+            --primary-dark: #4338ca;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-dark: #1f2937;
+            --text-gray: #6b7280;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --radius: 16px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
 
-        /* --- DASHBOARD (FORM) --- */
-        #dashboard { display: none; } 
-        .header-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
-        .store-badge { background: #007bff; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold; font-size: 0.9rem; }
-        
-        /* --- History Section --- */
-        .history-box { background: #fff3cd; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ffeeba; display: none; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-        /* --- Form Elements --- */
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: 600; color: #444; font-size: 0.9rem; }
-        input[type="text"], input[type="date"], input[type="number"], input[type="tel"] { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
-        
-        .input-group { display: flex; gap: 5px; }
-        .btn-calc { background: #17a2b8; color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-size: 1.2rem; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            margin: 0; padding: 0;
+            min-height: 100vh;
+        }
 
-        /* --- Summary --- */
-        .summary { background: #e8f4fc; padding: 15px; border-radius: 8px; margin-top: 20px; }
-        
-        /* Indikator Balance */
-        .balance-ok { color: green; font-weight: bold; } /* Pas */
-        .balance-plus { color: #0056b3; font-weight: bold; } /* Lebih (Biru) */
-        .balance-min { color: #dc3545; font-weight: bold; } /* Kurang (Merah) */
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
 
-        /* --- Buttons --- */
-        .btn-action { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 1rem; transition: background 0.3s; }
         
-        /* Button Styles (Dynamic) */
-        .btn-green { background: #28a745; color: white; }
-        .btn-yellow { background: #ffc107; color: black; }
+        h1, h2, h3 { family: 'Poppins', sans-serif; margin: 0; }
         
-        .btn-wa { background: #25D366; color: white; display: none; } 
+        
+        #loginScreen {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-top: 20px;
+        }
+        
+        #loginScreen h2 { color: var(--primary); font-size: 1.5rem; margin-bottom: 10px; }
+        .login-note { background: #fee2e2; color: #b91c1c; padding: 10px; border-radius: 8px; font-size: 0.85rem; font-weight: 500; margin-bottom: 30px; display: inline-block;}
 
-        /* --- Modal Calculator --- */
-        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
-        .modal-content { background: white; padding: 20px; border-radius: 10px; width: 90%; max-width: 400px; }
-        .calc-row { display: flex; gap: 5px; margin-bottom: 5px; }
-        .calc-row input { flex:1; padding: 8px;}
-        .btn-remove { background: #dc3545; color: white; border: none; border-radius: 5px; width: 30px; }
+        .pin-wrapper { margin: 20px 0; position: relative; }
+        .pin-wrapper input {
+            font-family: 'Poppins', monospace;
+            font-size: 2rem;
+            width: 200px;
+            text-align: center;
+            letter-spacing: 10px;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            background: #f9fafb;
+            transition: all 0.3s ease;
+            outline: none;
+            color: var(--primary);
+            text-transform: uppercase;
+        }
+        .pin-wrapper input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); background: white; }
+
+        .btn-main {
+            background: var(--primary); color: white; border: none;
+            padding: 16px; border-radius: 50px; font-weight: 600;
+            font-size: 1rem; width: 100%; cursor: pointer;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+            transition: transform 0.2s;
+        }
+        .btn-main:active { transform: scale(0.98); }
+
+        
+        #dashboard { display: none; padding-bottom: 50px; }
+        
+        .header-card {
+            background: var(--primary);
+            color: white;
+            padding: 20px;
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .store-info h2 { font-size: 1.2rem; }
+        .store-badge { background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 8px; font-size: 0.8rem; margin-right: 5px; }
+        .btn-logout { background: white; color: var(--danger); border: none; padding: 8px 15px; border-radius: 20px; font-weight: 600; font-size: 0.8rem; cursor: pointer; }
+
+        
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 15px;
+        }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label {
+            display: block; font-size: 0.85rem; font-weight: 600;
+            color: var(--text-gray); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        
+        input[type="text"], input[type="date"], input[type="tel"], input[type="number"] {
+            width: 100%; padding: 14px;
+            border: 1px solid #e5e7eb; border-radius: 12px;
+            font-size: 1rem; color: var(--text-dark); background: #f9fafb;
+            font-family: 'Inter', sans-serif; outline: none; transition: 0.3s;
+        }
+        input:focus { border-color: var(--primary); background: white; }
+        
+        
+        #total_sales {
+            background: #eff6ff; border-color: #bfdbfe;
+            color: var(--primary); font-weight: 700; font-size: 1.2rem;
+        }
+
+        
+        .input-with-btn { display: flex; gap: 8px; }
+        .btn-add {
+            background: #e0e7ff; color: var(--primary); border: none;
+            width: 50px; border-radius: 12px; font-size: 1.2rem; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        
+        .summary-card {
+            background: #1f2937; color: white;
+            text-align: center; padding: 25px;
+        }
+        .summary-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; opacity: 0.9; }
+        .summary-divider { height: 1px; background: rgba(255,255,255,0.2); margin: 15px 0; }
+        
+        .status-box {
+            padding: 10px; border-radius: 10px; font-weight: 700; font-size: 1.1rem; margin-top: 10px;
+            display: block;
+        }
+        .status-ok { background: var(--success); color: white; }
+        .status-plus { background: #3b82f6; color: white; }
+        .status-min { background: var(--danger); color: white; }
+
+        
+        .btn-draft { background: var(--danger); color: white; width: 100%; padding: 12px; border:none; border-radius: 12px; margin-bottom: 15px; font-weight:600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;}
+        
+        .btn-action {
+            width: 100%; padding: 18px; border: none; border-radius: 16px;
+            font-weight: 700; font-size: 1rem; cursor: pointer;
+            color: white; margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: 0.2s;
+        }
+        .btn-green { background: var(--success); }
+        .btn-yellow { background: var(--warning); color: #fff; }
+        .btn-wa { background: #25D366; display: none; margin-top:15px;}
+
+        
+        .modal { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(2px); align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 25px; border-radius: 20px; width: 90%; max-width: 350px; animation: popUp 0.3s ease; }
+        @keyframes popUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        .calc-row { display: flex; gap: 10px; margin-bottom: 10px; }
+        .calc-input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
+        .btn-remove { background: #fee2e2; color: var(--danger); border: none; width: 40px; border-radius: 8px; cursor: pointer; }
+        
+        .modal-footer { margin-top: 20px; display: flex; gap: 10px; }
+        .btn-modal-save { flex: 2; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 600; cursor: pointer; }
+        .btn-modal-cancel { flex: 1; background: transparent; color: var(--text-gray); border: 1px solid #e5e7eb; border-radius: 10px; cursor: pointer; }
+        
+        
+        .hidden { display: none; }
+        #historyList { font-size: 0.85rem; color: #4b5563; padding: 10px; background: #fffbeb; border-radius: 8px; margin-bottom: 15px; border: 1px solid #fcd34d; display: none;}
     </style>
 </head>
 <body>
@@ -60,65 +199,87 @@
 <div class="container">
     
     <div id="loginScreen">
-        <h2 style="margin-bottom: 5px;">Laporan Setor Sales CRM</h2>
-        <p style="color: #dc3545; font-size: 0.9rem; font-weight: bold; margin-top: 0;">
-            📍 Pastikan penginputan berada di lokasi toko
-        </p>
-
-        <p style="margin-top: 30px;">Masukkan 4 digit kode toko:</p>
-        <div class="login-box">
-            <input type="text" id="inputKode" maxlength="4" placeholder="ABCD">
+        <div style="margin-bottom: 20px;">
+            <div style="width: 60px; height: 60px; background: #e0e7ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                <span style="font-size: 30px;">🏪</span>
+            </div>
+            <h2>Sales Report CRM</h2>
+            <p style="color: var(--text-gray); margin: 0;">Silakan masuk dengan Kode Toko</p>
         </div>
-        <button class="btn-login" onclick="doLogin()">MASUK</button>
-        <p id="loginError" style="color:red; display:none;">Kode harus 4 karakter!</p>
-        <p id="gpsStatus" style="font-size:0.8rem; color:#666; margin-top:20px;"></p>
+
+        <div class="login-note">
+            📍 Wajib berada di lokasi toko
+        </div>
+
+        <div class="pin-wrapper">
+            <input type="text" id="inputKode" maxlength="4" placeholder="CODE">
+        </div>
+
+        <button class="btn-main" onclick="doLogin()">MASUK SEKARANG</button>
+        
+        <p id="loginError" style="color:var(--danger); display:none; margin-top:15px; font-weight:600;">Kode Salah!</p>
+        <p id="gpsStatus" style="font-size:0.8rem; color:var(--text-gray); margin-top:20px;">Menunggu GPS...</p>
     </div>
 
     <div id="dashboard">
-        <div class="header-bar">
-            <div>
-                <span class="store-badge" id="displayKode">CODE</span>
-                <span id="displayNama" style="font-weight:bold; margin-left:5px;">Laporan Sales</span> 
+        
+        <div class="header-card">
+            <div class="store-info">
+                <div><span class="store-badge" id="displayKode">CODE</span></div>
+                <h2 id="displayNama">Nama Toko</h2>
+                <span style="font-size:0.8rem; opacity:0.8;">Input Laporan Harian</span>
             </div>
-            <button onclick="logout()" style="background:none; border:none; color:red; cursor:pointer;">Keluar</button>
+            <button class="btn-logout" onclick="logout()">Keluar</button>
         </div>
 
-        <button type="button" onclick="deleteDraft()" style="background:#dc3545; color:white; border:none; padding:8px 15px; border-radius:5px; width:100%; margin-bottom:10px; cursor:pointer; font-size:0.8rem;">🗑️ HAPUS DRAF CLOUD</button>
-        
-        <div id="historyPanel" class="history-box">
-            <div id="historyList">Loading...</div>
-        </div>
+        <div id="historyList">Loading...</div>
+        <button type="button" class="btn-draft" onclick="deleteDraft()">
+            <span>🗑️</span> Hapus Draf Cloud
+        </button>
 
         <form id="salesForm">
             <input type="hidden" name="Kode Toko" id="formKode">
             
-            <div class="form-group">
-                <label>Tanggal</label>
-                <input type="date" name="Tanggal" id="tgl" required onchange="autoSaveDraft()">
-            </div>
-            
-            <div class="form-group">
-                <label>Nama Toko</label>
-                <input type="text" name="Nama Toko" id="nama_toko" placeholder="Nama Toko Diisi Otomatis" required readonly style="background:#f8f9fa;"> 
+            <div class="card">
+                <div class="form-group">
+                    <label>📅 Tanggal Laporan</label>
+                    <input type="date" name="Tanggal" id="tgl" required onchange="autoSaveDraft()">
+                </div>
+                
+                <div class="form-group">
+                    <label>🏪 Nama Toko</label>
+                    <input type="text" name="Nama Toko" id="nama_toko" readonly style="background:#f3f4f6; color:#6b7280;"> 
+                </div>
+
+                <div class="form-group">
+                    <label>📱 WA Anda</label>
+                    <input type="tel" id="nomor_pengirim" placeholder="Contoh: 0812xxxx" onchange="saveSender(this.value)">
+                </div>
             </div>
 
-            <div class="form-group">
-                <label>Nomor WA Pengirim</label>
-                <input type="tel" id="nomor_pengirim" placeholder="Contoh: 0812xxxx" onchange="saveSender(this.value)">
-            </div>
-
-            <div class="form-group">
-                <label>TOTAL SALES SYSTEM (Rp)</label>
-                <input type="text" inputmode="numeric" name="Total Sales" id="total_sales" placeholder="0" onkeyup="formatRibuan(this); hitungGlobal();" style="background:#fff3cd; font-weight:bold;">
+            <div class="card" style="border-left: 5px solid var(--primary);">
+                <div class="form-group" style="margin-bottom:0;">
+                    <label style="color:var(--primary);">💰 TOTAL SALES TUTUPAN HARIAN (Rp)</label>
+                    <input type="text" inputmode="numeric" name="Total Sales" id="total_sales" placeholder="0" onkeyup="formatRibuan(this); hitungGlobal();">
+                </div>
             </div>
 
             <div id="dynamicInputs"></div>
 
-            <div class="summary">
-                <div>Total Fisik: <span id="disp_total_fisik">Rp 0</span></div>
-                <div>Total Potongan: <span id="disp_total_potong">Rp 0</span></div>
-                <hr>
-                <div>Status: <span id="disp_balance">0</span></div>
+            <div class="card summary-card">
+                <div class="summary-row">
+                    <span>Total Fisik</span>
+                    <span id="disp_total_fisik" style="font-weight:600;">Rp 0</span>
+                </div>
+                <div class="summary-row">
+                    <span>Total Potongan</span>
+                    <span id="disp_total_potong" style="font-weight:600;">Rp 0</span>
+                </div>
+                
+                <div class="summary-divider"></div>
+                
+                <div style="font-size: 0.9rem; opacity: 0.8;">Status Balance:</div>
+                <div id="disp_balance" class="status-box status-ok">0</div>
             </div>
 
             <input type="hidden" name="Setor Sore" id="h_setor_sore" value="0">
@@ -134,26 +295,34 @@
             <input type="hidden" id="val_selisih" value="0">
 
             <button type="button" class="btn-action btn-green" id="btn-submit" onclick="submitForm()">💾 SIMPAN FINAL</button>
+            <button type="button" class="btn-action btn-wa" id="btn-wa" onclick="kirimWA()">📲 KIRIM KE WA</button>
             
-            <button type="button" class="btn-action btn-wa" id="btn-wa" onclick="kirimWA()">📲 KIRIM WA</button>
-            <p id="status" style="text-align:center; margin-top:5px; font-weight:bold;"></p>
+            <p id="status" style="text-align:center; margin-top:15px; font-weight:bold; color:var(--text-gray);"></p>
         </form>
     </div>
 </div>
 
 <div id="calcModal" class="modal">
     <div class="modal-content">
-        <h3 id="modalTitle">Rincian</h3>
-        <div id="calcList" style="max-height:200px; overflow-y:auto; margin-bottom:10px;"></div>
-        <button onclick="addCalcRow()" style="background:#6c757d; color:white; border:none; padding:5px; cursor:pointer;">+ Tambah Nominal</button>
-        <div style="text-align:right; margin-top:10px;">Total: <strong id="modalTotal">0</strong></div>
-        <button onclick="saveCalculator()" style="width:100%; background:#007bff; color:white; padding:10px; margin-top:10px; border:none; border-radius:5px; cursor:pointer;">Simpan</button>
-        <button onclick="document.getElementById('calcModal').style.display='none'" style="width:100%; background:transparent; border:none; margin-top:5px; color:#666; cursor:pointer;">Batal</button>
+        <h3 id="modalTitle" style="margin-bottom:15px; color:var(--primary);">Rincian</h3>
+        
+        <div id="calcList" style="max-height:200px; overflow-y:auto; margin-bottom:15px;"></div>
+        
+        <button onclick="addCalcRow()" style="background:#f3f4f6; color:var(--text-dark); border:1px dashed #ccc; padding:8px; width:100%; border-radius:8px; cursor:pointer;">+ Tambah Baris</button>
+        
+        <div style="text-align:right; margin-top:15px; font-size:1.1rem;">
+            Total: <strong id="modalTotal" style="color:var(--primary);">0</strong>
+        </div>
+        
+        <div class="modal-footer">
+            <button class="btn-modal-cancel" onclick="document.getElementById('calcModal').style.display='none'">Batal</button>
+            <button class="btn-modal-save" onclick="saveCalculator()">Simpan</button>
+        </div>
     </div>
 </div>
 
 <script>
-    // === KONFIGURASI ===
+    
     const scriptURL = 'https://script.google.com/macros/s/AKfycbzX8YNW9U6fyuCzBOWB_lcu7FDJS5ivTOI5RU2QBAVQz-sW_ov4ys_CSuqxQNnYDQLT/exec'; 
     const MAX_RADIUS_METERS = 150; 
 
@@ -161,8 +330,6 @@
     let dataStore = {}; 
     let activeField = "";
 
-    // === UTILS & STARTUP ===
-    
     window.addEventListener('load', function() {
         let savedNum = localStorage.getItem('crm_sender_phone');
         if(savedNum && document.getElementById('nomor_pengirim')) {
@@ -170,9 +337,7 @@
         }
     });
 
-    function saveSender(val) {
-        localStorage.setItem('crm_sender_phone', val);
-    }
+    function saveSender(val) { localStorage.setItem('crm_sender_phone', val); }
 
     function formatDateIndo(dateString) {
         if (!dateString) return "";
@@ -234,15 +399,15 @@
 
     function loadDraft() {
         const historyList = document.getElementById('historyList');
-        document.getElementById('historyPanel').style.display = 'block';
-        historyList.innerHTML = `Mengecek draf...`;
+        document.getElementById('historyList').style.display = 'block';
+        historyList.innerHTML = `Mengecek draf cloud...`;
 
         const timestamp = new Date().getTime();
         fetch(scriptURL + "?action=load_draft&kode=" + currentStoreCode + "&tmp=" + timestamp)
             .then(res => res.json())
             .then(data => {
                 if (data.error) {
-                    historyList.innerHTML = `Mulai baru.`;
+                    historyList.style.display = 'none';
                     dataStore = {}; initForm();
                 } else {
                     const draft = data;
@@ -263,9 +428,10 @@
                     updateAllViewFields(); 
                     
                     let tglIndo = formatDateIndo(draft.tgl);
-                    historyList.innerHTML = `<span style="color:green; font-weight:bold;">✅ Draf Cloud (${tglIndo})</span>`;
+                    historyList.style.display = 'block';
+                    historyList.innerHTML = `<span style="color:green; font-weight:bold;">✅ Data Dipulihkan dari Cloud (${tglIndo})</span>`;
                 }
-            }).catch(e => { historyList.innerHTML = "Gagal Load."; initForm(); });
+            }).catch(e => { historyList.style.display = 'none'; initForm(); });
     }
 
     function deleteDraft() {
@@ -285,9 +451,9 @@
     // === LOGIN ===
     async function doLogin() {
         const code = document.getElementById('inputKode').value.toUpperCase().trim();
-        if (code.length !== 4) return alert("Kode salah");
+        if (code.length !== 4) return alert("Kode harus 4 karakter");
         
-        document.getElementById('gpsStatus').innerText = "Cek Lokasi...";
+        document.getElementById('gpsStatus').innerText = "Sedang melacak lokasi...";
         try {
             const res = await fetch(scriptURL + "?action=get_shop_info&kode=" + code + "&t=" + new Date().getTime());
             const shop = await res.json();
@@ -295,39 +461,56 @@
 
             navigator.geolocation.getCurrentPosition(pos => {
                 const dist = calculateDistance(pos.coords.latitude, pos.coords.longitude, shop.lat, shop.lon);
-                if (dist > MAX_RADIUS_METERS) return alert(`Jarak Terlalu Jauh (${Math.round(dist)}m).`);
+                if (dist > MAX_RADIUS_METERS) return alert(`Lokasi Anda Terlalu Jauh (${Math.round(dist)}m) dari titik toko.`);
                 
                 currentStoreCode = code;
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'block';
                 document.getElementById('displayKode').innerText = code;
                 document.getElementById('formKode').value = code;
+                document.getElementById('displayNama').innerText = shop.nama;
                 document.getElementById('nama_toko').value = shop.nama;
                 loadDraft();
-            }, () => alert("GPS Gagal/Mati."));
-        } catch(e) { alert("Error: " + e.message); }
+            }, () => alert("Mohon aktifkan GPS/Lokasi di HP Anda."));
+        } catch(e) { alert("Login Gagal: " + e.message); }
     }
     function logout() { location.reload(); }
 
-    // === FORM & CALC ===
+    
     function initForm() {
-        const fields = [
+        
+        const fieldsFisik = [
             {id:'setor_sore', label:'Setor Sore ☀️'}, {id:'setor_malam', label:'Setor Malam 🌙'}, {id:'setor_pagi', label:'Setor Pagi (H+1) 🌅'},
-            {id:'ekor_sales', label:'Ekor Sales 🪙', hasNote: true}, {id:'pot_ba', label:'Potongan BA Var ⚠️'}, {id:'pot_lebih', label:'Potongan Lebih ➕'}, {id:'pot_virtual', label:'Potongan Virtual 💳'}
+            {id:'ekor_sales', label:'Ekor Sales 🪙', hasNote: true}
         ];
-        let html = "";
-        fields.forEach(f => {
-            if (!dataStore[f.id]) dataStore[f.id] = [];
-            let ekorVal = (f.id==='ekor_sales') ? document.getElementById('val_nama_ekor').value : '';
-            
-            // oninput untuk respon lebih cepat
-            let noteInput = f.hasNote 
-                ? `<input type="text" id="note_ekor" placeholder="Ket Ekor (Contoh: BCA a.n Budi)" value="${ekorVal}" oninput="document.getElementById('val_nama_ekor').value=this.value; autoSaveDraft();" style="margin-top:5px;">` 
-                : '';
+        const fieldsPotong = [
+            {id:'pot_ba', label:'Potongan BA Var ⚠️'}, {id:'pot_lebih', label:'Potongan Lebih ➕'}, {id:'pot_virtual', label:'Potongan Virtual 💳'}
+        ];
 
-            html += `<div class="form-group"><label>${f.label}</label><div class="input-group"><input type="text" id="view_${f.id}" value="Rp 0" readonly style="background:#fff;"><button type="button" class="btn-calc" onclick="openCalc('${f.id}', '${f.label}')">➕</button></div>${noteInput}</div>`;
-        });
+        let html = "";
+        
+        
+        html += `<div class="card"><h3 style="margin-bottom:15px; font-size:1rem; color:var(--primary);">💵 Uang Fisik</h3>`;
+        fieldsFisik.forEach(f => html += createFieldHtml(f));
+        html += `</div>`;
+
+        
+        html += `<div class="card"><h3 style="margin-bottom:15px; font-size:1rem; color:var(--danger);">✂️ Potongan</h3>`;
+        fieldsPotong.forEach(f => html += createFieldHtml(f));
+        html += `</div>`;
+
         document.getElementById('dynamicInputs').innerHTML = html;
+    }
+
+    function createFieldHtml(f) {
+        if (!dataStore[f.id]) dataStore[f.id] = [];
+        let ekorVal = (f.id==='ekor_sales') ? document.getElementById('val_nama_ekor').value : '';
+        
+        let noteInput = f.hasNote 
+            ? `<input type="text" id="note_ekor" placeholder="Keterangan Ekor (Misal: BCA Budi)" value="${ekorVal}" oninput="document.getElementById('val_nama_ekor').value=this.value; autoSaveDraft();" style="margin-top:8px; border:1px dashed #ccc;">` 
+            : '';
+
+        return `<div class="form-group"><label>${f.label}</label><div class="input-with-btn"><input type="text" id="view_${f.id}" value="Rp 0" readonly style="background:#fff;"><button type="button" class="btn-add" onclick="openCalc('${f.id}', '${f.label}')">+</button></div>${noteInput}</div>`;
     }
 
     function openCalc(id, title) { activeField=id; document.getElementById('modalTitle').innerText=title; document.getElementById('calcModal').style.display='flex'; renderCalcRows(); updateModalTotal(); }
@@ -335,7 +518,7 @@
         const c = document.getElementById('calcList'); c.innerHTML="";
         let vals = dataStore[activeField]||[]; if(vals.length===0) vals.push(0);
         vals.forEach((v,i) => {
-            c.innerHTML += `<div class="calc-row"><input type="text" inputmode="numeric" class="calc-input" value="${v===0?'':v.toLocaleString('id-ID')}" onkeyup="formatRibuan(this);updateModalTotal()"><button class="btn-remove" onclick="removeRow(${i})">&times;</button></div>`;
+            c.innerHTML += `<div class="calc-row"><input type="text" inputmode="numeric" class="calc-input" value="${v===0?'':v.toLocaleString('id-ID')}" onkeyup="formatRibuan(this);updateModalTotal()"><button class="btn-remove" onclick="removeRow(${i})">X</button></div>`;
         });
     }
     function addCalcRow() { saveTemp(); dataStore[activeField].push(0); renderCalcRows(); }
@@ -352,7 +535,7 @@
         document.getElementById('calcModal').style.display='none'; hitungGlobal();
     }
 
-    // === LOGIKA HITUNG + UBAH TOMBOL ===
+    
     function hitungGlobal() {
         let sales = getCleanNumber(document.getElementById('total_sales').value);
         let fisik = Number(document.getElementById('h_setor_sore').value) + Number(document.getElementById('h_setor_malam').value) + Number(document.getElementById('h_setor_pagi').value) + Number(document.getElementById('h_ekor_sales').value);
@@ -368,34 +551,28 @@
         let elBal = document.getElementById('disp_balance');
         let btn = document.getElementById('btn-submit');
         
-        // --- LOGIKA UBAH TOMBOL & STATUS ---
+        elBal.classList.remove('status-ok', 'status-plus', 'status-min');
+
         if (selisih < 0) {
-            // JIKA MINUS
             elBal.innerText = "KURANG (-) Rp " + Math.abs(selisih).toLocaleString('id-ID');
-            elBal.className = "balance-min";
-            
-            // Ubah Tombol Jadi DRAFT
-            btn.innerText = "⚠️ SIMPAN DRAFT";
+            elBal.classList.add('status-min');
+            btn.innerText = "⚠️ SIMPAN DRAFT (MINUS)";
             btn.className = "btn-action btn-yellow";
         } else {
-            // JIKA BALANCE / LEBIH
             if (selisih === 0) {
-                elBal.innerText = "BALANCE OK ✅"; 
-                elBal.className = "balance-ok";
+                elBal.innerText = "BALANCE (PAS) ✅"; 
+                elBal.classList.add('status-ok');
             } else {
                 elBal.innerText = "LEBIH (+) Rp " + selisih.toLocaleString('id-ID');
-                elBal.className = "balance-plus";
+                elBal.classList.add('status-plus');
             }
-            
-            // Ubah Tombol Jadi FINAL
             btn.innerText = "💾 SIMPAN FINAL";
             btn.className = "btn-action btn-green";
         }
-        
         autoSaveDraft();
     }
 
-    // === SUBMIT LOGIC (DUAL MODE) ===
+    
     function submitForm() {
         const btn = document.getElementById('btn-submit');
         const status = document.getElementById('status');
@@ -404,46 +581,38 @@
         let realSales = getCleanNumber(document.getElementById('total_sales').value);
         let rawTgl = document.getElementById('tgl').value; 
 
-        // === MODE 1: SIMPAN DRAFT (JIKA MINUS) ===
         if (selisih < 0) {
             autoSaveDraft();
-            alert(`⚠️ DATA MASIH MINUS (Rp ${Math.abs(selisih).toLocaleString('id-ID')}).\n\nData telah diamankan di DRAFT CLOUD. Silakan lengkapi nanti.`);
-            status.innerText = "⚠️ Tersimpan di Draft (Data Kurang)";
-            status.style.color = "#856404"; 
+            alert(`⚠️ DATA MASIH MINUS (Rp ${Math.abs(selisih).toLocaleString('id-ID')}).\n\nData diamankan di Cloud Draft.`);
+            status.innerText = "⚠️ Data Kurang (Tersimpan di Draft)";
             return; 
         }
 
-        // === MODE 2: SIMPAN FINAL (JIKA AMAN) ===
         let confirmMsg = (selisih > 0) 
             ? `Ada KELEBIHAN uang Rp ${selisih.toLocaleString('id-ID')}.\nTetap Simpan Final?`
             : "Data BALANCE OK. Simpan Final?";
 
         if (!confirm(confirmMsg)) return;
 
-        btn.disabled = true; btn.innerText = "Menyimpan...";
+        btn.disabled = true; btn.innerText = "Sedang Mengirim...";
         
         const form = document.getElementById('salesForm');
         const formData = new FormData(form);
         formData.set('action', 'submit_final'); 
         formData.set('Total Sales', realSales);
-        
-        // Format Tanggal
         formData.set('Tanggal', formatDateIndo(rawTgl)); 
-        
-        // ---------- PERBAIKAN: Gunakan SET untuk memastikan data valid ----------
         formData.set('Ket Ekor', document.getElementById('val_nama_ekor').value);
-        // ------------------------------------------------------------------------
         formData.set('Pengirim', document.getElementById('nomor_pengirim').value);
 
         fetch(scriptURL, { method: 'POST', body: formData })
             .then(res => res.json())
             .then(data => {
                 if (data.result === "success") {
-                     status.innerText = "✅ Tersimpan Final!"; status.style.color = "green";
+                     status.innerText = "✅ Laporan Berhasil!"; status.style.color = "var(--success)";
                      btn.style.display = 'none'; document.getElementById('btn-wa').style.display = 'block';
                      const delData = new FormData(); delData.append('action', 'delete_draft'); delData.append('Kode Toko', currentStoreCode);
                      fetch(scriptURL, { method: 'POST', body: delData }); 
-                     alert("Laporan Final Berhasil Disimpan!");
+                     alert("Sukses! Data telah tersimpan.");
                 } else { throw new Error(data.error); }
             })
             .catch(err => {
@@ -452,7 +621,6 @@
             });
     }
 
-    // === KIRIM WA ===
     function kirimWA() {
         let getVal = (id) => document.getElementById('view_'+id).value;
         let selisih = Number(document.getElementById('val_selisih').value);
@@ -471,10 +639,9 @@
         else statusTxt = `KURANG (-) Rp ${Math.abs(selisih).toLocaleString('id-ID')} ❌`;
 
         let ekorTxt = getVal('ekor_sales');
-        // Keterangan Ekor juga muncul di WA
-        if(document.getElementById('val_nama_ekor').value) ekorTxt += ` (a.n ${document.getElementById('val_nama_ekor').value})`;
+        if(document.getElementById('val_nama_ekor').value) ekorTxt += ` (Ket: ${document.getElementById('val_nama_ekor').value})`;
 
-        let txt = `*LAPORAN SETOR SALES*\n${kode} - ${nama}\n*Tgl Sales:* ${tglIndo}\n*Total Sales:* Rp ${document.getElementById('total_sales').value}\n------------------\n*Fisik:*\n1. Sore: ${getVal('setor_sore')}\n2. Malam: ${getVal('setor_malam')}\n3. Pagi: ${getVal('setor_pagi')}\n4. Ekor: ${ekorTxt}\n------------------ (+)\n*Total Fisik: ${document.getElementById('disp_total_fisik').innerText}*\n\n*Potongan:*\n1. BA Var: ${getVal('pot_ba')}\n2. Lebih: ${getVal('pot_lebih')}\n3. Virtual: ${getVal('pot_virtual')}\n------------------ (+)\n*Total Potong: ${document.getElementById('disp_total_potong').innerText}*\n\n------------------\n*${statusTxt}*\n\n*Pengirim:* ${pengirim}`;
+        let txt = `*LAPORAN SALES HARIAN*\n🏢 ${kode} - ${nama}\n📅 ${tglIndo}\n💰 *Sales System:* Rp ${document.getElementById('total_sales').value}\n\n*FISIK:*\n☀️ Sore: ${getVal('setor_sore')}\n🌙 Malam: ${getVal('setor_malam')}\n🌅 Pagi: ${getVal('setor_pagi')}\n🪙 Ekor: ${ekorTxt}\n------------------ (+)\n*Total Fisik: ${document.getElementById('disp_total_fisik').innerText}*\n\n*POTONGAN:*\n⚠️ BA: ${getVal('pot_ba')}\n➕ Lebih: ${getVal('pot_lebih')}\n💳 Virtual: ${getVal('pot_virtual')}\n------------------ (+)\n*Total Potong: ${document.getElementById('disp_total_potong').innerText}*\n\n------------------\n*STATUS: ${statusTxt}*\n\n👤 Pengirim: ${pengirim}`;
         
         window.open(`https://wa.me/6285183347653?text=${encodeURIComponent(txt)}`, '_blank');
     }
