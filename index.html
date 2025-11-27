@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* --- STYLE SAMA SEPERTI SEBELUMNYA (SOFT SLATE) --- */
+        /* --- STYLE SAMA SEPERTI SEBELUMNYA --- */
         :root {
             --primary: #3b82f6; --primary-dark: #2563eb; --primary-soft: #eff6ff;
             --bg-color: #f1f5f9; --card-bg: #ffffff;
@@ -129,7 +129,9 @@
             <input type="hidden" name="Potongan BA" id="h_pot_ba" value="0">
             <input type="hidden" name="Potongan Lebih" id="h_pot_lebih" value="0">
             <input type="hidden" name="Potongan Virtual" id="h_pot_virtual" value="0">
+            
             <input type="hidden" name="Ket Ekor" id="val_nama_ekor"> 
+            
             <input type="hidden" id="val_selisih" value="0">
 
             <button type="button" class="btn-action btn-green" id="btn-submit" onclick="trySubmitForm()"><span>💾</span> SIMPAN FINAL</button>
@@ -164,7 +166,6 @@
         const code = document.getElementById('inputKode').value.toUpperCase().trim();
         if (code.length < 3) return showAlert("Gagal", "Kode terlalu pendek");
 
-        // --- BYPASS COBA (NO GPS) ---
         if (code === "COBA") {
             currentStoreCode = "COBA";
             document.getElementById('loginScreen').style.display = 'none';
@@ -173,7 +174,7 @@
             document.getElementById('formKode').value = "COBA";
             document.getElementById('displayNama').innerText = "Mode Uji Coba (Tanpa GPS)";
             document.getElementById('nama_toko').value = "Toko Uji Coba";
-            loadDraft(); // Load draft jika ada
+            loadDraft(); 
             showAlert("Mode Uji Coba", "Anda masuk tanpa verifikasi GPS.");
             return; 
         }
@@ -201,13 +202,12 @@
     }
     function logout() { location.reload(); }
 
-    // --- FUNGSI UTAMA LOAD DRAFT & INIT FORM ---
     function loadDraft() {
         const hList = document.getElementById('historyList'); 
         hList.style.display = 'block'; 
         hList.innerHTML = `🔄 Mengecek draf cloud...`;
         
-        // Panggil InitForm duluan agar struktur form terbentuk
+        // Panggil InitForm duluan agar hidden inputs & struktur siap
         initForm(); 
 
         fetch(scriptURL + "?action=load_draft&kode=" + currentStoreCode + "&tmp=" + new Date().getTime())
@@ -215,37 +215,36 @@
                 if (data.error) { 
                     hList.style.display = 'none'; 
                     dataStore = {}; 
-                    // Init ulang dengan data kosong
-                    initForm(); 
+                    initForm(); // Refresh form kosong
                 } 
                 else {
                     const draft = data;
                     document.getElementById('tgl').value = draft.tgl || new Date().toISOString().substring(0, 10);
                     document.getElementById('total_sales').value = draft.total_sales || '';
+                    
+                    // 1. Simpan Note Ekor ke Hidden Input DULUAN
                     document.getElementById('val_nama_ekor').value = draft.ekor_note || '';
 
-                    // Load Data Store (Rincian Angka)
+                    // 2. Load Data Store (Rincian Angka)
                     if (typeof draft.dataStore === 'string') { try { dataStore = JSON.parse(draft.dataStore); } catch(e) { dataStore = {}; } } else { dataStore = draft.dataStore || {}; }
 
-                    // Isi Hidden Inputs
+                    // 3. Isi Hidden Inputs Nominal
                     ['setor_sore', 'setor_malam', 'setor_pagi', 'ekor_sales', 'pot_ba', 'pot_lebih', 'pot_virtual'].forEach(key => { 
                         document.getElementById('h_' + key).value = draft['h_' + key] || 0; 
                     });
 
-                    // Update Tampilan View
+                    // 4. Re-Init Form agar input text Ekor Sales terisi valuenya dari 'val_nama_ekor'
+                    initForm();
+
+                    // 5. Update Tampilan Angka (Rp ...)
                     updateAllViewFields(); 
                     
-                    // Update Input Teks Ekor (PENTING!)
-                    if(document.getElementById('note_ekor')) {
-                        document.getElementById('note_ekor').value = draft.ekor_note || '';
-                    }
-
-                    // Panggil Hitung Global agar status Balance muncul
+                    // 6. Hitung Total Akhir
                     hitungGlobal();
 
                     hList.innerHTML = `<span style="color:green; font-weight:bold;">✅ Data Dipulihkan dari Cloud</span>`;
                 }
-            }).catch(e => { hList.style.display = 'none'; });
+            }).catch(e => { hList.style.display = 'none'; initForm(); });
     }
 
     function initForm() {
@@ -253,7 +252,7 @@
             {id:'setor_sore', label:'☀️ Setor Sore'}, 
             {id:'setor_malam', label:'🌙 Setor Malam'}, 
             {id:'setor_pagi', label:'🌅 Setor Pagi (H+1)'}, 
-            {id:'ekor_sales', label:'🪙 Ekor Sales', hasNote: true} // hasNote: true pemicu munculnya text box
+            {id:'ekor_sales', label:'🪙 Ekor Sales', hasNote: true} 
         ];
         const fPotong = [
             {id:'pot_ba', label:'⚠️ Potongan BA Var'}, 
@@ -271,10 +270,9 @@
 
     function createFieldHtml(f) {
         if (!dataStore[f.id]) dataStore[f.id] = [];
-        // Ambil nilai ekor note dari hidden input jika ada
+        // Ambil nilai dari hidden input val_nama_ekor
         let ekorVal = document.getElementById('val_nama_ekor') ? document.getElementById('val_nama_ekor').value : '';
         
-        // Buat input text jika hasNote == true
         let noteInput = f.hasNote 
             ? `<input type="text" id="note_ekor" placeholder="Ket. Ekor (Misal: BCA Budi)" value="${ekorVal}" oninput="document.getElementById('val_nama_ekor').value=this.value; autoSaveDraft();" style="margin-top:10px; border:1px dashed #cbd5e1; background: #f8fafc;">` 
             : '';
@@ -350,7 +348,6 @@
         formData.set('Tanggal', formatDateIndo(document.getElementById('tgl').value)); 
         formData.set('Ket Ekor', document.getElementById('val_nama_ekor').value);
         formData.set('Pengirim', document.getElementById('nomor_pengirim').value);
-        // KIRIM DATA RINCIAN (JSON)
         formData.append('raw_rincian', JSON.stringify(dataStore));
 
         fetch(scriptURL, { method: 'POST', body: formData }).then(res => res.json()).then(data => {
