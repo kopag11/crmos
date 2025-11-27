@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Report Sales CRM</title>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
-    <style>
 
+    <style>
+        /* --- STYLE SAMA SEPERTI SEBELUMNYA (SOFT SLATE) --- */
         :root {
             --primary: #3b82f6; --primary-dark: #2563eb; --primary-soft: #eff6ff;
             --bg-color: #f1f5f9; --card-bg: #ffffff;
@@ -162,7 +164,7 @@
         const code = document.getElementById('inputKode').value.toUpperCase().trim();
         if (code.length < 3) return showAlert("Gagal", "Kode terlalu pendek");
 
-       
+        // --- BYPASS COBA (NO GPS) ---
         if (code === "COBA") {
             currentStoreCode = "COBA";
             document.getElementById('loginScreen').style.display = 'none';
@@ -171,7 +173,7 @@
             document.getElementById('formKode').value = "COBA";
             document.getElementById('displayNama').innerText = "Mode Uji Coba (Tanpa GPS)";
             document.getElementById('nama_toko').value = "Toko Uji Coba";
-            loadDraft();
+            loadDraft(); // Load draft jika ada
             showAlert("Mode Uji Coba", "Anda masuk tanpa verifikasi GPS.");
             return; 
         }
@@ -199,29 +201,66 @@
     }
     function logout() { location.reload(); }
 
+    // --- FUNGSI UTAMA LOAD DRAFT & INIT FORM ---
     function loadDraft() {
-        const hList = document.getElementById('historyList'); hList.style.display = 'block'; hList.innerHTML = `🔄 Mengecek draf cloud...`;
+        const hList = document.getElementById('historyList'); 
+        hList.style.display = 'block'; 
+        hList.innerHTML = `🔄 Mengecek draf cloud...`;
+        
+        // Panggil InitForm duluan agar struktur form terbentuk
+        initForm(); 
+
         fetch(scriptURL + "?action=load_draft&kode=" + currentStoreCode + "&tmp=" + new Date().getTime())
             .then(res => res.json()).then(data => {
-                if (data.error) { hList.style.display = 'none'; dataStore = {}; initForm(); } 
+                if (data.error) { 
+                    hList.style.display = 'none'; 
+                    dataStore = {}; 
+                    // Init ulang dengan data kosong
+                    initForm(); 
+                } 
                 else {
                     const draft = data;
                     document.getElementById('tgl').value = draft.tgl || new Date().toISOString().substring(0, 10);
                     document.getElementById('total_sales').value = draft.total_sales || '';
                     document.getElementById('val_nama_ekor').value = draft.ekor_note || '';
+
+                    // Load Data Store (Rincian Angka)
                     if (typeof draft.dataStore === 'string') { try { dataStore = JSON.parse(draft.dataStore); } catch(e) { dataStore = {}; } } else { dataStore = draft.dataStore || {}; }
-                    ['setor_sore', 'setor_malam', 'setor_pagi', 'ekor_sales', 'pot_ba', 'pot_lebih', 'pot_virtual'].forEach(key => { document.getElementById('h_' + key).value = draft['h_' + key] || 0; });
-                    initForm(); 
-                    if(document.getElementById('note_ekor')) document.getElementById('note_ekor').value = draft.ekor_note || '';
+
+                    // Isi Hidden Inputs
+                    ['setor_sore', 'setor_malam', 'setor_pagi', 'ekor_sales', 'pot_ba', 'pot_lebih', 'pot_virtual'].forEach(key => { 
+                        document.getElementById('h_' + key).value = draft['h_' + key] || 0; 
+                    });
+
+                    // Update Tampilan View
                     updateAllViewFields(); 
+                    
+                    // Update Input Teks Ekor (PENTING!)
+                    if(document.getElementById('note_ekor')) {
+                        document.getElementById('note_ekor').value = draft.ekor_note || '';
+                    }
+
+                    // Panggil Hitung Global agar status Balance muncul
+                    hitungGlobal();
+
                     hList.innerHTML = `<span style="color:green; font-weight:bold;">✅ Data Dipulihkan dari Cloud</span>`;
                 }
-            }).catch(e => { hList.style.display = 'none'; initForm(); });
+            }).catch(e => { hList.style.display = 'none'; });
     }
 
     function initForm() {
-        const fFisik = [{id:'setor_sore', label:'☀️ Setor Sore'}, {id:'setor_malam', label:'🌙 Setor Malam'}, {id:'setor_pagi', label:'🌅 Setor Pagi (H+1)'}, {id:'ekor_sales', label:'🪙 Ekor Sales', hasNote: true}];
-        const fPotong = [{id:'pot_ba', label:'⚠️ Potongan BA Var'}, {id:'pot_lebih', label:'➕ Potongan Lebih'}, {id:'pot_virtual', label:'💳 Potongan Virtual'}];
+        const fFisik = [
+            {id:'setor_sore', label:'☀️ Setor Sore'}, 
+            {id:'setor_malam', label:'🌙 Setor Malam'}, 
+            {id:'setor_pagi', label:'🌅 Setor Pagi (H+1)'}, 
+            {id:'ekor_sales', label:'🪙 Ekor Sales', hasNote: true} // hasNote: true pemicu munculnya text box
+        ];
+        const fPotong = [
+            {id:'pot_ba', label:'⚠️ Potongan BA Var'}, 
+            {id:'pot_lebih', label:'➕ Potongan Lebih'}, 
+            {id:'pot_virtual', label:'💳 Potongan Virtual'}
+        ];
+        
         let html = `<div class="card"><div class="section-title t-fisik"><span>💵</span> Uang Fisik</div>`;
         fFisik.forEach(f => html += createFieldHtml(f));
         html += `</div><div class="card"><div class="section-title t-potong"><span>✂️</span> Potongan</div>`;
@@ -232,9 +271,22 @@
 
     function createFieldHtml(f) {
         if (!dataStore[f.id]) dataStore[f.id] = [];
-        let ekorVal = (f.id==='ekor_sales') ? document.getElementById('val_nama_ekor').value : '';
-        let noteInput = f.hasNote ? `<input type="text" id="note_ekor" placeholder="Ket. Ekor" value="${ekorVal}" oninput="document.getElementById('val_nama_ekor').value=this.value; autoSaveDraft();" style="margin-top:10px; border:1px dashed #cbd5e1; background: #f8fafc;">` : '';
-        return `<div class="form-group"><label>${f.label}</label><div class="input-with-btn"><input type="text" id="view_${f.id}" value="Rp 0" readonly style="background:white; cursor: default;"><button type="button" class="btn-add" onclick="openCalc('${f.id}', '${f.label}')">+</button></div>${noteInput}</div>`;
+        // Ambil nilai ekor note dari hidden input jika ada
+        let ekorVal = document.getElementById('val_nama_ekor') ? document.getElementById('val_nama_ekor').value : '';
+        
+        // Buat input text jika hasNote == true
+        let noteInput = f.hasNote 
+            ? `<input type="text" id="note_ekor" placeholder="Ket. Ekor (Misal: BCA Budi)" value="${ekorVal}" oninput="document.getElementById('val_nama_ekor').value=this.value; autoSaveDraft();" style="margin-top:10px; border:1px dashed #cbd5e1; background: #f8fafc;">` 
+            : '';
+            
+        return `<div class="form-group">
+                    <label>${f.label}</label>
+                    <div class="input-with-btn">
+                        <input type="text" id="view_${f.id}" value="Rp 0" readonly style="background:white; cursor: default;">
+                        <button type="button" class="btn-add" onclick="openCalc('${f.id}', '${f.label}')">+</button>
+                    </div>
+                    ${noteInput}
+                </div>`;
     }
 
     function openCalc(id, title) { activeField=id; document.getElementById('modalTitle').innerText=title; document.getElementById('calcModal').style.display='flex'; renderCalcRows(); updateModalTotal(); }
@@ -252,13 +304,34 @@
         let sales = getCleanNumber(document.getElementById('total_sales').value);
         let fisik = Number(document.getElementById('h_setor_sore').value) + Number(document.getElementById('h_setor_malam').value) + Number(document.getElementById('h_setor_pagi').value) + Number(document.getElementById('h_ekor_sales').value);
         let potong = Number(document.getElementById('h_pot_ba').value) + Number(document.getElementById('h_pot_lebih').value) + Number(document.getElementById('h_pot_virtual').value);
-        document.getElementById('disp_total_fisik').innerText = "Rp " + fisik.toLocaleString('id-ID'); document.getElementById('disp_total_potong').innerText = "Rp " + potong.toLocaleString('id-ID');
+        
+        document.getElementById('disp_total_fisik').innerText = "Rp " + fisik.toLocaleString('id-ID'); 
+        document.getElementById('disp_total_potong').innerText = "Rp " + potong.toLocaleString('id-ID');
         document.getElementById('h_total_fisik').value = fisik;
-        let selisih = (fisik + potong) - sales; document.getElementById('val_selisih').value = selisih;
-        let elBal = document.getElementById('disp_balance'); let btn = document.getElementById('btn-submit');
+        
+        let selisih = (fisik + potong) - sales; 
+        document.getElementById('val_selisih').value = selisih;
+        
+        let elBal = document.getElementById('disp_balance'); 
+        let btn = document.getElementById('btn-submit');
         elBal.classList.remove('status-ok', 'status-plus', 'status-min');
-        if (selisih < 0) { elBal.innerHTML = `<span>⚠️</span> KURANG (-) Rp ` + Math.abs(selisih).toLocaleString('id-ID'); elBal.classList.add('status-min'); btn.innerHTML = `<span>⚠️</span> SIMPAN DRAFT (MINUS)`; btn.className = "btn-action btn-yellow"; } 
-        else { if (selisih === 0) { elBal.innerHTML = `<span>✅</span> BALANCE (PAS)`; elBal.classList.add('status-ok'); } else { elBal.innerHTML = `<span>➕</span> LEBIH (+) Rp ` + selisih.toLocaleString('id-ID'); elBal.classList.add('status-plus'); } btn.innerHTML = `<span>💾</span> SIMPAN FINAL`; btn.className = "btn-action btn-green"; }
+        
+        if (selisih < 0) { 
+            elBal.innerHTML = `<span>⚠️</span> KURANG (-) Rp ` + Math.abs(selisih).toLocaleString('id-ID'); 
+            elBal.classList.add('status-min'); 
+            btn.innerHTML = `<span>⚠️</span> SIMPAN DRAFT (MINUS)`; 
+            btn.className = "btn-action btn-yellow"; 
+        } else { 
+            if (selisih === 0) { 
+                elBal.innerHTML = `<span>✅</span> BALANCE (PAS)`; 
+                elBal.classList.add('status-ok'); 
+            } else { 
+                elBal.innerHTML = `<span>➕</span> LEBIH (+) Rp ` + selisih.toLocaleString('id-ID'); 
+                elBal.classList.add('status-plus'); 
+            } 
+            btn.innerHTML = `<span>💾</span> SIMPAN FINAL`; 
+            btn.className = "btn-action btn-green"; 
+        }
         autoSaveDraft();
     }
 
@@ -277,7 +350,7 @@
         formData.set('Tanggal', formatDateIndo(document.getElementById('tgl').value)); 
         formData.set('Ket Ekor', document.getElementById('val_nama_ekor').value);
         formData.set('Pengirim', document.getElementById('nomor_pengirim').value);
-        // SEPTA GANTENG (JSON)
+        // KIRIM DATA RINCIAN (JSON)
         formData.append('raw_rincian', JSON.stringify(dataStore));
 
         fetch(scriptURL, { method: 'POST', body: formData }).then(res => res.json()).then(data => {
