@@ -10,7 +10,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* --- STYLE SAMA SEPERTI SEBELUMNYA --- */
         :root {
             --primary: #3b82f6; --primary-dark: #2563eb; --primary-soft: #eff6ff;
             --bg-color: #f1f5f9; --card-bg: #ffffff;
@@ -215,31 +214,24 @@
                 if (data.error) { 
                     hList.style.display = 'none'; 
                     dataStore = {}; 
-                    initForm(); // Refresh form kosong
+                    initForm(); 
                 } 
                 else {
                     const draft = data;
                     document.getElementById('tgl').value = draft.tgl || new Date().toISOString().substring(0, 10);
                     document.getElementById('total_sales').value = draft.total_sales || '';
                     
-                    // 1. Simpan Note Ekor ke Hidden Input DULUAN
                     document.getElementById('val_nama_ekor').value = draft.ekor_note || '';
 
-                    // 2. Load Data Store (Rincian Angka)
                     if (typeof draft.dataStore === 'string') { try { dataStore = JSON.parse(draft.dataStore); } catch(e) { dataStore = {}; } } else { dataStore = draft.dataStore || {}; }
 
-                    // 3. Isi Hidden Inputs Nominal
                     ['setor_sore', 'setor_malam', 'setor_pagi', 'ekor_sales', 'pot_ba', 'pot_lebih', 'pot_virtual'].forEach(key => { 
                         document.getElementById('h_' + key).value = draft['h_' + key] || 0; 
                     });
 
-                    // 4. Re-Init Form agar input text Ekor Sales terisi valuenya dari 'val_nama_ekor'
+                    // Re-Init Form agar input text Ekor Sales terisi
                     initForm();
-
-                    // 5. Update Tampilan Angka (Rp ...)
                     updateAllViewFields(); 
-                    
-                    // 6. Hitung Total Akhir
                     hitungGlobal();
 
                     hList.innerHTML = `<span style="color:green; font-weight:bold;">✅ Data Dipulihkan dari Cloud</span>`;
@@ -270,7 +262,6 @@
 
     function createFieldHtml(f) {
         if (!dataStore[f.id]) dataStore[f.id] = [];
-        // Ambil nilai dari hidden input val_nama_ekor
         let ekorVal = document.getElementById('val_nama_ekor') ? document.getElementById('val_nama_ekor').value : '';
         
         let noteInput = f.hasNote 
@@ -348,6 +339,7 @@
         formData.set('Tanggal', formatDateIndo(document.getElementById('tgl').value)); 
         formData.set('Ket Ekor', document.getElementById('val_nama_ekor').value);
         formData.set('Pengirim', document.getElementById('nomor_pengirim').value);
+        // KIRIM DATA RINCIAN (JSON)
         formData.append('raw_rincian', JSON.stringify(dataStore));
 
         fetch(scriptURL, { method: 'POST', body: formData }).then(res => res.json()).then(data => {
