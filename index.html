@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
 
     <style>
+        
         :root {
             --primary: #3b82f6; 
             --primary-dark: #2563eb;
@@ -363,7 +364,7 @@
                 <g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g>
                 </svg>
             </div>
-            <h2>Report Sales CRM</h2>
+            <h2>Sales Report CRM</h2>
             <p style="color: var(--text-gray); margin: 5px 0 0 0;">Input Laporan Harian</p>
         </div>
         
@@ -503,13 +504,12 @@
 <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbzX8YNW9U6fyuCzBOWB_lcu7FDJS5ivTOI5RU2QBAVQz-sW_ov4ys_CSuqxQNnYDQLT/exec'; 
     const MAX_RADIUS_METERS = 40; 
-
+//SEPTA GANTENG
     let currentStoreCode = "";
     let dataStore = {}; 
     let activeField = "";
     let onConfirmAction = null;
 
-    
     window.addEventListener('load', function() {
         getDetailedDeviceInfo();
         let savedNum = localStorage.getItem('crm_sender_phone');
@@ -520,7 +520,6 @@
 
     function saveSender(val) { localStorage.setItem('crm_sender_phone', val); }
 
-    
     async function getDetailedDeviceInfo() {
         var info = "";
         var ua = navigator.userAgent;
@@ -861,7 +860,7 @@
         const btn = document.getElementById('btn-submit');
         const status = document.getElementById('status');
         
-        btn.disabled = true; btn.innerText = "⏳ Sedang Mengirim...";
+        btn.disabled = true; btn.innerText = "⏳ Sedang Memproses...";
         
         const form = document.getElementById('salesForm');
         const formData = new FormData(form);
@@ -895,27 +894,6 @@
             });
     }
 
-    
-    function resetFormulir() {
-        
-        document.getElementById('total_sales').value = "";
-        document.getElementById('tgl').value = new Date().toISOString().substring(0, 10);
-        document.getElementById('val_nama_ekor').value = "";
-        if(document.getElementById('note_ekor')) document.getElementById('note_ekor').value = "";
-
-        
-        dataStore = {}; 
-        initForm(); // SEPTA GANTENG
-        document.getElementById('status').innerText = "";
-        
-        
-        document.getElementById('btn-wa').style.display = 'none';
-        let btnSubmit = document.getElementById('btn-submit');
-        btnSubmit.style.display = 'flex';
-        btnSubmit.disabled = false;
-        btnSubmit.innerHTML = "<span>💾</span> SIMPAN FINAL";
-    }
-
     function kirimWA() {
         let getVal = (id) => document.getElementById('view_'+id).value;
         let selisih = Number(document.getElementById('val_selisih').value);
@@ -938,10 +916,13 @@
 
         let txt = `*LAPORAN SETOR SALES*\n*${kode} - ${nama}*\n*Tgl Sales:* ${tglIndo}\n*Total Sales:* Rp ${document.getElementById('total_sales').value}\n------------------\n*Fisik Setor:*\n1. Sore: ${getVal('setor_sore')}\n2. Malam: ${getVal('setor_malam')}\n3. Pagi: ${getVal('setor_pagi')}\n4. Ekor: ${ekorTxt}\n------------------ (+)\n*Total Setor: ${document.getElementById('disp_total_fisik').innerText}*\n\n*Potongan:*\n1. BA Var: ${getVal('pot_ba')}\n2. Lebih: ${getVal('pot_lebih')}\n3. Virtual: ${getVal('pot_virtual')}\n------------------ (+)\n*Total Potong: ${document.getElementById('disp_total_potong').innerText}*\n\n------------------\n*${statusTxt}*\n\n👤 *Pengirim:* ${pengirim}`;
         
+        
         window.open(`https://wa.me/6285183347653?text=${encodeURIComponent(txt)}`, '_blank');
         
         
-        setTimeout(resetFormulir, 2000); 
+        setTimeout(function() {
+            location.reload();
+        }, 1000); 
     }
 </script>
 </body>
