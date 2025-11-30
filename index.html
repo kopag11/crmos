@@ -4,24 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Report Sales CRM</title>
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
-
     <style>
-        :root {
-            --primary: #3b82f6; --primary-dark: #2563eb; --primary-soft: #eff6ff;
-            --bg-color: #f1f5f9; --card-bg: #ffffff;
-            --text-dark: #1e293b; --text-gray: #64748b;
-            --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --danger-soft: #fee2e2;
-            --radius: 16px; --radius-sm: 12px; --shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.05);
-        }
+        :root { --primary: #3b82f6; --primary-dark: #2563eb; --primary-soft: #eff6ff; --bg-color: #f1f5f9; --card-bg: #ffffff; --text-dark: #1e293b; --text-gray: #64748b; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --danger-soft: #fee2e2; --radius: 16px; --radius-sm: 12px; --shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.05); }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-dark); margin: 0; padding: 0; min-height: 100vh; line-height: 1.5; }
         .container { width: 100%; max-width: 550px; margin: 0 auto; padding: 20px; min-height: 100vh; display: flex; flex-direction: column; }
         h1, h2, h3 { family: 'Poppins', sans-serif; margin: 0; color: var(--text-dark); }
-        
         #loginScreen { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 30px 25px; background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow); margin: 20px 0; }
         .icon-circle { width: 70px; height: 70px; background: var(--primary-soft); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; padding: 10px; }
         .icon-circle svg { width: 100%; height: 100%; }
@@ -30,95 +21,51 @@
         .pin-wrapper input:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); }
         .btn-main { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; border: none; padding: 18px; border-radius: 50px; font-weight: 600; font-size: 1rem; width: 100%; cursor: pointer; box-shadow: 0 8px 20px rgba(59, 130, 246, 0.25); transition: transform 0.2s; margin-top: 20px; }
         .btn-main:active { transform: scale(0.98); }
-
         #dashboard { display: none; padding-bottom: 60px; }
         .header-card { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; padding: 24px; border-radius: var(--radius); margin-bottom: 20px; box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4); display: flex; justify-content: space-between; align-items: flex-start; }
         .store-badge { background: rgba(255,255,255,0.2); backdrop-filter: blur(5px); padding: 4px 10px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; display: inline-block; }
         .btn-logout { background: rgba(255,255,255,0.9); color: var(--danger); border: none; padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 0.8rem; cursor: pointer; }
-
         .card { background: var(--card-bg); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); margin-bottom: 15px; border: 1px solid #f1f5f9; }
         .form-group { margin-bottom: 20px; }
         
-        /* Flex label untuk icon (i) */
-        .form-group label {
-            display: flex; align-items: center;
-            font-size: 0.85rem; font-weight: 600;
-            color: var(--text-gray); margin-bottom: 8px; 
-            text-transform: uppercase; letter-spacing: 0.5px;
-        }
-        
-        /* Style Tombol Info (i) */
-        .info-btn {
-            margin-left: 8px;
-            width: 20px; height: 20px;
-            border-radius: 50%;
-            background-color: var(--primary-soft);
-            color: var(--primary);
-            border: 1px solid var(--primary);
-            font-size: 12px; font-weight: bold;
-            font-family: serif; 
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; text-transform: none;
-        }
+        /* UPDATE: Label Flex & Tombol Info Cantik */
+        .form-group label { display: flex; align-items: center; font-size: 0.85rem; font-weight: 600; color: var(--text-gray); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .info-btn { margin-left: 8px; width: 20px; height: 20px; border-radius: 50%; background-color: var(--primary-soft); color: var(--primary); border: 1px solid var(--primary); font-size: 12px; font-weight: bold; font-family: serif; display: flex; align-items: center; justify-content: center; cursor: pointer; text-transform: none; }
         .info-btn:active { background-color: var(--primary); color: white; }
-        
-        input[type="text"], input[type="date"], input[type="tel"], input[type="number"] {
-            width: 100%; padding: 14px 16px;
-            border: 1px solid #e2e8f0; border-radius: var(--radius-sm);
-            font-size: 1rem; color: var(--text-dark); background: #f8fafc;
-            font-family: 'Inter', sans-serif; outline: none; transition: 0.3s;
-            -webkit-appearance: none;
-        }
+
+        input[type="text"], input[type="date"], input[type="tel"], input[type="number"] { width: 100%; padding: 14px 16px; border: 1px solid #e2e8f0; border-radius: var(--radius-sm); font-size: 1rem; color: var(--text-dark); background: #f8fafc; font-family: 'Inter', sans-serif; outline: none; transition: 0.3s; -webkit-appearance: none; }
         input:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
         .highlight-card { background: var(--primary-soft); border: 1px solid #bfdbfe; }
         #total_sales { background: white; border-color: #93c5fd; color: var(--primary-dark); font-weight: 700; font-size: 1.4rem; text-align: center; }
         .input-with-btn { display: flex; gap: 10px; }
         .btn-add { background: var(--bg-color); color: var(--primary); border: 1px solid #e2e8f0; width: 55px; border-radius: var(--radius-sm); font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        
         .summary-card { background: #1e293b; color: white; text-align: center; padding: 25px; position: relative; overflow: hidden; }
         .summary-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.95rem; opacity: 0.9; }
         .status-box { padding: 15px; border-radius: 12px; font-weight: 700; font-size: 1.1rem; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
-        .status-ok { background: var(--success); color: white; }
-        .status-plus { background: #3b82f6; color: white; }
-        .status-min { background: var(--danger); color: white; }
-
+        .status-ok { background: var(--success); color: white; } .status-plus { background: #3b82f6; color: white; } .status-min { background: var(--danger); color: white; }
         .btn-action { width: 100%; padding: 18px; border: none; border-radius: var(--radius); font-weight: 700; font-size: 1rem; cursor: pointer; color: white; margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .btn-green { background: var(--success); }
-        .btn-yellow { background: var(--warning); color: #78350f; }
-        .btn-wa { background: #25D366; display: none; margin-top:15px;}
-
+        .btn-green { background: var(--success); } .btn-yellow { background: var(--warning); color: #78350f; } .btn-wa { background: #25D366; display: none; margin-top:15px; }
         .draft-controls { display: flex; gap: 10px; margin-bottom: 20px; }
         .btn-draft { background: white; color: var(--text-gray); border: 1px solid #e2e8f0; width: 100%; padding: 12px; border-radius: var(--radius-sm); font-weight:600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.85rem; }
         .btn-draft-save { color: var(--warning); border-color: var(--warning-soft); background: #fffbeb; }
         .btn-draft-del { color: var(--danger); border-color: var(--danger-soft); background: #fef2f2; }
-
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); align-items: center; justify-content: center; }
         .modal-content { background: white; padding: 30px 25px; border-radius: 24px; width: 85%; max-width: 350px; animation: popUp 0.3s ease; box-shadow: 0 20px 40px rgba(0,0,0,0.2); text-align: center;}
         @keyframes popUp { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        
-        .modal-icon { font-size: 3rem; margin-bottom: 15px; display: block; }
-        .modal-title { font-weight: 700; font-size: 1.2rem; margin-bottom: 10px; color: var(--text-dark); font-family: 'Poppins', sans-serif;}
-        .modal-text { color: var(--text-gray); font-size: 0.95rem; margin-bottom: 25px; line-height: 1.5; }
-        
         .modal-footer { margin-top: 20px; display: flex; gap: 12px; }
         .btn-modal-primary { flex: 1; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 600; cursor: pointer; }
         .btn-modal-danger { flex: 1; background: var(--danger); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 600; cursor: pointer; }
-        .btn-modal-cancel { flex: 1; background: transparent; color: var(--text-gray); border: 1px solid #e2e8f0; border-radius: 12px; cursor: pointer; font-weight: 600; padding: 14px;}
-        
+        .btn-modal-cancel { flex: 1; background: transparent; color: var(--text-gray); border: 1px solid #e2e8f0; border-radius: 12px; cursor: pointer; font-weight: 600; padding: 14px; }
         .calc-row { display: flex; gap: 10px; margin-bottom: 10px; text-align: left;}
         .calc-input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; }
-        .btn-remove { background: var(--danger-soft); color: var(--danger); border: none; width: 45px; border-radius: 8px; cursor: pointer; font-size: 1.2rem; }
-        
-        #historyList { font-size: 0.85rem; color: #b45309; padding: 15px; background: #fffbeb; border-radius: 12px; margin-bottom: 20px; border: 1px solid #fcd34d; display: none; text-align: left;}
-
         .section-title { display: flex; align-items: center; gap: 8px; font-size: 1rem; font-weight: 700; margin-bottom: 15px; }
         .t-fisik { color: var(--primary); } .t-potong { color: var(--danger); }
-        
-        /* Auto Save Notification Dihilangkan */
-        #autoSaveStatus { display: none; } 
+        #autoSaveStatus { display: none; }
     </style>
 </head>
 <body>
+
+<div id="autoSaveStatus">Menyimpan draf...</div>
 
 <div class="container">
     <div id="loginScreen">
@@ -202,7 +149,7 @@
 </div>
 
 <div id="confirmModal" class="modal"><div class="modal-content"><span id="confirmIcon" style="font-size:3rem;">⚠️</span><div id="confirmTitle" class="modal-title">Konfirmasi</div><div id="confirmMsg" class="modal-text">Msg</div><div class="modal-footer"><button class="btn-modal-cancel" onclick="closeConfirm()">Batal</button><button id="btnConfirmYes" class="btn-modal-primary" onclick="doConfirmYes()">Ya</button></div></div></div>
-<div id="alertModal" class="modal"><div class="modal-content"><span style="font-size:3rem;">ℹ️</span><div class="modal-title" id="alertTitle">Info</div><div class="modal-text" id="alertMsg">Msg</div><button class="btn-modal-primary" style="width:100%" onclick="document.getElementById('alertModal').style.display='none'">OK</button></div></div>
+<div id="alertModal" class="modal"><div class="modal-content"><span style="font-size:3rem;">ℹ️</span><div class="modal-title" id="alertTitle">Info</div><div class="modal-text" id="alertMsg">Msg</div><button class="btn-modal-primary" style="width:100%" onclick="document.getElementById('alertModal').style.display='none'">OK, Mengerti</button></div></div>
 <div id="calcModal" class="modal"><div class="modal-content"><h3 id="modalTitle" style="margin-bottom:20px; color:var(--primary);">Rincian</h3><div id="calcList" style="max-height:250px; overflow-y:auto; margin-bottom:15px;"></div><button onclick="addCalcRow()" style="background:#f8fafc; color:var(--primary); border:2px dashed #cbd5e1; padding:12px; width:100%; border-radius:12px; font-weight:600; margin-bottom:15px;">+ Tambah Baris</button><div style="background:var(--primary-soft); padding:15px; border-radius:12px; display:flex; justify-content:space-between; margin-bottom:20px;"><span>Total:</span><strong id="modalTotal">0</strong></div><div class="modal-footer"><button class="btn-modal-cancel" onclick="document.getElementById('calcModal').style.display='none'">Batal</button><button class="btn-modal-primary" onclick="saveCalculator()">Simpan</button></div></div></div>
 
 <script>
@@ -220,21 +167,37 @@
     function closeConfirm() { document.getElementById('confirmModal').style.display = 'none'; onConfirmAction = null; }
     function doConfirmYes() { if (onConfirmAction) onConfirmAction(); closeConfirm(); }
 
-    window.addEventListener('load', function() { detectDevice(); let savedNum = localStorage.getItem('crm_sender_phone'); if(savedNum && document.getElementById('nomor_pengirim')) { document.getElementById('nomor_pengirim').value = savedNum; } });
+    window.addEventListener('load', function() { 
+        getDetailedDeviceInfo(); 
+        let savedNum = localStorage.getItem('crm_sender_phone'); 
+        if(savedNum && document.getElementById('nomor_pengirim')) { document.getElementById('nomor_pengirim').value = savedNum; } 
+    });
+    
     function saveSender(val) { localStorage.setItem('crm_sender_phone', val); }
 
-    function detectDevice() {
-        var userAgent = navigator.userAgent; var deviceType = "Unknown";
-        if (/Android/i.test(userAgent)) deviceType = "Android";
-        else if (/iPhone/i.test(userAgent)) deviceType = "iPhone";
-        else if (/Windows/i.test(userAgent)) deviceType = "PC Windows";
-        else if (/Linux/i.test(userAgent)) deviceType = "Linux";
-        
-        var browser = "Unknown";
-        if(userAgent.indexOf("Chrome") > -1) browser = "Chrome";
-        else if(userAgent.indexOf("Safari") > -1) browser = "Safari";
-        
-        document.getElementById('info_perangkat').value = deviceType + " - " + browser;
+    // --- DETEKSI PERANGKAT DETAIL ---
+    async function getDetailedDeviceInfo() {
+        var info = "";
+        var ua = navigator.userAgent;
+        var screenRes = window.screen.width + "x" + window.screen.height;
+        var gl = document.createElement('canvas').getContext('webgl');
+        var gpu = "Unknown GPU";
+        if (gl) {
+            var debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+            if (debugInfo) { gpu = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL); }
+        }
+        if (navigator.userAgentData) {
+            try {
+                const uaData = await navigator.userAgentData.getHighEntropyValues(["model", "platform", "platformVersion"]);
+                var model = uaData.model || "";
+                var platform = uaData.platform || "";
+                var ver = uaData.platformVersion || "";
+                info = `${platform} ${model} (v${ver}) | ${gpu}`;
+            } catch (e) { info = `${ua} | ${gpu}`; }
+        } else {
+            info = `${ua} | ${gpu} | ${screenRes}`;
+        }
+        document.getElementById('info_perangkat').value = info;
     }
 
     async function doLogin() {
@@ -247,10 +210,10 @@
             document.getElementById('dashboard').style.display = 'block';
             document.getElementById('displayKode').innerText = "TEST";
             document.getElementById('formKode').value = "COBA";
-            document.getElementById('displayNama').innerText = "Mode Uji Coba (Tanpa GPS)";
+            document.getElementById('displayNama').innerText = "Mode Uji Coba";
             document.getElementById('nama_toko').value = "Toko Uji Coba";
             loadDraft(); 
-            showAlert("Mode Uji Coba", "Anda masuk tanpa verifikasi GPS.");
+            showAlert("Mode Uji Coba", "Masuk tanpa GPS.");
             return; 
         }
 
@@ -278,21 +241,29 @@
     function logout() { location.reload(); }
 
     function loadDraft() {
-        const hList = document.getElementById('historyList'); hList.style.display = 'block'; hList.innerHTML = `🔄 Mengecek draf cloud...`;
+        const hList = document.getElementById('historyList'); 
+        hList.style.display = 'block'; hList.innerHTML = `🔄 Mengecek draf cloud...`;
+        
         initForm(); 
+
         fetch(scriptURL + "?action=load_draft&kode=" + currentStoreCode + "&tmp=" + new Date().getTime())
             .then(res => res.json()).then(data => {
-                if (data.error) { hList.style.display = 'none'; dataStore = {}; initForm(); } 
+                if (data.error) { 
+                    hList.style.display = 'none'; dataStore = {}; initForm(); 
+                } 
                 else {
                     const draft = data;
                     document.getElementById('tgl').value = draft.tgl || new Date().toISOString().substring(0, 10);
                     document.getElementById('total_sales').value = draft.total_sales || '';
                     if(draft.pengirim) document.getElementById('nomor_pengirim').value = draft.pengirim;
                     document.getElementById('val_nama_ekor').value = draft.ekor_note || '';
+
                     if (typeof draft.dataStore === 'string') { try { dataStore = JSON.parse(draft.dataStore); } catch(e) { dataStore = {}; } } else { dataStore = draft.dataStore || {}; }
+
                     ['setor_sore', 'setor_malam', 'setor_pagi', 'ekor_sales', 'pot_ba', 'pot_lebih', 'pot_virtual'].forEach(key => { 
                         document.getElementById('h_' + key).value = draft['h_' + key] || 0; 
                     });
+
                     initForm(); updateAllViewFields(); hitungGlobal();
                     hList.innerHTML = `<span style="color:green; font-weight:bold;">✅ Data Terakhir Dipulihkan</span>`;
                 }
@@ -306,18 +277,18 @@
         });
     }
 
-    // --- FORM INIT DENGAN ALERT CUSTOM (TANPA GITHUB.IO SAYS) ---
+    // --- FORM INIT DENGAN ALERT BERSIH (TANPA SAYS...) ---
     function initForm() {
         const fFisik = [
-            {id:'setor_sore', label:'☀️ Setor Sore', desc:'setoran yang di lakukan setelah sales h-1 sudah clear'},
-            {id:'setor_malam', label:'🌙 Setor Malam', desc:'setoran yang di lakukan jam 21-00 sampai jam 24.00'},
-            {id:'setor_pagi', label:'🌅 Setor Pagi (H+1)', desc:'setoran yang dilakukan dari jam 24.00 sampai setoran sales h-1 selesai'},
-            {id:'ekor_sales', label:'🪙 Ekor Sales', hasNote: true, desc:'transfer an yang menggunakan mobile banking untuk ekor, dan bukti nya dikirim ke wa'}
+            {id:'setor_sore', label:'☀️ Setor Sore', desc:'Setoran yang dilakukan setelah sales H-1 sudah clear.'},
+            {id:'setor_malam', label:'🌙 Setor Malam', desc:'Setoran yang dilakukan jam 21.00 sampai jam 24.00.'},
+            {id:'setor_pagi', label:'🌅 Setor Pagi (H+1)', desc:'Setoran yang dilakukan dari jam 24.00 sampai setoran sales H-1 selesai.'},
+            {id:'ekor_sales', label:'🪙 Ekor Sales', hasNote: true, desc:'Transferan yang menggunakan mobile banking untuk ekor, dan buktinya dikirim ke WA.'}
         ];
         const fPotong = [
-            {id:'pot_ba', label:'⚠️ Potongan BA Var', desc:'jika sudah ada email klaim atau ba pdf yang langsung di ttd lengkap'},
-            {id:'pot_lebih', label:'➕ Potongan Lebih', desc:'potong atas lebih setoran sales sebelum nya'},
-            {id:'pot_virtual', label:'💳 Potongan Virtual', desc:'potong atas seluruh email dari virtual yg menyatakan gagal atau bisa koreksi sales'}
+            {id:'pot_ba', label:'⚠️ Potongan BA Var', desc:'Jika sudah ada email klaim atau BA PDF yang langsung ditandatangani lengkap.'},
+            {id:'pot_lebih', label:'➕ Potongan Lebih', desc:'Potong atas kelebihan setoran sales sebelumnya.'},
+            {id:'pot_virtual', label:'💳 Potongan Virtual', desc:'Potong atas seluruh email dari virtual yang menyatakan gagal atau bisa koreksi sales.'}
         ];
         
         let html = `<div class="card"><div class="section-title t-fisik"><span>💵</span> Uang Fisik</div>`;
@@ -331,9 +302,11 @@
     function createFieldHtml(f) {
         if (!dataStore[f.id]) dataStore[f.id] = [];
         let ekorVal = document.getElementById('val_nama_ekor') ? document.getElementById('val_nama_ekor').value : '';
-        let noteInput = f.hasNote ? `<input type="text" id="note_ekor" placeholder="Ket. Ekor (Misal: BCA Budi)" value="${ekorVal}" oninput="document.getElementById('val_nama_ekor').value=this.value; autoSaveDraft();" style="margin-top:10px; border:1px dashed #cbd5e1; background: #f8fafc;">` : '';
-        
-        // GUNAKAN showAlert UNTUK POPUP BERSIH
+        let noteInput = f.hasNote 
+            ? `<input type="text" id="note_ekor" placeholder="Ket. Ekor (Misal: BCA Budi)" value="${ekorVal}" oninput="document.getElementById('val_nama_ekor').value=this.value; autoSaveDraft();" style="margin-top:10px; border:1px dashed #cbd5e1; background: #f8fafc;">` 
+            : '';
+            
+        // GUNAKAN showAlert CUSTOM
         let infoHtml = f.desc ? `<span class="info-btn" onclick="showAlert('Informasi', '${f.desc}')">i</span>` : '';
 
         return `<div class="form-group">
@@ -373,7 +346,7 @@
 
     function trySubmitForm() {
         let selisih = Number(document.getElementById('val_selisih').value);
-        if (selisih < 0) { autoSaveDraft(); showAlert("Data Kurang", `Data masih minus. Telah disimpan di Draf.`); return; }
+        if (selisih < 0) { autoSaveDraft(); showAlert("Data Kurang", `Data masih minus Rp ${Math.abs(selisih).toLocaleString('id-ID')}. Telah disimpan di Draf.`); return; }
         showConfirm("Konfirmasi Simpan", "Data sudah benar?", false, function() { processSubmit(); });
     }
 
@@ -413,7 +386,15 @@
 
     function manualSaveDraft() { autoSaveDraft(); showAlert("Tersimpan", "Draf berhasil disimpan manual ke cloud."); }
     function confirmDeleteDraft() { showConfirm("Hapus Draf?", "Data cloud akan dihapus.", true, function() { const form = new FormData(); form.append('action', 'delete_draft'); form.append('Kode Toko', currentStoreCode); fetch(scriptURL, { method: 'POST', body: form }).then(() => location.reload()); }); }
-    function autoSaveDraft() { if (!currentStoreCode) return; const formData = new FormData(); formData.append('action', 'save_draft'); formData.append('Kode Toko', currentStoreCode); formData.append('draft_data', JSON.stringify(collectDraftData())); fetch(scriptURL, { method: 'POST', body: formData }).catch(e => console.log("Autosave err")); }
+    
+    // AUTO SAVE TANPA NOTIFIKASI
+    function autoSaveDraft() { 
+        if (!currentStoreCode) return;
+        if(saveTimeout) clearTimeout(saveTimeout);
+        const formData = new FormData(); formData.append('action', 'save_draft'); formData.append('Kode Toko', currentStoreCode); formData.append('draft_data', JSON.stringify(collectDraftData())); 
+        fetch(scriptURL, { method: 'POST', body: formData }).catch(e => console.log("Autosave err")); 
+    }
+
     function collectDraftData() { return { tgl: document.getElementById('tgl').value, nama_toko: document.getElementById('nama_toko').value, total_sales: document.getElementById('total_sales').value, pengirim: document.getElementById('nomor_pengirim').value, dataStore: dataStore, ekor_note: document.getElementById('val_nama_ekor').value, h_setor_sore: document.getElementById('h_setor_sore').value, h_setor_malam: document.getElementById('h_setor_malam').value, h_setor_pagi: document.getElementById('h_setor_pagi').value, h_ekor_sales: document.getElementById('h_ekor_sales').value, h_pot_ba: document.getElementById('h_pot_ba').value, h_pot_lebih: document.getElementById('h_pot_lebih').value, h_pot_virtual: document.getElementById('h_pot_virtual').value }; }
     function getCleanNumber(val) { if (!val) return 0; return Number(val.toString().replace(/\./g, '')) || 0; }
     function formatRibuan(element) { let val = element.value.replace(/[^,\d]/g, '').toString(); let split = val.split(','); let sisa = split[0].length % 3; let rupiah = split[0].substr(0, sisa); let ribuan = split[0].substr(sisa).match(/\d{3}/gi); if (ribuan) { let separator = sisa ? '.' : ''; rupiah += separator + ribuan.join('.'); } rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah; element.value = rupiah; if (element.id === 'total_sales') autoSaveDraft(); }
