@@ -171,7 +171,7 @@
 
         .form-group { margin-bottom: 20px; }
         
-        /* SEPTA GANTENG
+        
         .form-group label {
             display: flex; align-items: center;
             font-size: 0.85rem; font-weight: 600;
@@ -770,7 +770,7 @@
             ? `<input type="text" id="note_ekor" placeholder="Ket. Ekor (Misal: BCA Budi)" value="${ekorVal}" oninput="document.getElementById('val_nama_ekor').value=this.value; autoSaveDraft();" style="margin-top:10px; border:1px dashed #cbd5e1; background: #f8fafc;">` 
             : '';
         
-        
+       
         let infoHtml = f.desc ? `<span class="info-btn" onclick="showAlert('Informasi', '${f.desc}')">i</span>` : '';
 
         return `<div class="form-group">
