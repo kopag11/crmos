@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
 
     <style>
+        
         :root {
             --primary: #3b82f6; 
             --primary-dark: #2563eb;
@@ -169,11 +170,27 @@
         }
 
         .form-group { margin-bottom: 20px; }
+        
+        
         .form-group label {
-            display: block; font-size: 0.85rem; font-weight: 600;
+            display: flex; align-items: center;
+            font-size: 0.85rem; font-weight: 600;
             color: var(--text-gray); margin-bottom: 8px; 
             text-transform: uppercase; letter-spacing: 0.5px;
         }
+        .info-btn {
+            margin-left: 8px;
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            background-color: var(--primary-soft);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            font-size: 12px; font-weight: bold;
+            font-family: serif; 
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; text-transform: none;
+        }
+        .info-btn:active { background-color: var(--primary); color: white; }
         
         input[type="text"], input[type="date"], input[type="tel"], input[type="number"] {
             width: 100%; padding: 14px 16px;
@@ -259,6 +276,11 @@
         .btn-yellow { background: var(--warning); color: #78350f; }
         .btn-wa { background: #25D366; display: none; margin-top:15px;}
 
+        .draft-controls { display: flex; gap: 10px; margin-bottom: 20px; }
+        .btn-draft { background: white; color: var(--text-gray); border: 1px solid #e2e8f0; width: 100%; padding: 12px; border-radius: var(--radius-sm); font-weight:600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.85rem; }
+        .btn-draft-save { color: var(--warning); border-color: var(--warning-soft); background: #fffbeb; }
+        .btn-draft-del { color: var(--danger); border-color: var(--danger-soft); background: #fef2f2; }
+
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); align-items: center; justify-content: center; }
         .modal-content { background: white; padding: 30px 25px; border-radius: 24px; width: 85%; max-width: 350px; animation: popUp 0.3s ease; box-shadow: 0 20px 40px rgba(0,0,0,0.2); text-align: center;}
         @keyframes popUp { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -284,11 +306,14 @@
         }
         .t-fisik { color: var(--primary); }
         .t-potong { color: var(--danger); }
+        
+        #autoSaveStatus { display: none; } 
     </style>
 </head>
 <body>
 
 <div class="container">
+    
     <div id="loginScreen">
         <div style="margin-bottom: 20px;">
             <div class="icon-circle">
@@ -349,17 +374,25 @@
             <h2>Report Sales CRM</h2>
             <p style="color: var(--text-gray); margin: 5px 0 0 0;">Input Laporan Harian</p>
         </div>
-        <div class="login-note"><span>📍</span> Wajib berada di lokasi toko</div>
-        <div class="pin-wrapper"><input type="text" id="inputKode" maxlength="4" placeholder="KODE" inputmode="text"></div>
+        
+        <div class="login-note">
+            <span>📍</span> Wajib berada di lokasi toko
+        </div>
+        
+        <div class="pin-wrapper">
+            <input type="text" id="inputKode" maxlength="4" placeholder="KODE" inputmode="text">
+        </div>
+        
         <button class="btn-main" onclick="doLogin()">MASUK SEKARANG</button>
-        <p id="loginError" style="color:var(--danger); display:none; margin-top:20px; font-weight:600;">Kode Salah!</p>
+        
+        <p id="loginError" style="color:var(--danger); display:none; margin-top:20px; font-weight:600; background: var(--danger-soft); padding: 10px; border-radius: 8px;">Kode Salah!</p>
         <p id="gpsStatus" style="font-size:0.85rem; color:var(--text-gray); margin-top:25px;">⏳ Menunggu sinyal GPS...</p>
     </div>
 
     <div id="dashboard">
         <div class="header-card">
             <div class="store-info">
-                <span style="font-size:0.8rem; opacity:0.9;">Selamat Datang,</span>
+                <span style="font-size:0.8rem; opacity:0.9; margin-bottom:5px; display:block;">Selamat Datang,</span>
                 <h2 id="displayNama">Nama Toko</h2>
                 <div style="margin-top: 8px;"><span class="store-badge" id="displayKode">CODE</span></div>
             </div>
@@ -367,12 +400,19 @@
         </div>
 
         <div id="historyList">Loading...</div>
-        <button type="button" class="btn-draft" onclick="confirmDeleteDraft()">
-            <span>🗑️</span> Hapus Draf di Cloud
-        </button>
+        
+        <div class="draft-controls">
+            <button type="button" class="btn-draft btn-draft-save" onclick="manualSaveDraft()">
+                <span>💾</span> Simpan Draf
+            </button>
+            <button type="button" class="btn-draft btn-draft-del" onclick="confirmDeleteDraft()">
+                <span>🗑️</span> Hapus Draf
+            </button>
+        </div>
 
         <form id="salesForm">
             <input type="hidden" name="Kode Toko" id="formKode">
+            <input type="hidden" name="Info Perangkat" id="info_perangkat">
             
             <div class="card">
                 <div class="form-group">
@@ -474,14 +514,51 @@
     </div>
 </div>
 
+<div id="autoSaveStatus"></div>
+
 <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbzX8YNW9U6fyuCzBOWB_lcu7FDJS5ivTOI5RU2QBAVQz-sW_ov4ys_CSuqxQNnYDQLT/exec'; 
-    const MAX_RADIUS_METERS = 30; 
+    const MAX_RADIUS_METERS = 40; 
 
     let currentStoreCode = "";
     let dataStore = {}; 
     let activeField = "";
     let onConfirmAction = null;
+    let saveTimeout = null;
+
+    window.addEventListener('load', function() {
+        getDetailedDeviceInfo();
+        let savedNum = localStorage.getItem('crm_sender_phone');
+        if(savedNum && document.getElementById('nomor_pengirim')) {
+            document.getElementById('nomor_pengirim').value = savedNum;
+        }
+    });
+
+    function saveSender(val) { localStorage.setItem('crm_sender_phone', val); }
+
+    async function getDetailedDeviceInfo() {
+        var info = "";
+        var ua = navigator.userAgent;
+        var screenRes = window.screen.width + "x" + window.screen.height;
+        var gl = document.createElement('canvas').getContext('webgl');
+        var gpu = "Unknown GPU";
+        if (gl) {
+            var debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+            if (debugInfo) { gpu = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL); }
+        }
+        if (navigator.userAgentData) {
+            try {
+                const uaData = await navigator.userAgentData.getHighEntropyValues(["model", "platform", "platformVersion"]);
+                var model = uaData.model || "";
+                var platform = uaData.platform || "";
+                var ver = uaData.platformVersion || "";
+                info = `${platform} ${model} (v${ver}) | ${gpu}`;
+            } catch (e) { info = `${ua} | ${gpu}`; }
+        } else {
+            info = `${ua} | ${gpu} | ${screenRes}`;
+        }
+        document.getElementById('info_perangkat').value = info;
+    }
 
     function showAlert(title, msg) {
         document.getElementById('alertTitle').innerText = title;
@@ -517,15 +594,6 @@
         if (onConfirmAction) onConfirmAction();
         closeConfirm();
     }
-
-    window.addEventListener('load', function() {
-        let savedNum = localStorage.getItem('crm_sender_phone');
-        if(savedNum && document.getElementById('nomor_pengirim')) {
-            document.getElementById('nomor_pengirim').value = savedNum;
-        }
-    });
-
-    function saveSender(val) { localStorage.setItem('crm_sender_phone', val); }
 
     function formatDateIndo(dateString) {
         if (!dateString) return "";
@@ -563,6 +631,7 @@
             tgl: document.getElementById('tgl').value,
             nama_toko: document.getElementById('nama_toko').value,
             total_sales: document.getElementById('total_sales').value,
+            pengirim: document.getElementById('nomor_pengirim').value,
             dataStore: dataStore,
             ekor_note: document.getElementById('val_nama_ekor').value,
             h_setor_sore: document.getElementById('h_setor_sore').value,
@@ -577,6 +646,7 @@
 
     function autoSaveDraft() {
         if (!currentStoreCode) return;
+        if(saveTimeout) clearTimeout(saveTimeout);
         const formData = new FormData();
         formData.append('action', 'save_draft');
         formData.append('Kode Toko', currentStoreCode);
@@ -600,6 +670,7 @@
                     const draft = data;
                     document.getElementById('tgl').value = draft.tgl || new Date().toISOString().substring(0, 10);
                     document.getElementById('total_sales').value = draft.total_sales || '';
+                    if(draft.pengirim) document.getElementById('nomor_pengirim').value = draft.pengirim;
                     document.getElementById('val_nama_ekor').value = draft.ekor_note || '';
 
                     if (typeof draft.dataStore === 'string') {
@@ -640,21 +711,19 @@
     async function doLogin() {
         const code = document.getElementById('inputKode').value.toUpperCase().trim();
         if (code.length !== 4) return showAlert("Gagal", "Kode harus 4 karakter");
-
-
+        
         if (code === "COBA") {
             currentStoreCode = "COBA";
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('dashboard').style.display = 'block';
             document.getElementById('displayKode').innerText = "TEST";
             document.getElementById('formKode').value = "COBA";
-            document.getElementById('displayNama').innerText = "Mode Uji Coba (Tanpa GPS)";
+            document.getElementById('displayNama').innerText = "Mode Uji Coba";
             document.getElementById('nama_toko').value = "Toko Uji Coba";
             loadDraft(); 
-            showAlert("Mode Uji Coba", "Anda masuk tanpa verifikasi GPS.");
-            return; 
+            showAlert("Mode Uji Coba", "Masuk tanpa GPS.");
+            return;
         }
-        
 
         document.getElementById('gpsStatus').innerText = "Sedang melacak lokasi...";
         try {
@@ -681,26 +750,26 @@
 
 
     function initForm() {
-        const fieldsFisik = [
-            {id:'setor_sore', label:'☀️ Setor Sore'}, {id:'setor_malam', label:'🌙 Setor Malam'}, {id:'setor_pagi', label:'🌅 Setor Pagi (H+1)'},
-            {id:'ekor_sales', label:'🪙 Ekor Sales', hasNote: true}
+        const fFisik = [
+            {id:'setor_sore', label:'☀️ Setor Sore', desc:'Setoran yang dilakukan setelah sales H-1 sudah clear.'},
+            {id:'setor_malam', label:'🌙 Setor Malam', desc:'Setoran yang dilakukan jam 21.00 sampai jam 24.00.'},
+            {id:'setor_pagi', label:'🌅 Setor Pagi (H+1)', desc:'Setoran yang dilakukan dari jam 24.00 sampai setoran sales H-1 selesai.'},
+            {id:'ekor_sales', label:'🪙 Ekor Sales', hasNote: true, desc:'Transferan yang menggunakan mobile banking untuk ekor, dan buktinya dikirim ke WA.'}
         ];
-        const fieldsPotong = [
-            {id:'pot_ba', label:'⚠️ Potongan BA Var'}, {id:'pot_lebih', label:'➕ Potongan Lebih'}, {id:'pot_virtual', label:'💳 Potongan Virtual'}
+        const fPotong = [
+            {id:'pot_ba', label:'⚠️ Potongan BA Var', desc:'Jika sudah ada email klaim atau BA PDF yang langsung ditandatangani lengkap.'},
+            {id:'pot_lebih', label:'➕ Potongan Lebih', desc:'Potong atas kelebihan setoran sales sebelumnya.'},
+            {id:'pot_virtual', label:'💳 Potongan Virtual', desc:'Potong atas seluruh email dari virtual yang menyatakan gagal atau bisa koreksi sales.'}
         ];
 
         let html = "";
         
-        
-        html += `<div class="card">
-                    <div class="section-title t-fisik"><span>💵</span> Uang Fisik</div>`;
-        fieldsFisik.forEach(f => html += createFieldHtml(f));
+        html += `<div class="card"><div class="section-title t-fisik"><span>💵</span> Uang Fisik</div>`;
+        fFisik.forEach(f => html += createFieldHtml(f));
         html += `</div>`;
 
-        
-        html += `<div class="card">
-                    <div class="section-title t-potong"><span>✂️</span> Potongan</div>`;
-        fieldsPotong.forEach(f => html += createFieldHtml(f));
+        html += `<div class="card"><div class="section-title t-potong"><span>✂️</span> Potongan</div>`;
+        fPotong.forEach(f => html += createFieldHtml(f));
         html += `</div>`;
         
         document.getElementById('dynamicInputs').innerHTML = html;
@@ -708,12 +777,15 @@
 
     function createFieldHtml(f) {
         if (!dataStore[f.id]) dataStore[f.id] = [];
-        let ekorVal = (f.id==='ekor_sales') ? document.getElementById('val_nama_ekor').value : '';
+        let ekorVal = document.getElementById('val_nama_ekor') ? document.getElementById('val_nama_ekor').value : '';
         let noteInput = f.hasNote 
             ? `<input type="text" id="note_ekor" placeholder="Ket. Ekor (Misal: BCA Budi)" value="${ekorVal}" oninput="document.getElementById('val_nama_ekor').value=this.value; autoSaveDraft();" style="margin-top:10px; border:1px dashed #cbd5e1; background: #f8fafc;">` 
             : '';
+        
+        let infoHtml = f.desc ? `<span class="info-btn" onclick="showAlert('Informasi', '${f.desc}')">i</span>` : '';
+
         return `<div class="form-group">
-                    <label>${f.label}</label>
+                    <label>${f.label} ${infoHtml}</label>
                     <div class="input-with-btn">
                         <input type="text" id="view_${f.id}" value="Rp 0" readonly style="background:white; cursor: default;">
                         <button type="button" class="btn-add" onclick="openCalc('${f.id}', '${f.label}')">+</button>
@@ -814,10 +886,8 @@
         formData.set('Ket Ekor', document.getElementById('val_nama_ekor').value);
         formData.set('Pengirim', document.getElementById('nomor_pengirim').value);
 
-
         formData.append('raw_rincian', JSON.stringify(dataStore));
-        // ----------SEPTA GANTENG---------------
-        
+        formData.set('Info Perangkat', document.getElementById('info_perangkat').value);
 
         fetch(scriptURL, { method: 'POST', body: formData })
             .then(res => res.json())
@@ -830,7 +900,7 @@
                      
                      showAlert("Berhasil!", "Laporan Final telah tersimpan.");
                      
-                     
+                     // ---SEPTA GANTEG---
                      resetForm();
                 } else { throw new Error(data.error); }
             })
@@ -840,6 +910,8 @@
                 showAlert("Error", "Gagal mengirim data. Coba lagi.");
             });
     }
+
+    function manualSaveDraft() { autoSaveDraft(); showAlert("Tersimpan", "Draf berhasil disimpan manual ke cloud."); }
 
     
     function resetForm() {
@@ -872,24 +944,9 @@
         let kode = document.getElementById('formKode').value || currentStoreCode;
         let nama = document.getElementById('nama_toko').value;
         let pengirim = document.getElementById('nomor_pengirim').value || "-"; 
-        let rawTgl = document.getElementById('tgl').value;
-        let tglIndo = formatDateIndo(rawTgl); 
-        
-        saveSender(pengirim);
-
-        let statusTxt = "";
-        if (selisih === 0) statusTxt = "BALANCE OK ✅"; 
-        else if (selisih > 0) statusTxt = `LEBIH (+) Rp ${selisih.toLocaleString('id-ID')}⚠️`;
-        else statusTxt = `KURANG (-) Rp ${Math.abs(selisih).toLocaleString('id-ID')}⚠️`;
-
-        let ekorTxt = getVal('ekor_sales');
-        if(document.getElementById('val_nama_ekor').value) ekorTxt += ` (a.n ${document.getElementById('val_nama_ekor').value})`;
-
-        let txt = `*LAPORAN SETOR SALES*\n*${kode} - ${nama}*\n*Tgl Sales:* ${tglIndo}\n*Total Sales:* Rp ${document.getElementById('total_sales').value}\n------------------\n*Fisik Setor:*\n1. Sore: ${getVal('setor_sore')}\n2. Malam: ${getVal('setor_malam')}\n3. Pagi: ${getVal('setor_pagi')}\n4. Ekor: ${ekorTxt}\n------------------ (+)\n*Total Setor: ${document.getElementById('disp_total_fisik').innerText}*\n\n*Potongan:*\n1. BA Var: ${getVal('pot_ba')}\n2. Lebih: ${getVal('pot_lebih')}\n3. Virtual: ${getVal('pot_virtual')}\n------------------ (+)\n*Total Potong: ${document.getElementById('disp_total_potong').innerText}*\n\n------------------\n*${statusTxt}*\n\n👤 *Pengirim:* ${pengirim}`;
-        
+        let txt = `*LAPORAN SALES*\n*${kode} - ${nama}*\n*Sales:* Rp ${document.getElementById('total_sales').value}\n------------------\n*Total Setor: ${document.getElementById('disp_total_fisik').innerText}*\n*Total Potong: ${document.getElementById('disp_total_potong').innerText}*\n*Status:* ${document.getElementById('disp_balance').innerText}\n👤 *Pengirim:* ${pengirim}`;
         window.open(`https://wa.me/6285183347653?text=${encodeURIComponent(txt)}`, '_blank');
     }
 </script>
 </body>
 </html>
-
