@@ -364,7 +364,7 @@
                 <g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g>
                 </svg>
             </div>
-            <h2>Report Sales CRM</h2>
+            <h2>Sales Report CRM</h2>
             <p style="color: var(--text-gray); margin: 5px 0 0 0;">Input Laporan Harian</p>
         </div>
         
@@ -503,8 +503,8 @@
 
 <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbzX8YNW9U6fyuCzBOWB_lcu7FDJS5ivTOI5RU2QBAVQz-sW_ov4ys_CSuqxQNnYDQLT/exec'; 
-    const MAX_RADIUS_METERS = 40; 
-//SEPTA GANTENG
+    const MAX_RADIUS_METERS = 180; 
+
     let currentStoreCode = "";
     let dataStore = {}; 
     let activeField = "";
@@ -732,7 +732,7 @@
     function logout() { location.reload(); }
 
 
-    
+    //SEPTA GANTENG
     function initForm() {
         const fieldsFisik = [
             {id:'setor_sore', label:'☀️ Setor Sore', desc:'Setoran yang dilakukan setelah sales H-1 sudah clear'},
@@ -821,7 +821,7 @@
         if (selisih < 0) {
             elBal.innerHTML = `<span>⚠️</span> KURANG (-) Rp ` + Math.abs(selisih).toLocaleString('id-ID');
             elBal.classList.add('status-min');
-            btn.innerHTML = `<span>⚠️</span> SIMPAN DRAFT (MINUS)`;
+            btn.innerHTML = `<span>⚠️</span> SIMPAN DRAFT (MINUS)`; 
             btn.className = "btn-action btn-yellow";
         } else {
             if (selisih === 0) {
@@ -838,20 +838,39 @@
     }
 
 
+    
     function trySubmitForm() {
+        
+        let tgl = document.getElementById('tgl').value;
+        let rawSales = document.getElementById('total_sales').value;
+        let sales = getCleanNumber(rawSales);
+
+        if (!tgl) { showAlert("Data Kosong", "Isi TANGGAL dulu!"); return; }
+        if (!rawSales || sales === 0) { showAlert("Data Kosong", "Isi TOTAL SALES dulu!"); return; }
+
+        
         let selisih = Number(document.getElementById('val_selisih').value);
+        let msg = "";
+        let isDanger = false;
+
         
         if (selisih < 0) {
-            autoSaveDraft();
-            showAlert("Data Kurang", `Data masih minus Rp ${Math.abs(selisih).toLocaleString('id-ID')}. Telah disimpan di Draf.`);
-            return; 
+            autoSaveDraft(); 
+            
+            showAlert("Data Kurang", `Data masih MINUS Rp ${Math.abs(selisih).toLocaleString('id-ID')}.\n\nSilakan perbaiki data atau hanya simpan sebagai Draft.`);
+            return; // BERHENTI DI SINI (Tombol Simpan Final tidak jalan)
+        } 
+        
+        
+        else if (selisih > 0) {
+            msg = `ℹ️ INFO: Ada KELEBIHAN uang Rp ${selisih.toLocaleString('id-ID')}.\n\nSimpan laporan?`;
+            isDanger = false;
+        } else {
+            msg = "✅ Data BALANCE (PAS).\n\nSimpan laporan final?";
+            isDanger = false;
         }
 
-        let msg = (selisih > 0) 
-            ? `Ada KELEBIHAN uang Rp ${selisih.toLocaleString('id-ID')}. Tetap simpan?`
-            : "Data BALANCE OK. Simpan laporan final?";
-
-        showConfirm("Konfirmasi Simpan", msg, false, function() {
+        showConfirm("Konfirmasi Laporan", msg, isDanger, function() {
             processSubmit();
         });
     }
@@ -860,7 +879,7 @@
         const btn = document.getElementById('btn-submit');
         const status = document.getElementById('status');
         
-        btn.disabled = true; btn.innerText = "⏳ Sedang Memproses...";
+        btn.disabled = true; btn.innerText = "⏳ Sedang Mengirim...";
         
         const form = document.getElementById('salesForm');
         const formData = new FormData(form);
@@ -918,8 +937,6 @@
         
         
         window.open(`https://wa.me/6285183347653?text=${encodeURIComponent(txt)}`, '_blank');
-        
-        
         setTimeout(function() {
             location.reload();
         }, 1000); 
@@ -927,4 +944,3 @@
 </script>
 </body>
 </html>
-
