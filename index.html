@@ -879,7 +879,7 @@
         const btn = document.getElementById('btn-submit');
         const status = document.getElementById('status');
         
-        btn.disabled = true; btn.innerText = "⏳ Sedang Mengirim...";
+        btn.disabled = true; btn.innerText = "⏳ Sedang Memproses...";
         
         const form = document.getElementById('salesForm');
         const formData = new FormData(form);
@@ -909,7 +909,7 @@
             .catch(err => {
                 status.innerText = "Gagal: " + err.message;
                 btn.disabled = false; btn.innerText = "💾 SIMPAN FINAL";
-                showAlert("Error", "Gagal mengirim data. Coba lagi.");
+                showAlert("Error", "Gagal memproses data. Coba lagi.");
             });
     }
 
@@ -944,3 +944,4 @@
 </script>
 </body>
 </html>
+
