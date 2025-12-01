@@ -898,12 +898,12 @@
             .then(res => res.json())
             .then(data => {
                 if (data.result === "success") {
-                     status.innerText = "✅ Laporan Berhasil!"; status.style.color = "var(--success)";
+                     status.innerText = "✅ Laporan Sudah Terbentuk, tinggal kirim WA!"; status.style.color = "var(--success)";
                      btn.style.display = 'none'; document.getElementById('btn-wa').style.display = 'flex';
                      const delData = new FormData(); delData.append('action', 'delete_draft'); delData.append('Kode Toko', currentStoreCode);
                      fetch(scriptURL, { method: 'POST', body: delData }); 
                      
-                     showAlert("Berhasil!", "Laporan Final telah tersimpan.");
+                     showAlert("Berhasil!", "Laporan Final telah terbentuk.");
                 } else { throw new Error(data.error); }
             })
             .catch(err => {
@@ -944,4 +944,5 @@
 </script>
 </body>
 </html>
+
 
