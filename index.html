@@ -53,9 +53,30 @@
 
         h1, h2, h3 { family: 'Poppins', sans-serif; margin: 0; color: var(--text-dark); }
         
+        
+        #loadingOverlay {
+            display: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-color);
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .spinner {
+            width: 50px; height: 50px;
+            border: 5px solid #e2e8f0;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
         #loginScreen {
             flex: 1;
-            display: flex;
+            display: flex; 
             flex-direction: column;
             justify-content: center;
             align-items: center;
@@ -325,6 +346,12 @@
 </head>
 <body>
 
+<div id="loadingOverlay">
+    <div class="spinner"></div>
+    <h3 style="color:var(--text-dark);">Memverifikasi...</h3>
+    <p style="color:var(--text-gray); font-size:0.9rem;">Mohon tunggu sebentar</p>
+</div>
+
 <div class="container">
     
     <div id="loginScreen">
@@ -527,8 +554,7 @@
     let onConfirmAction = null;
 
     // SEPTA GANTENG
-
-    window.addEventListener('load', function() {
+    window.addEventListener('DOMContentLoaded', function() {
         getDetailedDeviceInfo();
         let savedNum = localStorage.getItem('crm_sender_phone');
         if(savedNum && document.getElementById('nomor_pengirim')) {
@@ -542,8 +568,15 @@
         const qrKode = urlParams.get('kode');
 
         if (qrKode) {
+            
+            document.getElementById('loginScreen').style.display = 'none';
+            
+            
+            document.getElementById('loadingOverlay').style.display = 'flex';
+
+            
             document.getElementById('inputKode').value = qrKode.toUpperCase();
-            document.getElementById('gpsStatus').innerHTML = "🔄 Mendeteksi QR Code...";
+
             
             doLogin(true); 
         }
@@ -732,7 +765,12 @@
 
     function masukDashboard(realCode, displayCode, shopName) {
         currentStoreCode = realCode;
+        
+        
+        document.getElementById('loadingOverlay').style.display = 'none';
         document.getElementById('loginScreen').style.display = 'none';
+        
+        
         document.getElementById('dashboard').style.display = 'block';
         
         
@@ -748,19 +786,22 @@
         const codeInput = document.getElementById('inputKode');
         const code = codeInput.value.toUpperCase().trim();
         
-        if (code.length < 2) return showAlert("Gagal", "Kode Toko harus diisi");
+        if (code.length < 2) {
+            
+            if(!bypassGPS) showAlert("Gagal", "Kode Toko harus diisi");
+            return;
+        }
         
         if (code === "COBA") {
             masukDashboard("COBA", "TEST", "Toko Uji Coba");
-            showAlert("Mode Uji Coba", "Masuk tanpa GPS.");
+            if(!bypassGPS) showAlert("Mode Uji Coba", "Masuk tanpa GPS.");
             return;
         }
 
         const statusEl = document.getElementById('gpsStatus');
         
-        if (bypassGPS) {
-            statusEl.innerText = "⏳ Verifikasi QR Code...";
-        } else {
+        
+        if (!bypassGPS) {
             statusEl.innerText = "⏳ Sedang melacak lokasi...";
         }
 
@@ -773,7 +814,6 @@
             if (bypassGPS) {
                 
                 masukDashboard(code, code, shop.nama);
-                
                 window.history.replaceState({}, document.title, window.location.pathname);
             } else {
                 
@@ -789,8 +829,15 @@
                 }, () => showAlert("GPS Mati", "Mohon aktifkan GPS/Lokasi di HP Anda."));
             }
         } catch(e) { 
-            showAlert("Login Gagal", "Kode salah atau koneksi error."); 
-            statusEl.innerText = "❌ Gagal memuat data.";
+            
+            if(bypassGPS) {
+                document.getElementById('loadingOverlay').style.display = 'none';
+                document.getElementById('loginScreen').style.display = 'flex';
+                showAlert("Login Gagal", "Kode QR tidak valid atau koneksi bermasalah.");
+            } else {
+                showAlert("Login Gagal", "Kode salah atau koneksi error."); 
+                statusEl.innerText = "❌ Gagal memuat data.";
+            }
         }
     }
     
