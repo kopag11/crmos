@@ -53,30 +53,9 @@
 
         h1, h2, h3 { family: 'Poppins', sans-serif; margin: 0; color: var(--text-dark); }
         
-        
-        #loadingOverlay {
-            display: none;
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-color);
-            z-index: 9999;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
-        .spinner {
-            width: 50px; height: 50px;
-            border: 5px solid #e2e8f0;
-            border-top: 5px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
         #loginScreen {
             flex: 1;
-            display: flex; 
+            display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
@@ -162,7 +141,8 @@
         .store-info h2 { color: white; font-size: 1.25rem; margin-bottom: 5px; }
         .store-badge { 
             background: rgba(255,255,255,0.2); 
-            -webkit-backdrop-filter: blur(5px); 
+            
+            -webkit-backdrop-filter: blur(5px);
             backdrop-filter: blur(5px);
             padding: 4px 10px; 
             border-radius: 8px; 
@@ -302,7 +282,6 @@
         .btn-green { background: var(--success); }
         .btn-yellow { background: var(--warning); color: #78350f; }
         
-        
         .btn-blue { 
             background: #0ea5e9; 
             color: white; 
@@ -314,7 +293,8 @@
         .modal { 
             display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.6); 
-            -webkit-backdrop-filter: blur(4px); 
+            
+            -webkit-backdrop-filter: blur(4px);
             backdrop-filter: blur(4px); 
             align-items: center; justify-content: center; 
         }
@@ -345,12 +325,6 @@
     </style>
 </head>
 <body>
-
-<div id="loadingOverlay">
-    <div class="spinner"></div>
-    <h3 style="color:var(--text-dark);">Memverifikasi...</h3>
-    <p style="color:var(--text-gray); font-size:0.9rem;">Mohon tunggu sebentar</p>
-</div>
 
 <div class="container">
     
@@ -422,7 +396,7 @@
             <input type="text" id="inputKode" maxlength="4" placeholder="KODE" inputmode="text">
         </div>
         
-        <button class="btn-main" onclick="doLogin(false)">MASUK SEKARANG</button>
+        <button class="btn-main" onclick="doLogin()">MASUK SEKARANG</button>
         
         <p id="loginError" style="color:var(--danger); display:none; margin-top:20px; font-weight:600; background: var(--danger-soft); padding: 10px; border-radius: 8px;">Kode Salah!</p>
         <p id="gpsStatus" style="font-size:0.85rem; color:var(--text-gray); margin-top:25px;">⏳ Menunggu sinyal GPS...</p>
@@ -554,7 +528,8 @@
     let onConfirmAction = null;
 
     // SEPTA GANTENG
-    window.addEventListener('DOMContentLoaded', function() {
+
+    window.addEventListener('load', function() {
         getDetailedDeviceInfo();
         let savedNum = localStorage.getItem('crm_sender_phone');
         if(savedNum && document.getElementById('nomor_pengirim')) {
@@ -568,19 +543,123 @@
         const qrKode = urlParams.get('kode');
 
         if (qrKode) {
-            
-            document.getElementById('loginScreen').style.display = 'none';
-            
-            
-            document.getElementById('loadingOverlay').style.display = 'flex';
+            const cleanCode = qrKode.toUpperCase();
+            document.getElementById('inputKode').value = cleanCode;
 
             
-            document.getElementById('inputKode').value = qrKode.toUpperCase();
+            window.history.replaceState({}, document.title, window.location.pathname);
 
             
-            doLogin(true); 
+            
+            const cachedName = localStorage.getItem('shop_cache_' + cleanCode);
+
+            if (cachedName) {
+                
+                console.log("🚀 Login via Cache (Super Cepat)");
+                
+                
+                masukDashboard(cleanCode, cleanCode, cachedName);
+                
+                
+                
+                doLogin(true, true); 
+            } else {
+                
+                document.getElementById('gpsStatus').innerHTML = "🚀 Sinkronisasi data toko...";
+                
+                doLogin(true, false);
+            }
         }
     });
+
+    
+    function masukDashboard(realCode, displayCode, shopName) {
+        currentStoreCode = realCode;
+        
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+
+        
+        document.getElementById('displayKode').innerText = displayCode;
+        document.getElementById('displayNama').innerText = shopName;
+        document.getElementById('nama_toko').value = shopName;
+        document.getElementById('formKode').value = realCode;
+
+        
+        localStorage.setItem('shop_cache_' + realCode, shopName);
+
+        loadDraft();
+    }
+
+    
+    async function doLogin(bypassGPS = false, isSilent = false) {
+        const codeInput = document.getElementById('inputKode');
+        const code = codeInput.value.toUpperCase().trim();
+        
+        if (code.length < 2) {
+            if(!isSilent) showAlert("Gagal", "Kode Toko harus diisi!");
+            return;
+        }
+        
+        if (code === "COBA") {
+            masukDashboard("COBA", "TEST", "Toko Uji Coba");
+            if(!isSilent) showAlert("Mode Uji Coba", "Masuk tanpa GPS.");
+            return;
+        }
+
+        const statusEl = document.getElementById('gpsStatus');
+        
+        
+        if (!isSilent) {
+            statusEl.innerText = bypassGPS ? "⏳ Mengambil data..." : "⏳ Sedang melacak lokasi...";
+        }
+
+        try {
+            
+            const res = await fetch(scriptURL + "?action=get_shop_info&kode=" + code + "&t=" + new Date().getTime());
+            const shop = await res.json();
+            
+            if (shop.error) throw new Error(shop.error);
+
+            
+            if (isSilent) {
+                
+                document.getElementById('displayNama').innerText = shop.nama;
+                document.getElementById('nama_toko').value = shop.nama;
+                
+                localStorage.setItem('shop_cache_' + code, shop.nama);
+                return; 
+            }
+
+            
+            if (bypassGPS) {
+                
+                masukDashboard(code, code, shop.nama);
+            } else {
+                
+                navigator.geolocation.getCurrentPosition(pos => {
+                    const dist = calculateDistance(pos.coords.latitude, pos.coords.longitude, shop.lat, shop.lon);
+                    
+                    if (dist > MAX_RADIUS_METERS) {
+                        return showAlert("Lokasi Jauh", `Anda berjarak ${Math.round(dist)}m dari toko. \n\nSilakan scan QR Code di KARTU.`);
+                    }
+                    
+                    masukDashboard(code, code, shop.nama);
+
+                }, () => showAlert("GPS Mati", "Mohon aktifkan GPS/Lokasi di HP Anda."));
+            }
+
+        } catch(e) { 
+            
+            if(!isSilent) {
+                showAlert("Login Gagal", "Kode tidak valid atau sinyal buruk.");
+                statusEl.innerText = "❌ Gagal memuat.";
+            }
+            console.error(e);
+        }
+    }
+
+
 
     function saveSender(val) { localStorage.setItem('crm_sender_phone', val); }
 
@@ -761,87 +840,7 @@
         hitungGlobal();
     }
 
-    
-
-    function masukDashboard(realCode, displayCode, shopName) {
-        currentStoreCode = realCode;
-        
-        
-        document.getElementById('loadingOverlay').style.display = 'none';
-        document.getElementById('loginScreen').style.display = 'none';
-        
-        
-        document.getElementById('dashboard').style.display = 'block';
-        
-        
-        document.getElementById('displayKode').innerText = displayCode;
-        document.getElementById('displayNama').innerText = shopName;
-        document.getElementById('nama_toko').value = shopName;
-        document.getElementById('formKode').value = realCode;
-
-        loadDraft();
-    }
-
-    async function doLogin(bypassGPS = false) {
-        const codeInput = document.getElementById('inputKode');
-        const code = codeInput.value.toUpperCase().trim();
-        
-        if (code.length < 2) {
-            
-            if(!bypassGPS) showAlert("Gagal", "Kode Toko harus diisi");
-            return;
-        }
-        
-        if (code === "COBA") {
-            masukDashboard("COBA", "TEST", "Toko Uji Coba");
-            if(!bypassGPS) showAlert("Mode Uji Coba", "Masuk tanpa GPS.");
-            return;
-        }
-
-        const statusEl = document.getElementById('gpsStatus');
-        
-        
-        if (!bypassGPS) {
-            statusEl.innerText = "⏳ Sedang melacak lokasi...";
-        }
-
-        try {
-            const res = await fetch(scriptURL + "?action=get_shop_info&kode=" + code + "&t=" + new Date().getTime());
-            const shop = await res.json();
-            
-            if (shop.error) throw new Error(shop.error);
-
-            if (bypassGPS) {
-                
-                masukDashboard(code, code, shop.nama);
-                window.history.replaceState({}, document.title, window.location.pathname);
-            } else {
-                
-                navigator.geolocation.getCurrentPosition(pos => {
-                    const dist = calculateDistance(pos.coords.latitude, pos.coords.longitude, shop.lat, shop.lon);
-                    
-                    if (dist > MAX_RADIUS_METERS) {
-                        return showAlert("Lokasi Jauh", `Anda berjarak ${Math.round(dist)}m dari toko. Wajib scan QR atau mendekat.`);
-                    }
-                    
-                    masukDashboard(code, code, shop.nama);
-
-                }, () => showAlert("GPS Mati", "Mohon aktifkan GPS/Lokasi di HP Anda."));
-            }
-        } catch(e) { 
-            
-            if(bypassGPS) {
-                document.getElementById('loadingOverlay').style.display = 'none';
-                document.getElementById('loginScreen').style.display = 'flex';
-                showAlert("Login Gagal", "Kode QR tidak valid atau koneksi bermasalah.");
-            } else {
-                showAlert("Login Gagal", "Kode salah atau koneksi error."); 
-                statusEl.innerText = "❌ Gagal memuat data.";
-            }
-        }
-    }
-    
-    function logout() { location.href = window.location.pathname; }
+    function logout() { location.reload(); }
 
     function initForm() {
         const fieldsFisik = [
@@ -931,8 +930,11 @@
         let elBal = document.getElementById('disp_balance');
         let btn = document.getElementById('btn-submit');
         
+        
         elBal.classList.remove('status-ok', 'status-plus', 'status-min', 'status-draft');
         btn.classList.remove('btn-green', 'btn-yellow', 'btn-blue');
+
+        
         
         if (sales === 0) {
             elBal.innerHTML = `<span>📝</span> PENGISIAN DATA`;
@@ -942,6 +944,7 @@
             btn.className = "btn-action btn-blue";
             btn.onclick = manualDraftSave;
         } 
+        
         else {
             btn.onclick = trySubmitForm; 
 
@@ -962,6 +965,8 @@
                 btn.className = "btn-action btn-green";
             }
         }
+
+       
         autoSaveDraft();
     }
 
@@ -1056,3 +1061,247 @@
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
