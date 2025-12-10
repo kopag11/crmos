@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Kalkulator CRM</title>
+    <title>Report Sales CRM</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -53,6 +53,31 @@
 
         h1, h2, h3 { family: 'Poppins', sans-serif; margin: 0; color: var(--text-dark); }
         
+        
+        #qrOverlay {
+            display: none; 
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #ffffff;
+            z-index: 9999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .pulse-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
         #loginScreen {
             flex: 1;
             display: flex;
@@ -141,7 +166,6 @@
         .store-info h2 { color: white; font-size: 1.25rem; margin-bottom: 5px; }
         .store-badge { 
             background: rgba(255,255,255,0.2); 
-            
             -webkit-backdrop-filter: blur(5px);
             backdrop-filter: blur(5px);
             padding: 4px 10px; 
@@ -293,7 +317,6 @@
         .modal { 
             display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.6); 
-            
             -webkit-backdrop-filter: blur(4px);
             backdrop-filter: blur(4px); 
             align-items: center; justify-content: center; 
@@ -325,6 +348,12 @@
     </style>
 </head>
 <body>
+
+<div id="qrOverlay">
+    <div class="pulse-icon">📸</div>
+    <h3 style="color:var(--primary); margin-bottom:5px;">Sedang Memverifikasi...</h3>
+    <p style="color:var(--text-gray); font-size:0.9rem;">Mohon tunggu sebentar</p>
+</div>
 
 <div class="container">
     
@@ -384,7 +413,7 @@
                     S222.803,365.127,217.289,365.127z"/>
                 </svg>
             </div>
-            <h2>Kalkulator CRM</h2>
+            <h2>Report Sales CRM</h2>
             <p style="color: var(--text-gray); margin: 5px 0 0 0;">Input Laporan Harian</p>
         </div>
         
@@ -543,6 +572,10 @@
         const qrKode = urlParams.get('kode');
 
         if (qrKode) {
+            
+            document.getElementById('qrOverlay').style.display = 'flex';
+            document.getElementById('loginScreen').style.display = 'none';
+
             const cleanCode = qrKode.toUpperCase();
             document.getElementById('inputKode').value = cleanCode;
 
@@ -550,22 +583,17 @@
             window.history.replaceState({}, document.title, window.location.pathname);
 
             
-            
             const cachedName = localStorage.getItem('shop_cache_' + cleanCode);
 
             if (cachedName) {
                 
-                console.log("🚀 Login via Cache (Super Cepat)");
-                
-                
-                masukDashboard(cleanCode, cleanCode, cachedName);
-                
-                
-                
-                doLogin(true, true); 
+                setTimeout(() => {
+                    masukDashboard(cleanCode, cleanCode, cachedName);
+                    
+                    document.getElementById('qrOverlay').style.display = 'none';
+                    doLogin(true, true); // Update background
+                }, 500); // Delay kecil agar transisi halus
             } else {
-                
-                document.getElementById('gpsStatus').innerHTML = "🚀 Sinkronisasi data toko...";
                 
                 doLogin(true, false);
             }
@@ -577,15 +605,14 @@
         currentStoreCode = realCode;
         
         document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('qrOverlay').style.display = 'none'; // Pastikan overlay hilang
         document.getElementById('dashboard').style.display = 'block';
 
-        
         document.getElementById('displayKode').innerText = displayCode;
         document.getElementById('displayNama').innerText = shopName;
         document.getElementById('nama_toko').value = shopName;
         document.getElementById('formKode').value = realCode;
 
-        
         localStorage.setItem('shop_cache_' + realCode, shopName);
 
         loadDraft();
@@ -610,28 +637,23 @@
         const statusEl = document.getElementById('gpsStatus');
         
         
-        if (!isSilent) {
-            statusEl.innerText = bypassGPS ? "⏳ Mengambil data..." : "⏳ Sedang melacak lokasi...";
+        if (!isSilent && !bypassGPS) {
+            statusEl.innerText = "⏳ Sedang melacak lokasi...";
         }
 
         try {
-            
             const res = await fetch(scriptURL + "?action=get_shop_info&kode=" + code + "&t=" + new Date().getTime());
             const shop = await res.json();
             
             if (shop.error) throw new Error(shop.error);
 
-            
             if (isSilent) {
-                
                 document.getElementById('displayNama').innerText = shop.nama;
                 document.getElementById('nama_toko').value = shop.nama;
-                
                 localStorage.setItem('shop_cache_' + code, shop.nama);
-                return; 
+                return;
             }
 
-            
             if (bypassGPS) {
                 
                 masukDashboard(code, code, shop.nama);
@@ -641,7 +663,7 @@
                     const dist = calculateDistance(pos.coords.latitude, pos.coords.longitude, shop.lat, shop.lon);
                     
                     if (dist > MAX_RADIUS_METERS) {
-                        return showAlert("Lokasi Jauh", `Anda berjarak ${Math.round(dist)}m dari toko. \n\nSilakan scan QR Code di KARTU.`);
+                        return showAlert("Lokasi Jauh", `Anda berjarak ${Math.round(dist)}m dari toko. \n\nSilakan scan QR Code di kartu.`);
                     }
                     
                     masukDashboard(code, code, shop.nama);
@@ -650,8 +672,11 @@
             }
 
         } catch(e) { 
-            
             if(!isSilent) {
+                
+                document.getElementById('qrOverlay').style.display = 'none';
+                document.getElementById('loginScreen').style.display = 'flex';
+                
                 showAlert("Login Gagal", "Kode tidak valid atau sinyal buruk.");
                 statusEl.innerText = "❌ Gagal memuat.";
             }
@@ -659,7 +684,7 @@
         }
     }
 
-
+    
 
     function saveSender(val) { localStorage.setItem('crm_sender_phone', val); }
 
@@ -1061,247 +1086,3 @@
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
