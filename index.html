@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Report Sales CRM</title>
+    <title>Kalkulator CRM</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -141,6 +141,7 @@
         .store-info h2 { color: white; font-size: 1.25rem; margin-bottom: 5px; }
         .store-badge { 
             background: rgba(255,255,255,0.2); 
+            -webkit-backdrop-filter: blur(5px); 
             backdrop-filter: blur(5px);
             padding: 4px 10px; 
             border-radius: 8px; 
@@ -254,7 +255,6 @@
         .status-plus { background: #3b82f6; color: white; }
         .status-min { background: var(--danger); color: white; }
 
-        /SEPTA GANTENG
         .status-draft {
             background: #e0f2fe;
             color: #0369a1;
@@ -290,7 +290,13 @@
         
         .btn-wa { background: #25D366; display: none; margin-top:15px;}
 
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); align-items: center; justify-content: center; }
+        .modal { 
+            display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.6); 
+            -webkit-backdrop-filter: blur(4px); 
+            backdrop-filter: blur(4px); 
+            align-items: center; justify-content: center; 
+        }
         .modal-content { background: white; padding: 30px 25px; border-radius: 24px; width: 85%; max-width: 350px; animation: popUp 0.3s ease; box-shadow: 0 20px 40px rgba(0,0,0,0.2); text-align: center;}
         @keyframes popUp { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         
@@ -377,7 +383,7 @@
                     S222.803,365.127,217.289,365.127z"/>
                 </svg>
             </div>
-            <h2>Report Sales CRM</h2>
+            <h2>Kalkulator CRM</h2>
             <p style="color: var(--text-gray); margin: 5px 0 0 0;">Input Laporan Harian</p>
         </div>
         
@@ -389,7 +395,7 @@
             <input type="text" id="inputKode" maxlength="4" placeholder="KODE" inputmode="text">
         </div>
         
-        <button class="btn-main" onclick="doLogin()">MASUK SEKARANG</button>
+        <button class="btn-main" onclick="doLogin(false)">MASUK SEKARANG</button>
         
         <p id="loginError" style="color:var(--danger); display:none; margin-top:20px; font-weight:600; background: var(--danger-soft); padding: 10px; border-radius: 8px;">Kode Salah!</p>
         <p id="gpsStatus" style="font-size:0.85rem; color:var(--text-gray); margin-top:25px;">⏳ Menunggu sinyal GPS...</p>
@@ -520,6 +526,8 @@
     let activeField = "";
     let onConfirmAction = null;
 
+    // SEPTA GANTENG
+
     window.addEventListener('load', function() {
         getDetailedDeviceInfo();
         let savedNum = localStorage.getItem('crm_sender_phone');
@@ -528,6 +536,17 @@
         }
         
         hitungGlobal();
+
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const qrKode = urlParams.get('kode');
+
+        if (qrKode) {
+            document.getElementById('inputKode').value = qrKode.toUpperCase();
+            document.getElementById('gpsStatus').innerHTML = "🔄 Mendeteksi QR Code...";
+            
+            doLogin(true); 
+        }
     });
 
     function saveSender(val) { localStorage.setItem('crm_sender_phone', val); }
@@ -709,45 +728,73 @@
         hitungGlobal();
     }
 
-    async function doLogin() {
-        const code = document.getElementById('inputKode').value.toUpperCase().trim();
-        if (code.length !== 4) return showAlert("Gagal", "Kode harus 4 karakter");
+    
+
+    function masukDashboard(realCode, displayCode, shopName) {
+        currentStoreCode = realCode;
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+        
+        
+        document.getElementById('displayKode').innerText = displayCode;
+        document.getElementById('displayNama').innerText = shopName;
+        document.getElementById('nama_toko').value = shopName;
+        document.getElementById('formKode').value = realCode;
+
+        loadDraft();
+    }
+
+    async function doLogin(bypassGPS = false) {
+        const codeInput = document.getElementById('inputKode');
+        const code = codeInput.value.toUpperCase().trim();
+        
+        if (code.length < 2) return showAlert("Gagal", "Kode Toko harus diisi");
         
         if (code === "COBA") {
-            currentStoreCode = "COBA";
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'block';
-            document.getElementById('displayKode').innerText = "TEST";
-            document.getElementById('formKode').value = "COBA";
-            document.getElementById('displayNama').innerText = "Mode Uji Coba";
-            document.getElementById('nama_toko').value = "Toko Uji Coba";
-            loadDraft(); 
+            masukDashboard("COBA", "TEST", "Toko Uji Coba");
             showAlert("Mode Uji Coba", "Masuk tanpa GPS.");
             return;
         }
 
-        document.getElementById('gpsStatus').innerText = "Sedang melacak lokasi...";
+        const statusEl = document.getElementById('gpsStatus');
+        
+        if (bypassGPS) {
+            statusEl.innerText = "⏳ Verifikasi QR Code...";
+        } else {
+            statusEl.innerText = "⏳ Sedang melacak lokasi...";
+        }
+
         try {
             const res = await fetch(scriptURL + "?action=get_shop_info&kode=" + code + "&t=" + new Date().getTime());
             const shop = await res.json();
+            
             if (shop.error) throw new Error(shop.error);
 
-            navigator.geolocation.getCurrentPosition(pos => {
-                const dist = calculateDistance(pos.coords.latitude, pos.coords.longitude, shop.lat, shop.lon);
-                if (dist > MAX_RADIUS_METERS) return showAlert("Lokasi Jauh", `Anda berjarak ${Math.round(dist)}m dari toko.`);
+            if (bypassGPS) {
                 
-                currentStoreCode = code;
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('dashboard').style.display = 'block';
-                document.getElementById('displayKode').innerText = code;
-                document.getElementById('formKode').value = code;
-                document.getElementById('displayNama').innerText = shop.nama;
-                document.getElementById('nama_toko').value = shop.nama;
-                loadDraft();
-            }, () => showAlert("GPS Mati", "Mohon aktifkan GPS/Lokasi di HP Anda."));
-        } catch(e) { showAlert("Login Gagal", e.message); }
+                masukDashboard(code, code, shop.nama);
+                
+                window.history.replaceState({}, document.title, window.location.pathname);
+            } else {
+                
+                navigator.geolocation.getCurrentPosition(pos => {
+                    const dist = calculateDistance(pos.coords.latitude, pos.coords.longitude, shop.lat, shop.lon);
+                    
+                    if (dist > MAX_RADIUS_METERS) {
+                        return showAlert("Lokasi Jauh", `Anda berjarak ${Math.round(dist)}m dari toko. Wajib scan QR atau mendekat.`);
+                    }
+                    
+                    masukDashboard(code, code, shop.nama);
+
+                }, () => showAlert("GPS Mati", "Mohon aktifkan GPS/Lokasi di HP Anda."));
+            }
+        } catch(e) { 
+            showAlert("Login Gagal", "Kode salah atau koneksi error."); 
+            statusEl.innerText = "❌ Gagal memuat data.";
+        }
     }
-    function logout() { location.reload(); }
+    
+    function logout() { location.href = window.location.pathname; }
 
     function initForm() {
         const fieldsFisik = [
@@ -837,11 +884,8 @@
         let elBal = document.getElementById('disp_balance');
         let btn = document.getElementById('btn-submit');
         
-        
         elBal.classList.remove('status-ok', 'status-plus', 'status-min', 'status-draft');
         btn.classList.remove('btn-green', 'btn-yellow', 'btn-blue');
-
-        
         
         if (sales === 0) {
             elBal.innerHTML = `<span>📝</span> PENGISIAN DATA`;
@@ -851,7 +895,6 @@
             btn.className = "btn-action btn-blue";
             btn.onclick = manualDraftSave;
         } 
-        
         else {
             btn.onclick = trySubmitForm; 
 
@@ -872,8 +915,6 @@
                 btn.className = "btn-action btn-green";
             }
         }
-
-       
         autoSaveDraft();
     }
 
