@@ -749,13 +749,13 @@
 
     function initForm() {
         const fieldsFisik = [
-            {id:'setor_sore', label:'☀️ Setor Sore', desc:'Setoran yang dilakukan setelah sales H-1 sudah clear'},
-            {id:'setor_malam', label:'🌙 Setor Malam', desc:'Setoran yang dilakukan jam 21.00 sampai jam 24.00'},
-            {id:'setor_pagi', label:'🌅 Setor Pagi (H+1)', desc:'Setoran yang dilakukan dari jam 24.00 sampai setoran sales H-1 selesai'},
+            {id:'setor_sore', label:'☀️ Setor Sore', desc:'Setoran yang dilakukan setelah sales kemarin sudah selesai (ORI)'},
+            {id:'setor_malam', label:'🌙 Setor Malam', desc:'Setoran yang dilakukan saat jam 21.00 sampai jam 24.00'},
+            {id:'setor_pagi', label:'🌅 Setor Pagi (H+1)', desc:'Setoran yang dilakukan dari jam 24.00 sampai setoran sales kemarin selesai'},
             {id:'ekor_sales', label:'🪙 Ekor Sales', hasNote: true, desc:'Transferan yang menggunakan mobile banking untuk ekor, dan buktinya dikirim ke WA'}
         ];
         const fieldsPotong = [
-            {id:'pot_ba', label:'⚠️ Potongan BA Var', desc:'Jika sudah ada email klaim atau BA PDF yang langsung di-TTD lengkap'},
+            {id:'pot_ba', label:'⚠️ Potongan BA Var', desc:'potongan yangj jika sudah ada email klaim varian atau BA PDF yang langsung di-TTD lengkap'},
             {id:'pot_lebih', label:'➕ Potongan Lebih', desc:'Potong atas kelebihan setoran sales sebelumnya'},
             {id:'pot_virtual', label:'💳 Potongan Virtual', desc:'Potong atas seluruh email dari virtual yg menyatakan gagal atau bisa koreksi sales'}
         ];
@@ -970,5 +970,6 @@
 </script>
 </body>
 </html>
+
 
 
