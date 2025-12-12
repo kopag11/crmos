@@ -922,12 +922,12 @@
                      btn.style.display = 'none'; document.getElementById('btn-wa').style.display = 'flex';
                      const delData = new FormData(); delData.append('action', 'delete_draft'); delData.append('Kode Toko', currentStoreCode);
                      fetch(scriptURL, { method: 'POST', body: delData }); 
-                     showAlert("Berhasil!", "Laporan Final telah terbentuk.");
+                     showAlert("Berhasil!", "Laporan WA telah terbentuk.");
                 } else { throw new Error(data.error); }
             })
             .catch(err => {
                 status.innerText = "Gagal: " + err.message;
-                btn.disabled = false; btn.innerText = "💾 SIMPAN FINAL";
+                btn.disabled = false; btn.innerText = "💾 SIMPAN (Bentuk Laporan WA)";
                 showAlert("Error", "Gagal memproses data. Coba lagi.");
             });
     }
@@ -970,6 +970,7 @@
 </script>
 </body>
 </html>
+
 
 
 
