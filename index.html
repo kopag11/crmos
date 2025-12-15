@@ -560,7 +560,7 @@
                     const dist = calculateDistance(pos.coords.latitude, pos.coords.longitude, shop.lat, shop.lon);
                     
                     if (dist > MAX_RADIUS_METERS) {
-                        return showAlert("Lokasi Jauh", `Anda berjarak ${Math.round(dist)}m dari toko. \n\nSilakan scan QR Code di tembok.`);
+                        return showAlert("Lokasi Jauh", `Anda berjarak ${Math.round(dist)}m dari toko. \n\nSilakan scan QR Code di kartu.`);
                     }
                     masukDashboard(code, code, shop.nama);
                 }, () => showAlert("GPS Mati", "Mohon aktifkan GPS/Lokasi di HP Anda."));
@@ -981,3 +981,4 @@
 </script>
 </body>
 </html>
+
