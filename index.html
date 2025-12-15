@@ -35,7 +35,6 @@
 
         h1, h2, h3 { family: 'Poppins', sans-serif; margin: 0; color: var(--text-dark); }
         
-        
         #qrOverlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #ffffff; z-index: 9999; flex-direction: column;
@@ -45,7 +44,6 @@
         .pulse-icon { font-size: 4rem; margin-bottom: 20px; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
 
-        
         #exitScreen {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #f1f5f9; z-index: 10000; flex-direction: column;
@@ -416,14 +414,20 @@
         
         hitungGlobal();
 
+        
         const urlParams = new URLSearchParams(window.location.search);
         const qrKode = urlParams.get('kode');
 
         
+        const lockStatus = localStorage.getItem('lock_status');
+        const activeSession = localStorage.getItem('active_session_code');
+        const loginMethod = localStorage.getItem('login_method');
+
+        
         if (qrKode) {
-           
             localStorage.setItem('lock_status', 'OPEN');
             localStorage.setItem('login_method', 'QR');
+            localStorage.setItem('active_session_code', qrKode.toUpperCase()); 
             
             
             document.getElementById('qrOverlay').style.display = 'flex';
@@ -433,10 +437,8 @@
             const cleanCode = qrKode.toUpperCase();
             document.getElementById('inputKode').value = cleanCode;
 
-            
             window.history.replaceState({}, document.title, window.location.pathname);
 
-            
             const cachedName = localStorage.getItem('shop_cache_' + cleanCode);
             if (cachedName) {
                 setTimeout(() => {
@@ -451,11 +453,19 @@
         }
 
         
-        const lockStatus = localStorage.getItem('lock_status');
         if (lockStatus === 'LOCKED') {
-             
              showExitLocked();
              return;
+        }
+
+        
+        if (activeSession && loginMethod === 'QR') {
+            const cachedName = localStorage.getItem('shop_cache_' + activeSession);
+            
+            masukDashboard(activeSession, activeSession, cachedName || "Memuat...");
+            // Update data di background
+            doLogin(true, true);
+            return;
         }
 
         
@@ -467,19 +477,19 @@
     function logout() { 
         const method = localStorage.getItem('login_method');
         
+        
+        localStorage.removeItem('active_session_code');
+
         if (method === 'QR') {
-            
             localStorage.setItem('lock_status', 'LOCKED');
             showExitLocked();
             window.close(); 
         } else {
-            
             localStorage.removeItem('login_method');
             location.reload(); 
         }
     }
 
-    
     function showExitLocked() {
         document.getElementById('dashboard').style.display = 'none';
         document.getElementById('loginScreen').style.display = 'none';
@@ -487,7 +497,6 @@
         document.getElementById('exitScreen').style.display = 'flex';
     }
 
-    
 
     function masukDashboard(realCode, displayCode, shopName) {
         currentStoreCode = realCode;
@@ -556,7 +565,6 @@
         } catch(e) { 
             if(!isSilent) {
                 document.getElementById('qrOverlay').style.display = 'none';
-                
                 localStorage.removeItem('lock_status'); 
                 document.getElementById('loginScreen').style.display = 'flex';
                 showAlert("Login Gagal", "Kode tidak valid atau sinyal buruk.");
@@ -566,7 +574,7 @@
         }
     }
 
-    
+
 
     function saveSender(val) { localStorage.setItem('crm_sender_phone', val); }
 
@@ -747,158 +755,6 @@
         hitungGlobal();
     }
 
-    function initForm() {
-        const fieldsFisik = [
-            {id:'setor_sore', label:'☀️ Setor Sore', desc:'Setoran yang dilakukan setelah sales kemarin sudah selesai (ORI)'},
-            {id:'setor_malam', label:'🌙 Setor Malam', desc:'Setoran yang dilakukan saat jam 21.00 sampai jam 24.00'},
-            {id:'setor_pagi', label:'🌅 Setor Pagi (H+1)', desc:'Setoran yang dilakukan dari jam 24.00 sampai setoran sales kemarin selesai'},
-            {id:'ekor_sales', label:'🪙 Ekor Sales', hasNote: true, desc:'Transferan yang menggunakan mobile banking untuk ekor, dan buktinya dikirim ke WA'}
-        ];
-        const fieldsPotong = [
-            {id:'pot_ba', label:'⚠️ Potongan BA Var', desc:'potongan yang jika sudah ada email klaim varian atau BA PDF yang langsung di-TTD lengkap'},
-            {id:'pot_lebih', label:'➕ Potongan Lebih', desc:'Potong atas kelebihan setoran sales sebelumnya'},
-            {id:'pot_virtual', label:'💳 Potongan Virtual', desc:'Potong atas seluruh email dari virtual yg menyatakan gagal atau bisa koreksi sales'}
-        ];
-
-        let html = "";
-        html += `<div class="card"><div class="section-title t-fisik"><span>💵</span> Uang Fisik</div>`;
-        fieldsFisik.forEach(f => html += createFieldHtml(f));
-        html += `</div>`;
-        html += `<div class="card"><div class="section-title t-potong"><span>✂️</span> Potongan</div>`;
-        fieldsPotong.forEach(f => html += createFieldHtml(f));
-        html += `</div>`;
-        
-        document.getElementById('dynamicInputs').innerHTML = html;
-    }
-
-    function createFieldHtml(f) {
-        if (!dataStore[f.id]) dataStore[f.id] = [];
-        let ekorVal = document.getElementById('val_nama_ekor') ? document.getElementById('val_nama_ekor').value : '';
-        let noteInput = f.hasNote 
-            ? `<input type="text" id="note_ekor" placeholder="Ket. Ekor (Misal: BCA Budi)" value="${ekorVal}" oninput="document.getElementById('val_nama_ekor').value=this.value; autoSaveDraft();" style="margin-top:10px; border:1px dashed #cbd5e1; background: #f8fafc;">` 
-            : '';
-        let infoHtml = f.desc ? `<span class="info-btn" onclick="showAlert('Informasi', '${f.desc}')">i</span>` : '';
-
-        return `<div class="form-group">
-                    <label>${f.label} ${infoHtml}</label>
-                    <div class="input-with-btn">
-                        <input type="text" id="view_${f.id}" value="Rp 0" readonly style="background:white; cursor: default;">
-                        <button type="button" class="btn-add" onclick="openCalc('${f.id}', '${f.label}')">+</button>
-                    </div>
-                    ${noteInput}
-                </div>`;
-    }
-
-    function openCalc(id, title) { activeField=id; document.getElementById('modalTitle').innerText=title; document.getElementById('calcModal').style.display='flex'; renderCalcRows(); updateModalTotal(); }
-    function renderCalcRows() {
-        const c = document.getElementById('calcList'); c.innerHTML="";
-        let vals = dataStore[activeField]||[]; if(vals.length===0) vals.push(0);
-        vals.forEach((v,i) => {
-            c.innerHTML += `<div class="calc-row"><input type="text" inputmode="numeric" class="calc-input" value="${v===0?'':v.toLocaleString('id-ID')}" onkeyup="formatRibuan(this);updateModalTotal()"><button class="btn-remove" onclick="removeRow(${i})">✕</button></div>`;
-        });
-    }
-    function addCalcRow() { saveTemp(); dataStore[activeField].push(0); renderCalcRows(); }
-    function removeRow(i) { saveTemp(); dataStore[activeField].splice(i,1); renderCalcRows(); updateModalTotal(); }
-    function saveTemp() { dataStore[activeField] = Array.from(document.querySelectorAll('.calc-input')).map(i=>getCleanNumber(i.value)); }
-    function updateModalTotal() { 
-        let t=0; document.querySelectorAll('.calc-input').forEach(i=>t+=getCleanNumber(i.value)); 
-        document.getElementById('modalTotal').innerText="Rp "+t.toLocaleString('id-ID'); 
-    }
-    function saveCalculator() {
-        saveTemp(); let t = dataStore[activeField].reduce((a,b)=>a+b,0);
-        document.getElementById('view_'+activeField).value="Rp "+t.toLocaleString('id-ID');
-        document.getElementById('h_'+activeField).value=t;
-        document.getElementById('calcModal').style.display='none'; hitungGlobal();
-    }
-
-    
-    function hitungGlobal() {
-        let rawSales = document.getElementById('total_sales').value;
-        let sales = getCleanNumber(rawSales);
-        
-        let fisik = Number(document.getElementById('h_setor_sore').value) + 
-                    Number(document.getElementById('h_setor_malam').value) + 
-                    Number(document.getElementById('h_setor_pagi').value) + 
-                    Number(document.getElementById('h_ekor_sales').value);
-                    
-        let potong = Number(document.getElementById('h_pot_ba').value) + 
-                     Number(document.getElementById('h_pot_lebih').value) + 
-                     Number(document.getElementById('h_pot_virtual').value);
-
-        document.getElementById('disp_total_fisik').innerText = "Rp " + fisik.toLocaleString('id-ID');
-        document.getElementById('disp_total_potong').innerText = "Rp " + potong.toLocaleString('id-ID');
-        document.getElementById('h_total_fisik').value = fisik;
-
-        let selisih = (fisik + potong) - sales;
-        document.getElementById('val_selisih').value = selisih;
-
-        let elBal = document.getElementById('disp_balance');
-        let btn = document.getElementById('btn-submit');
-        
-        elBal.classList.remove('status-ok', 'status-plus', 'status-min', 'status-draft');
-        btn.classList.remove('btn-green', 'btn-yellow', 'btn-blue');
-        
-        if (sales === 0) {
-            elBal.innerHTML = `<span>📝</span> PENGISIAN DATA`;
-            elBal.classList.add('status-draft');
-            
-            btn.innerHTML = `<span>☁️</span> SIMPAN DRAFT`;
-            btn.className = "btn-action btn-blue";
-            btn.onclick = manualDraftSave;
-        } 
-        
-        else {
-            btn.onclick = trySubmitForm; 
-
-            if (selisih < 0) {
-                elBal.innerHTML = `<span>⚠️</span> KURANG (-) Rp ` + Math.abs(selisih).toLocaleString('id-ID');
-                elBal.classList.add('status-min');
-                btn.innerHTML = `<span>⚠️</span> SIMPAN DRAFT (MINUS)`; 
-                btn.className = "btn-action btn-yellow";
-            } else {
-                if (selisih === 0) {
-                    elBal.innerHTML = `<span>✅</span> BALANCE (PAS)`; 
-                    elBal.classList.add('status-ok');
-                } else {
-                    elBal.innerHTML = `<span>➕</span> LEBIH (+) Rp ` + selisih.toLocaleString('id-ID');
-                    elBal.classList.add('status-plus');
-                }
-                btn.innerHTML = `<span>💾</span> SIMPAN (Bentuk Laporan WA)`;
-                btn.className = "btn-action btn-green";
-            }
-        }
-       
-        autoSaveDraft();
-    }
-
-    function trySubmitForm() {
-        let tgl = document.getElementById('tgl').value;
-        let rawSales = document.getElementById('total_sales').value;
-        let sales = getCleanNumber(rawSales);
-
-        if (!tgl) { showAlert("Data Kosong", "Isi TANGGAL dulu!"); return; }
-
-        let selisih = Number(document.getElementById('val_selisih').value);
-        let msg = "";
-        let isDanger = false;
-
-        if (selisih < 0) {
-            autoSaveDraft(); 
-            showAlert("Data Kurang", `Data masih MINUS Rp ${Math.abs(selisih).toLocaleString('id-ID')}.\n\nData tersimpan otomatis sebagai DRAFT.`);
-            return; 
-        } else if (selisih > 0) {
-            msg = `ℹ️ INFO: Ada KELEBIHAN uang Rp ${selisih.toLocaleString('id-ID')}.\n\nSimpan laporan?`;
-            isDanger = false;
-        } else {
-            msg = "✅ Data BALANCE (PAS).\n\nSimpan laporan final?";
-            isDanger = false;
-        }
-
-        showConfirm("Konfirmasi Laporan", msg, isDanger, function() {
-            processSubmit();
-        });
-    }
-
     function processSubmit() {
         const btn = document.getElementById('btn-submit');
         const status = document.getElementById('status');
@@ -955,24 +811,12 @@
         let txt = `*LAPORAN SETOR SALES*\n*${kode} - ${nama}*\n*Tgl Sales:* ${tglIndo}\n*Total Sales:* Rp ${document.getElementById('total_sales').value}\n------------------\n*Fisik Setor:*\n1. Sore: ${getVal('setor_sore')}\n2. Malam: ${getVal('setor_malam')}\n3. Pagi: ${getVal('setor_pagi')}\n4. Ekor: ${ekorTxt}\n------------------ (+)\n*Total Setor: ${document.getElementById('disp_total_fisik').innerText}*\n\n*Potongan:*\n1. BA Var: ${getVal('pot_ba')}\n2. Lebih: ${getVal('pot_lebih')}\n3. Virtual: ${getVal('pot_virtual')}\n------------------ (+)\n*Total Potong: ${document.getElementById('disp_total_potong').innerText}*\n\n------------------\n*${statusTxt}*\n\n👤 *Pengirim:* ${pengirim}\n\nNote : untuk bukti ekor dan bukti potong email dilampirkan`;
         
         window.open(`https://wa.me/6285183347653?text=${encodeURIComponent(txt)}`, '_blank');
-        setTimeout(function() {
-            
-            const method = localStorage.getItem('login_method');
-            if(method === 'QR'){
-                 localStorage.setItem('lock_status', 'LOCKED');
-                 showExitLocked();
-                 window.close();
-            } else {
-                 location.reload();
-            }
-        }, 1000); 
+        
+        
+         setTimeout(function() {
+            logout();
+         }, 1000); 
     }
 </script>
 </body>
 </html>
-
-
-
-
-
-
