@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
 
     <style>
+        
         :root {
             --primary: #3b82f6; --primary-dark: #2563eb; --primary-soft: #eff6ff;
             --bg-color: #f1f5f9; --card-bg: #ffffff; --text-dark: #1e293b;
@@ -35,6 +36,7 @@
         h1, h2, h3 { family: 'Poppins', sans-serif; margin: 0; color: var(--text-dark); }
         
         
+        
         #qrOverlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #ffffff; z-index: 9999; flex-direction: column;
@@ -44,7 +46,6 @@
         .pulse-icon { font-size: 4rem; margin-bottom: 20px; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
 
-        
         #exitScreen {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #f1f5f9; z-index: 10000; flex-direction: column;
@@ -87,6 +88,7 @@
         }
         .btn-main:active { transform: scale(0.98); box-shadow: none; }
 
+        
         #dashboard { display: none; padding-bottom: 60px; }
         
         .header-card {
@@ -180,6 +182,7 @@
         .btn-blue { background: #0ea5e9; color: white; box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3); }
         .btn-wa { background: #25D366; display: none; margin-top:15px;}
 
+        
         .modal { 
             display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.6); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); 
@@ -209,16 +212,12 @@
         }
         .t-fisik { color: var(--primary); }
         .t-potong { color: var(--danger); }
-        
+
         
         .check-tertelan-wrapper {
-            display: inline-flex;
-            align-items: center;
-            margin-left: 10px;
-            background: #fff;
-            padding: 2px 8px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
+            display: inline-flex; align-items: center; margin-left: 8px;
+            background: #f1f5f9; padding: 2px 8px; border-radius: 6px;
+            border: 1px solid #cbd5e1;
         }
     </style>
 </head>
@@ -440,7 +439,7 @@
         if (qrKode) {
             localStorage.setItem('lock_status', 'OPEN');
             localStorage.setItem('login_method', 'QR');
-            localStorage.setItem('active_session_code', qrKode.toUpperCase());
+            localStorage.setItem('active_session_code', qrKode.toUpperCase()); 
             
             
             document.getElementById('qrOverlay').style.display = 'flex';
@@ -477,7 +476,7 @@
             const cachedName = localStorage.getItem('shop_cache_' + activeSession);
             
             masukDashboard(activeSession, activeSession, cachedName || "Memuat...");
-            
+           
             doLogin(true, true);
             return;
         }
@@ -511,7 +510,7 @@
         document.getElementById('exitScreen').style.display = 'flex';
     }
 
-    
+
 
     function masukDashboard(realCode, displayCode, shopName) {
         currentStoreCode = realCode;
@@ -788,7 +787,7 @@
         ];
         const fieldsPotong = [
             {id:'pot_ba', label:'⚠️ Potongan BA Var', desc:'potongan yang jika sudah ada email klaim varian atau BA PDF yang langsung di-TTD lengkap'},
-            {id:'pot_lebih', label:'➕ Potongan Lebih / Tertelan', isTertelanOption: true, desc:'Potong atas kelebihan setoran sales sebelumnya atau Uang Tertelan (cetang)'}, 
+            {id:'pot_lebih', label:'➕ Potongan Lebih / Tertelan', isTertelanOption: true, desc:'Potong atas kelebihan setoran sales sebelumnya atau centang kotak disamping jika Uang Tertelan'},
             {id:'pot_virtual', label:'💳 Potongan Virtual', desc:'Potong atas seluruh email dari virtual yg menyatakan gagal atau bisa koreksi sales'}
         ];
 
@@ -859,7 +858,8 @@
         
         if (wajibKelipatan.includes(activeField)) {
             if (t % 50000 !== 0) {
-                alert("⚠️ " + document.getElementById('modalTitle').innerText + "\nHarus kelipatan Rp 50.000!\n\n(Pastikan tidak ada recehan)");
+                
+                showAlert("Validasi Gagal", document.getElementById('modalTitle').innerText + "\nHarus kelipatan Rp 50.000!\n\n(Pastikan tidak ada recehan)");
                 return; 
             }
         }
@@ -1031,4 +1031,3 @@
 </script>
 </body>
 </html>
-
