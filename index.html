@@ -10,7 +10,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        
         :root {
             --primary: #3b82f6; --primary-dark: #2563eb; --primary-soft: #eff6ff;
             --bg-color: #f1f5f9; --card-bg: #ffffff; --text-dark: #1e293b;
@@ -52,7 +51,6 @@
             justify-content: center; align-items: center; text-align: center; padding: 30px;
         }
 
-        
         #loginScreen {
             flex: 1; display: none; 
             flex-direction: column; justify-content: center; align-items: center;
@@ -211,6 +209,17 @@
         }
         .t-fisik { color: var(--primary); }
         .t-potong { color: var(--danger); }
+        
+        
+        .check-tertelan-wrapper {
+            display: inline-flex;
+            align-items: center;
+            margin-left: 10px;
+            background: #fff;
+            padding: 2px 8px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
     </style>
 </head>
 <body>
@@ -337,9 +346,11 @@
             <input type="hidden" name="Setor Malam" id="h_setor_malam" value="0">
             <input type="hidden" name="Setor Pagi" id="h_setor_pagi" value="0">
             <input type="hidden" name="Ekor Sales" id="h_ekor_sales" value="0">
+            
             <input type="hidden" name="Potongan BA" id="h_pot_ba" value="0">
-            <input type="hidden" name="Potongan Lebih" id="h_pot_lebih" value="0">
+            <input type="hidden" name="Potongan Lebih" id="h_pot_lebih" value="0"> 
             <input type="hidden" name="Potongan Virtual" id="h_pot_virtual" value="0">
+
             <input type="hidden" name="Total Setor Fisik" id="h_total_fisik" value="0">
             <input type="hidden" name="Ket Ekor" id="val_nama_ekor"> 
             <input type="hidden" id="val_selisih" value="0">
@@ -429,7 +440,7 @@
         if (qrKode) {
             localStorage.setItem('lock_status', 'OPEN');
             localStorage.setItem('login_method', 'QR');
-            localStorage.setItem('active_session_code', qrKode.toUpperCase()); 
+            localStorage.setItem('active_session_code', qrKode.toUpperCase());
             
             
             document.getElementById('qrOverlay').style.display = 'flex';
@@ -500,7 +511,7 @@
         document.getElementById('exitScreen').style.display = 'flex';
     }
 
-
+    
 
     function masukDashboard(realCode, displayCode, shopName) {
         currentStoreCode = realCode;
@@ -560,7 +571,7 @@
                     const dist = calculateDistance(pos.coords.latitude, pos.coords.longitude, shop.lat, shop.lon);
                     
                     if (dist > MAX_RADIUS_METERS) {
-                        return showAlert("Lokasi Jauh", `Anda berjarak ${Math.round(dist)}m dari toko. \n\nSilakan scan QR Code di kartu.`);
+                        return showAlert("Lokasi Jauh", `Anda berjarak ${Math.round(dist)}m dari toko. \n\nSilakan scan QR Code di tembok.`);
                     }
                     masukDashboard(code, code, shop.nama);
                 }, () => showAlert("GPS Mati", "Mohon aktifkan GPS/Lokasi di HP Anda."));
@@ -577,6 +588,7 @@
             console.error(e);
         }
     }
+
 
 
     function saveSender(val) { localStorage.setItem('crm_sender_phone', val); }
@@ -673,6 +685,8 @@
             h_pot_ba: document.getElementById('h_pot_ba').value,
             h_pot_lebih: document.getElementById('h_pot_lebih').value,
             h_pot_virtual: document.getElementById('h_pot_virtual').value,
+            
+            is_tertelan: document.getElementById('check_tertelan') ? document.getElementById('check_tertelan').checked : false
         };
     }
 
@@ -729,11 +743,18 @@
                     } else { dataStore = draft.dataStore || {}; }
 
                     ['setor_sore', 'setor_malam', 'setor_pagi', 'ekor_sales', 'pot_ba', 'pot_lebih', 'pot_virtual'].forEach(key => {
-                        document.getElementById('h_' + key).value = draft['h_' + key] || 0;
+                        let el = document.getElementById('h_' + key);
+                        if(el) el.value = draft['h_' + key] || 0;
                     });
 
                     initForm(); 
                     if(document.getElementById('note_ekor')) document.getElementById('note_ekor').value = draft.ekor_note || '';
+                    
+                    
+                    if(document.getElementById('check_tertelan') && draft.is_tertelan) {
+                        document.getElementById('check_tertelan').checked = true;
+                    }
+
                     updateAllViewFields(); 
                     
                     let tglIndo = formatDateIndo(draft.tgl);
@@ -767,7 +788,7 @@
         ];
         const fieldsPotong = [
             {id:'pot_ba', label:'⚠️ Potongan BA Var', desc:'potongan yang jika sudah ada email klaim varian atau BA PDF yang langsung di-TTD lengkap'},
-            {id:'pot_lebih', label:'➕ Potongan Lebih', desc:'Potong atas kelebihan setoran sales sebelumnya'},
+            {id:'pot_lebih', label:'➕ Potongan Lebih / Tertelan', isTertelanOption: true, desc:'Potong atas kelebihan setoran sales sebelumnya atau Uang Tertelan (cetang)'}, 
             {id:'pot_virtual', label:'💳 Potongan Virtual', desc:'Potong atas seluruh email dari virtual yg menyatakan gagal atau bisa koreksi sales'}
         ];
 
@@ -790,8 +811,19 @@
             : '';
         let infoHtml = f.desc ? `<span class="info-btn" onclick="showAlert('Informasi', '${f.desc}')">i</span>` : '';
 
+        
+        let checkboxHtml = '';
+        if (f.isTertelanOption) {
+            checkboxHtml = `
+            <div class="check-tertelan-wrapper">
+                <input type="checkbox" id="check_tertelan" onchange="autoSaveDraft()">
+                <label for="check_tertelan" style="margin:0 0 0 5px; font-size:0.8rem; font-weight:normal; color:#475569; cursor:pointer;">Tertelan?</label>
+            </div>`;
+        }
+        
+
         return `<div class="form-group">
-                    <label>${f.label} ${infoHtml}</label>
+                    <label>${f.label} ${infoHtml} ${checkboxHtml}</label>
                     <div class="input-with-btn">
                         <input type="text" id="view_${f.id}" value="Rp 0" readonly style="background:white; cursor: default;">
                         <button type="button" class="btn-add" onclick="openCalc('${f.id}', '${f.label}')">+</button>
@@ -815,11 +847,27 @@
         let t=0; document.querySelectorAll('.calc-input').forEach(i=>t+=getCleanNumber(i.value)); 
         document.getElementById('modalTotal').innerText="Rp "+t.toLocaleString('id-ID'); 
     }
+    
+    
     function saveCalculator() {
-        saveTemp(); let t = dataStore[activeField].reduce((a,b)=>a+b,0);
+        saveTemp(); 
+        
+        let t = dataStore[activeField].reduce((a,b)=>a+b,0);
+
+        
+        const wajibKelipatan = ['setor_sore', 'setor_malam', 'setor_pagi'];
+        
+        if (wajibKelipatan.includes(activeField)) {
+            if (t % 50000 !== 0) {
+                alert("⚠️ " + document.getElementById('modalTitle').innerText + "\nHarus kelipatan Rp 50.000!\n\n(Pastikan tidak ada recehan)");
+                return; 
+            }
+        }
+
         document.getElementById('view_'+activeField).value="Rp "+t.toLocaleString('id-ID');
         document.getElementById('h_'+activeField).value=t;
-        document.getElementById('calcModal').style.display='none'; hitungGlobal();
+        document.getElementById('calcModal').style.display='none'; 
+        hitungGlobal();
     }
 
     
@@ -852,15 +900,11 @@
         if (sales === 0) {
             elBal.innerHTML = `<span>📝</span> PENGISIAN DATA`;
             elBal.classList.add('status-draft');
-            
             btn.innerHTML = `<span>☁️</span> SIMPAN DRAFT`;
             btn.className = "btn-action btn-blue";
             btn.onclick = manualDraftSave;
-        } 
-        
-        else {
+        } else {
             btn.onclick = trySubmitForm; 
-
             if (selisih < 0) {
                 elBal.innerHTML = `<span>⚠️</span> KURANG (-) Rp ` + Math.abs(selisih).toLocaleString('id-ID');
                 elBal.classList.add('status-min');
@@ -878,15 +922,11 @@
                 btn.className = "btn-action btn-green";
             }
         }
-       
         autoSaveDraft();
     }
 
     function trySubmitForm() {
         let tgl = document.getElementById('tgl').value;
-        let rawSales = document.getElementById('total_sales').value;
-        let sales = getCleanNumber(rawSales);
-
         if (!tgl) { showAlert("Data Kosong", "Isi TANGGAL dulu!"); return; }
 
         let selisih = Number(document.getElementById('val_selisih').value);
@@ -945,6 +985,7 @@
 
     function kirimWA() {
         let getVal = (id) => document.getElementById('view_'+id).value;
+        let getNum = (id) => Number(document.getElementById('h_'+id).value) || 0;
         let selisih = Number(document.getElementById('val_selisih').value);
         
         let kode = document.getElementById('formKode').value || currentStoreCode;
@@ -963,22 +1004,30 @@
         let ekorTxt = getVal('ekor_sales');
         if(document.getElementById('val_nama_ekor').value) ekorTxt += ` (a.n ${document.getElementById('val_nama_ekor').value})`;
 
-        let txt = `*LAPORAN SETOR SALES*\n*${kode} - ${nama}*\n*Tgl Sales:* ${tglIndo}\n*Total Sales:* Rp ${document.getElementById('total_sales').value}\n------------------\n*Fisik Setor:*\n1. Sore: ${getVal('setor_sore')}\n2. Malam: ${getVal('setor_malam')}\n3. Pagi: ${getVal('setor_pagi')}\n4. Ekor: ${ekorTxt}\n------------------ (+)\n*Total Setor: ${document.getElementById('disp_total_fisik').innerText}*\n\n*Potongan:*\n1. BA Var: ${getVal('pot_ba')}\n2. Lebih: ${getVal('pot_lebih')}\n3. Virtual: ${getVal('pot_virtual')}\n------------------ (+)\n*Total Potong: ${document.getElementById('disp_total_potong').innerText}*\n\n------------------\n*${statusTxt}*\n\n👤 *Pengirim:* ${pengirim}\n\nNote : untuk bukti ekor dan bukti potong email dilampirkan`;
+        
+        let potongTxt = "";
+        if(getNum('pot_ba') > 0) potongTxt += `\n1. BA Var: ${getVal('pot_ba')}`;
+        
+        if(getNum('pot_lebih') > 0) {
+           
+            let isTertelan = document.getElementById('check_tertelan').checked;
+            let labelPot = isTertelan ? "Tertelan" : "Lebih";
+            potongTxt += `\n2. ${labelPot}: ${getVal('pot_lebih')}`;
+        }
+
+        if(getNum('pot_virtual') > 0) potongTxt += `\n3. Virtual: ${getVal('pot_virtual')}`;
+        
+        if(potongTxt === "") potongTxt = "\n(Tidak ada)";
+        
+
+        let txt = `*LAPORAN SETOR SALES*\n\n*${kode} - ${nama}*\n*Tgl Sales:* ${tglIndo}\n*Total Sales:* Rp ${document.getElementById('total_sales').value}\n------------------\n*Fisik Setor:*\n1. Sore: ${getVal('setor_sore')}\n2. Malam: ${getVal('setor_malam')}\n3. Pagi: ${getVal('setor_pagi')}\n4. Ekor: ${ekorTxt}\n------------------ (+)\n*Total Setor: ${document.getElementById('disp_total_fisik').innerText}*\n\n*Potongan:*${potongTxt}\n------------------ (+)\n*Total Potong: ${document.getElementById('disp_total_potong').innerText}*\n\n------------------\n*${statusTxt}*\n\n👤 *Pengirim:* ${pengirim}\n\nNote : untuk bukti ekor dan bukti potong email dilampirkan`;
         
         window.open(`https://wa.me/6285183347653?text=${encodeURIComponent(txt)}`, '_blank');
-        setTimeout(function() {
-            
-            const method = localStorage.getItem('login_method');
-            if(method === 'QR'){
-                 localStorage.setItem('lock_status', 'LOCKED');
-                 showExitLocked();
-                 window.close();
-            } else {
-                 location.reload();
-            }
-        }, 1000); 
+        
+         setTimeout(function() {
+            logout();
+         }, 1000); 
     }
 </script>
 </body>
 </html>
-
