@@ -254,6 +254,7 @@
                 <path style="fill:#F5C86E;" d="M434,230H78c-21.085,0-38.697-14.835-42.991-34.634L34,195.289V458c0,24.301,19.699,44,44,44h360
                     c22.091,0,40-17.909,40-40V319.323V274C478,249.699,458.301,230,434,230z"/>
                 <path style="fill:#6E87F5;" d="M374.788,142H438c22.091,0,40,17.909,40,40v92v45.323V274c0-24.301-19.699-44-44-44H78
+                    c-24.301,0-44-19.699-44-44l0,0c0-24.301,19.699-44,44-44H78
                     c-24.301,0-44-19.699-44-44l0,0c0-24.301,19.699-44,44-44h59.454H374.788z"/>
                 <g><circle style="fill:#4BB9F5;" cx="110" cy="365.83" r="20"/><circle style="fill:#4BB9F5;" cx="217.29" cy="355.13" r="20"/></g>
                 <g><circle style="fill:#FF5A5A;" cx="200.62" cy="445.83" r="20"/><circle style="fill:#FF5A5A;" cx="281.12" cy="286.83" r="20"/></g>
@@ -316,8 +317,7 @@
             <div class="card">
                 <div class="form-group">
                     <label>📅 Tanggal Sales</label>
-                    <input type="date" name="Tanggal" id="tgl" required onchange="autoSaveDraft()">
-                </div>
+                    <input type="date" name="Tanggal" id="tgl" required onchange="validateDateChange(this)"> </div>
                 <div class="form-group">
                     <label>🏪 Nama Toko</label>
                     <input type="text" name="Nama Toko" id="nama_toko" readonly style="background:#f1f5f9; color:#64748b; font-weight: 500;"> 
@@ -420,8 +420,54 @@
     let dataStore = {}; 
     let activeField = "";
     let onConfirmAction = null;
+    let currentLoadedDate = "";
 
     // SEPTA GANTENG
+    function getTodayDate() {
+        let today = new Date();
+        let y = today.getFullYear();
+        let m = String(today.getMonth() + 1).padStart(2, '0');
+        let d = String(today.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    }
+
+    
+    function getYesterdayDate() {
+        let today = new Date();
+        let yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+        
+        let y = yesterday.getFullYear();
+        let m = String(yesterday.getMonth() + 1).padStart(2, '0');
+        let d = String(yesterday.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    }
+
+
+    function validateDateChange(input) {
+        let selectedDate = input.value;
+        let today = getTodayDate();
+        let hMin1 = getYesterdayDate();
+
+        
+        if (selectedDate === today) {
+            
+            if (currentLoadedDate === hMin1) {
+                
+                let sales = getCleanNumber(document.getElementById('total_sales').value);
+                let fisik = Number(document.getElementById('h_total_fisik').value);
+                
+                if (sales > 0 || fisik > 0) {
+                    showAlert("⚠️ Laporan Belum Selesai!", "Anda masih memiliki laporan sales kemarin yang belum dikirim.\n\nSelesaikan & Kirim WA dulu sebelum input untuk hari ini.");
+                    input.value = hMin1; 
+                    return; 
+                }
+            }
+        }
+        
+        
+        autoSaveDraft();
+    }
 
     window.addEventListener('load', function() {
         getDetailedDeviceInfo();
@@ -430,23 +476,22 @@
             document.getElementById('nomor_pengirim').value = savedNum;
         }
         
+        
+        document.getElementById('tgl').value = getYesterdayDate();
+
         hitungGlobal();
 
         
         const urlParams = new URLSearchParams(window.location.search);
         const qrKode = urlParams.get('kode');
-
-        
         const lockStatus = localStorage.getItem('lock_status');
         const activeSession = localStorage.getItem('active_session_code');
         const loginMethod = localStorage.getItem('login_method');
 
-        
         if (qrKode) {
             localStorage.setItem('lock_status', 'OPEN');
             localStorage.setItem('login_method', 'QR');
-            localStorage.setItem('active_session_code', qrKode.toUpperCase()); // Simpan Sesi
-            
+            localStorage.setItem('active_session_code', qrKode.toUpperCase()); 
             
             document.getElementById('qrOverlay').style.display = 'flex';
             document.getElementById('exitScreen').style.display = 'none';
@@ -470,24 +515,15 @@
             return;
         }
 
-        
-        if (lockStatus === 'LOCKED') {
-             showExitLocked();
-             return;
-        }
+        if (lockStatus === 'LOCKED') { showExitLocked(); return; }
 
-        
-        
         if (activeSession && loginMethod === 'QR') {
             const cachedName = localStorage.getItem('shop_cache_' + activeSession);
-            
             masukDashboard(activeSession, activeSession, cachedName || "Memuat...");
-            
             doLogin(true, true);
             return;
         }
 
-        
         localStorage.setItem('login_method', 'MANUAL');
         document.getElementById('loginScreen').style.display = 'flex';
     });
@@ -495,8 +531,6 @@
     
     function logout() { 
         const method = localStorage.getItem('login_method');
-        
-        
         localStorage.removeItem('active_session_code');
 
         if (method === 'QR') {
@@ -515,7 +549,6 @@
         document.getElementById('qrOverlay').style.display = 'none';
         document.getElementById('exitScreen').style.display = 'flex';
     }
-
 
 
     function masukDashboard(realCode, displayCode, shopName) {
@@ -576,7 +609,7 @@
                     const dist = calculateDistance(pos.coords.latitude, pos.coords.longitude, shop.lat, shop.lon);
                     
                     if (dist > MAX_RADIUS_METERS) {
-                        return showAlert("Lokasi Jauh", `Anda berjarak ${Math.round(dist)}m dari toko. \n\nSilakan scan QR Code di kartu.`);
+                        return showAlert("Lokasi Jauh", `Anda berjarak ${Math.round(dist)}m dari toko. \n\nSilakan scan QR Code di tembok.`);
                     }
                     masukDashboard(code, code, shop.nama);
                 }, () => showAlert("GPS Mati", "Mohon aktifkan GPS/Lokasi di HP Anda."));
@@ -593,7 +626,6 @@
             console.error(e);
         }
     }
-
 
 
     function saveSender(val) { localStorage.setItem('crm_sender_phone', val); }
@@ -690,7 +722,6 @@
             h_pot_ba: document.getElementById('h_pot_ba').value,
             h_pot_lebih: document.getElementById('h_pot_lebih').value,
             h_pot_virtual: document.getElementById('h_pot_virtual').value,
-            
             is_tertelan: document.getElementById('check_tertelan') ? document.getElementById('check_tertelan').checked : false
         };
     }
@@ -739,7 +770,18 @@
                     dataStore = {}; initForm();
                 } else {
                     const draft = data;
-                    document.getElementById('tgl').value = draft.tgl || new Date().toISOString().substring(0, 10);
+                    
+                    
+                    let draftDate = draft.tgl;
+                    const hMin1 = getYesterdayDate();
+                    
+                    if (draftDate < hMin1) {
+                       draftDate = hMin1; 
+                    }
+                    
+                    currentLoadedDate = draftDate; 
+                    
+                    document.getElementById('tgl').value = draftDate;
                     document.getElementById('total_sales').value = draft.total_sales || '';
                     document.getElementById('val_nama_ekor').value = draft.ekor_note || '';
 
@@ -755,14 +797,13 @@
                     initForm(); 
                     if(document.getElementById('note_ekor')) document.getElementById('note_ekor').value = draft.ekor_note || '';
                     
-                    
                     if(document.getElementById('check_tertelan') && draft.is_tertelan) {
                         document.getElementById('check_tertelan').checked = true;
                     }
 
                     updateAllViewFields(); 
                     
-                    let tglIndo = formatDateIndo(draft.tgl);
+                    let tglIndo = formatDateIndo(draftDate);
                     historyList.style.display = 'block';
                     historyList.innerHTML = `<span style="color:green; font-weight:bold;">✅ Data Dipulihkan dari Cloud (${tglIndo})</span>`;
                 }
@@ -793,7 +834,7 @@
         ];
         const fieldsPotong = [
             {id:'pot_ba', label:'⚠️ Potongan BA Var', desc:'potongan yang jika sudah ada email klaim varian atau BA PDF yang langsung di-TTD lengkap'},
-            {id:'pot_lebih', label:'➕ Potongan Lebih / Tertelan', isTertelanOption: true, desc:'Potong atas kelebihan setoran sales sebelumnya atau cetang kotak jika Uang Tertelan'}, 
+            {id:'pot_lebih', label:'➕ Potongan Lebih / Tertelan', isTertelanOption: true, desc:'Potong atas kelebihan setoran sales sebelumnya ATAU Uang Tertelan'},
             {id:'pot_virtual', label:'💳 Potongan Virtual', desc:'Potong atas seluruh email dari virtual yg menyatakan gagal atau bisa koreksi sales'}
         ];
 
@@ -853,18 +894,14 @@
         document.getElementById('modalTotal').innerText="Rp "+t.toLocaleString('id-ID'); 
     }
     
-    
     function saveCalculator() {
         saveTemp(); 
-        
         let t = dataStore[activeField].reduce((a,b)=>a+b,0);
 
-        
         const wajibKelipatan = ['setor_sore', 'setor_malam', 'setor_pagi'];
         
         if (wajibKelipatan.includes(activeField)) {
             if (t % 50000 !== 0) {
-                
                 showAlert("Validasi Gagal", document.getElementById('modalTitle').innerText + "\nHarus kelipatan Rp 50.000!\n\n(Pastikan tidak ada recehan)");
                 return; 
             }
@@ -876,7 +913,6 @@
         hitungGlobal();
     }
 
-    
     function hitungGlobal() {
         let rawSales = document.getElementById('total_sales').value;
         let sales = getCleanNumber(rawSales);
@@ -1010,12 +1046,10 @@
         let ekorTxt = getVal('ekor_sales');
         if(document.getElementById('val_nama_ekor').value) ekorTxt += ` (a.n ${document.getElementById('val_nama_ekor').value})`;
 
-        
         let potongTxt = "";
         if(getNum('pot_ba') > 0) potongTxt += `\n1. BA Var: ${getVal('pot_ba')}`;
         
         if(getNum('pot_lebih') > 0) {
-            
             let isTertelan = document.getElementById('check_tertelan').checked;
             let labelPot = isTertelan ? "Tertelan" : "Lebih";
             potongTxt += `\n2. ${labelPot}: ${getVal('pot_lebih')}`;
@@ -1024,9 +1058,8 @@
         if(getNum('pot_virtual') > 0) potongTxt += `\n3. Virtual: ${getVal('pot_virtual')}`;
         
         if(potongTxt === "") potongTxt = "\n(Tidak ada)";
-        
 
-        let txt = `*LAPORAN SETOR SALES*\n\n*${kode} - ${nama}*\n*Tgl Sales:* ${tglIndo}\n*Total Sales:* Rp ${document.getElementById('total_sales').value}\n------------------\n*Fisik Setor:*\n1. Sore: ${getVal('setor_sore')}\n2. Malam: ${getVal('setor_malam')}\n3. Pagi: ${getVal('setor_pagi')}\n4. Ekor: ${ekorTxt}\n------------------ (+)\n*Total Setor: ${document.getElementById('disp_total_fisik').innerText}*\n\n*Potongan:*${potongTxt}\n------------------ (+)\n*Total Potong: ${document.getElementById('disp_total_potong').innerText}*\n\n------------------\n*${statusTxt}*\n\n👤 *Pengirim:* ${pengirim}\n\nNote : untuk bukti ekor dan bukti potong email dilampirkan`;
+        let txt = `*LAPORAN SETOR SALES*\n*${kode} - ${nama}*\n*Tgl Sales:* ${tglIndo}\n*Total Sales:* Rp ${document.getElementById('total_sales').value}\n------------------\n*Fisik Setor:*\n1. Sore: ${getVal('setor_sore')}\n2. Malam: ${getVal('setor_malam')}\n3. Pagi: ${getVal('setor_pagi')}\n4. Ekor: ${ekorTxt}\n------------------ (+)\n*Total Setor: ${document.getElementById('disp_total_fisik').innerText}*\n\n*Potongan:*${potongTxt}\n------------------ (+)\n*Total Potong: ${document.getElementById('disp_total_potong').innerText}*\n\n------------------\n*${statusTxt}*\n\n👤 *Pengirim:* ${pengirim}\n\nNote : untuk bukti ekor dan bukti potong email dilampirkan`;
         
         window.open(`https://wa.me/6285183347653?text=${encodeURIComponent(txt)}`, '_blank');
         
@@ -1037,4 +1070,3 @@
 </script>
 </body>
 </html>
-
