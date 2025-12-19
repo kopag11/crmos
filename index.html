@@ -35,6 +35,7 @@
 
         h1, h2, h3 { family: 'Poppins', sans-serif; margin: 0; color: var(--text-dark); }
         
+       
         
         
         #qrOverlay {
@@ -43,15 +44,16 @@
             justify-content: center; align-items: center; text-align: center;
         }
         
-        .pulse-icon { font-size: 4rem; margin-bottom: 20px; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
-
         #exitScreen {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #f1f5f9; z-index: 10000 !important; flex-direction: column;
             justify-content: center; align-items: center; text-align: center; padding: 30px;
         }
 
+        .pulse-icon { font-size: 4rem; margin-bottom: 20px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
+
+        
         #loginScreen {
             flex: 1; display: none; 
             flex-direction: column; justify-content: center; align-items: center;
@@ -360,7 +362,7 @@
             <input type="hidden" name="Ket Ekor" id="val_nama_ekor"> 
             <input type="hidden" id="val_selisih" value="0">
 
-            <button type="button" class="btn-action btn-blue" id="btn-submit" onclick="manualDraftSave()">
+            <button type="button" class="btn-action btn-blue" id="btn-submit" onclick="processSubmit()">
                 <span>☁️</span> SIMPAN DRAFT
             </button>
             
@@ -458,7 +460,7 @@
                 let fisik = Number(document.getElementById('h_total_fisik').value);
                 
                 if (sales > 0 || fisik > 0) {
-                    showAlert("⚠️ Laporan Belum Selesai!", "Anda masih memiliki laporan sales kemarin yang belum dikirim.\n\nSelesaikan & Kirim WA dulu sebelum input untuk hari ini.");
+                    showAlert("⚠️ Laporan Belum Selesai!", "Anda masih memiliki laporan H-1 (Kemarin) yang belum dikirim.\n\nSelesaikan & Kirim WA dulu sebelum input untuk hari ini.");
                     input.value = hMin1; 
                     return; 
                 }
@@ -551,6 +553,7 @@
     }
 
 
+
     function masukDashboard(realCode, displayCode, shopName) {
         currentStoreCode = realCode;
         
@@ -609,7 +612,7 @@
                     const dist = calculateDistance(pos.coords.latitude, pos.coords.longitude, shop.lat, shop.lon);
                     
                     if (dist > MAX_RADIUS_METERS) {
-                        return showAlert("Lokasi Jauh", `Anda berjarak ${Math.round(dist)}m dari toko. \n\nSilakan scan QR Code di tembok.`);
+                        return showAlert("Lokasi Jauh", `Anda berjarak ${Math.round(dist)}m dari toko. \n\nSilakan scan QR Code di KARTU.`);
                     }
                     masukDashboard(code, code, shop.nama);
                 }, () => showAlert("GPS Mati", "Mohon aktifkan GPS/Lokasi di HP Anda."));
@@ -627,6 +630,7 @@
         }
     }
 
+    
 
     function saveSender(val) { localStorage.setItem('crm_sender_phone', val); }
 
@@ -894,8 +898,10 @@
         document.getElementById('modalTotal').innerText="Rp "+t.toLocaleString('id-ID'); 
     }
     
+    
     function saveCalculator() {
         saveTemp(); 
+        
         let t = dataStore[activeField].reduce((a,b)=>a+b,0);
 
         const wajibKelipatan = ['setor_sore', 'setor_malam', 'setor_pagi'];
@@ -913,6 +919,7 @@
         hitungGlobal();
     }
 
+    
     function hitungGlobal() {
         let rawSales = document.getElementById('total_sales').value;
         let sales = getCleanNumber(rawSales);
@@ -995,7 +1002,24 @@
     function processSubmit() {
         const btn = document.getElementById('btn-submit');
         const status = document.getElementById('status');
-        btn.disabled = true; btn.innerText = "⏳ Sedang Memproses...";
+        
+        
+        btn.disabled = true; 
+        
+        
+        let seconds = 0;
+        btn.innerText = "⏳ Menghubungi Server...";
+        
+        const timer = setInterval(() => {
+            seconds++;
+            if (seconds <= 5) {
+                btn.innerText = `⏳ Memproses... (${seconds}s)`;
+            } else if (seconds <= 15) {
+                btn.innerText = `📡 Menyimpan Data... (${seconds}s)`;
+            } else {
+                btn.innerText = `⚠️ Koneksi Lambat... (${seconds}s)`;
+            }
+        }, 1000);
         
         const form = document.getElementById('salesForm');
         const formData = new FormData(form);
@@ -1008,20 +1032,31 @@
         formData.set('Info Perangkat', document.getElementById('info_perangkat').value);
 
         fetch(scriptURL, { method: 'POST', body: formData })
-            .then(res => res.json())
+            .then(res => {
+                clearInterval(timer); 
+                return res.json();
+            })
             .then(data => {
                 if (data.result === "success") {
                      status.innerText = "✅ Laporan Sudah Terbentuk, tinggal kirim WA!"; status.style.color = "var(--success)";
                      btn.style.display = 'none'; document.getElementById('btn-wa').style.display = 'flex';
                      const delData = new FormData(); delData.append('action', 'delete_draft'); delData.append('Kode Toko', currentStoreCode);
                      fetch(scriptURL, { method: 'POST', body: delData }); 
+                     
                      showAlert("Berhasil!", "Laporan WA telah terbentuk.");
                 } else { throw new Error(data.error); }
             })
             .catch(err => {
+                clearInterval(timer); 
                 status.innerText = "Gagal: " + err.message;
-                btn.disabled = false; btn.innerText = "💾 SIMPAN (Bentuk Laporan WA)";
-                showAlert("Error", "Gagal memproses data. Coba lagi.");
+                btn.disabled = false; 
+                btn.innerText = "💾 SIMPAN (Bentuk Laporan WA)";
+                
+                if(err.message.includes("Failed to fetch") || err.message.includes("NetworkError")) {
+                    showAlert("Koneksi Bermasalah", "Gagal menghubungi server Google.\nPeriksa sinyal internet Anda dan coba lagi.");
+                } else {
+                    showAlert("Error", "Gagal memproses data. Coba lagi.");
+                }
             });
     }
 
@@ -1046,10 +1081,12 @@
         let ekorTxt = getVal('ekor_sales');
         if(document.getElementById('val_nama_ekor').value) ekorTxt += ` (a.n ${document.getElementById('val_nama_ekor').value})`;
 
+        
         let potongTxt = "";
         if(getNum('pot_ba') > 0) potongTxt += `\n1. BA Var: ${getVal('pot_ba')}`;
         
         if(getNum('pot_lebih') > 0) {
+            
             let isTertelan = document.getElementById('check_tertelan').checked;
             let labelPot = isTertelan ? "Tertelan" : "Lebih";
             potongTxt += `\n2. ${labelPot}: ${getVal('pot_lebih')}`;
@@ -1058,6 +1095,7 @@
         if(getNum('pot_virtual') > 0) potongTxt += `\n3. Virtual: ${getVal('pot_virtual')}`;
         
         if(potongTxt === "") potongTxt = "\n(Tidak ada)";
+        
 
         let txt = `*LAPORAN SETOR SALES*\n*${kode} - ${nama}*\n*Tgl Sales:* ${tglIndo}\n*Total Sales:* Rp ${document.getElementById('total_sales').value}\n------------------\n*Fisik Setor:*\n1. Sore: ${getVal('setor_sore')}\n2. Malam: ${getVal('setor_malam')}\n3. Pagi: ${getVal('setor_pagi')}\n4. Ekor: ${ekorTxt}\n------------------ (+)\n*Total Setor: ${document.getElementById('disp_total_fisik').innerText}*\n\n*Potongan:*${potongTxt}\n------------------ (+)\n*Total Potong: ${document.getElementById('disp_total_potong').innerText}*\n\n------------------\n*${statusTxt}*\n\n👤 *Pengirim:* ${pengirim}\n\nNote : untuk bukti ekor dan bukti potong email dilampirkan`;
         
