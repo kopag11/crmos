@@ -818,7 +818,7 @@
     
     function handleBlur(el) {
         let val = getCleanNumber(el.value);
-        const listAutoRibuan = ['setor_sore', 'setor_malam', 'setor_pagi', 'ekor_sales'];
+        const listAutoRibuan = ['setor_sore', 'setor_malam', 'setor_pagi'];
         if (listAutoRibuan.includes(activeField) && val > 0 && val < 100000) {
             val = val * 1000;
             el.value = val.toLocaleString('id-ID');
@@ -988,3 +988,4 @@
 </script>
 </body>
 </html>
+
