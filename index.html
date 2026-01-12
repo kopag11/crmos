@@ -3,10 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Kalkulator CRM Hybrid</title>
-    
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <title>Kalkulator CRM Hybrid (iOS Support)</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -140,7 +137,7 @@
         <div id="historyList">Loading...</div>
         <button type="button" class="btn-draft" onclick="confirmDeleteDraft()"><span>🗑️</span> Hapus Draf di Cloud</button>
 
-        <form id="salesForm">
+        <form id="salesForm" onsubmit="return false;">
             <input type="hidden" name="Kode Toko" id="formKode">
             <input type="hidden" name="Info Perangkat" id="info_perangkat">
             
@@ -209,6 +206,9 @@
     </div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
 <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbzX8YNW9U6fyuCzBOWB_lcu7FDJS5ivTOI5RU2QBAVQz-sW_ov4ys_CSuqxQNnYDQLT/exec'; 
     const MAX_RADIUS_METERS = 40; 
@@ -217,18 +217,71 @@
     let activeField = "";
     let onConfirmAction = null;
     let currentLoadedDate = "";
+    let db; 
 
+    
     const firebaseConfig = {
       databaseURL: "https://crmos-hybrid-default-rtdb.firebaseio.com/"
     };
     
-    try {
-        firebase.initializeApp(firebaseConfig);
-        var db = firebase.database();
-    } catch(e) {
-        console.log("Firebase Init Error (Mungkin sudah init)", e);
-        var db = firebase.database();
-    }
+    
+    window.addEventListener('load', function() {
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.database();
+            console.log("Firebase Ready");
+        } catch(e) {
+            console.log("Firebase Init Error", e);
+            db = null;
+        }
+
+        getDetailedDeviceInfo();
+        let savedNum = localStorage.getItem('crm_sender_phone');
+        if(savedNum && document.getElementById('nomor_pengirim')) {
+            document.getElementById('nomor_pengirim').value = savedNum;
+        }
+        document.getElementById('tgl').value = getYesterdayDate();
+        hitungGlobal();
+        
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const qrKode = urlParams.get('kode');
+        const lockStatus = localStorage.getItem('lock_status');
+        const activeSession = localStorage.getItem('active_session_code');
+        const loginMethod = localStorage.getItem('login_method');
+        
+        if (qrKode) {
+            localStorage.setItem('lock_status', 'OPEN');
+            localStorage.setItem('login_method', 'QR');
+            localStorage.setItem('active_session_code', qrKode.toUpperCase()); 
+            document.getElementById('qrOverlay').style.display = 'flex';
+            document.getElementById('exitScreen').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'none';
+            const cleanCode = qrKode.toUpperCase();
+            document.getElementById('inputKode').value = cleanCode;
+            window.history.replaceState({}, document.title, window.location.pathname);
+            const cachedName = localStorage.getItem('shop_cache_' + cleanCode);
+            if (cachedName) {
+                setTimeout(() => {
+                    masukDashboard(cleanCode, cleanCode, cachedName);
+                    document.getElementById('qrOverlay').style.display = 'none';
+                    doLogin(true, true);
+                }, 500);
+            } else {
+                doLogin(true, false);
+            }
+            return;
+        }
+        if (lockStatus === 'LOCKED') { showExitLocked(); return; }
+        if (activeSession && loginMethod === 'QR') {
+            const cachedName = localStorage.getItem('shop_cache_' + activeSession);
+            masukDashboard(activeSession, activeSession, cachedName || "Memuat...");
+            doLogin(true, true);
+            return;
+        }
+        localStorage.setItem('login_method', 'MANUAL');
+        document.getElementById('loginScreen').style.display = 'flex';
+    });
 
     function getTodayDate() {
         let today = new Date();
@@ -265,52 +318,6 @@
         }
         autoSaveDraft();
     }
-
-    window.addEventListener('load', function() {
-        getDetailedDeviceInfo();
-        let savedNum = localStorage.getItem('crm_sender_phone');
-        if(savedNum && document.getElementById('nomor_pengirim')) {
-            document.getElementById('nomor_pengirim').value = savedNum;
-        }
-        document.getElementById('tgl').value = getYesterdayDate();
-        hitungGlobal();
-        const urlParams = new URLSearchParams(window.location.search);
-        const qrKode = urlParams.get('kode');
-        const lockStatus = localStorage.getItem('lock_status');
-        const activeSession = localStorage.getItem('active_session_code');
-        const loginMethod = localStorage.getItem('login_method');
-        if (qrKode) {
-            localStorage.setItem('lock_status', 'OPEN');
-            localStorage.setItem('login_method', 'QR');
-            localStorage.setItem('active_session_code', qrKode.toUpperCase()); 
-            document.getElementById('qrOverlay').style.display = 'flex';
-            document.getElementById('exitScreen').style.display = 'none';
-            document.getElementById('loginScreen').style.display = 'none';
-            const cleanCode = qrKode.toUpperCase();
-            document.getElementById('inputKode').value = cleanCode;
-            window.history.replaceState({}, document.title, window.location.pathname);
-            const cachedName = localStorage.getItem('shop_cache_' + cleanCode);
-            if (cachedName) {
-                setTimeout(() => {
-                    masukDashboard(cleanCode, cleanCode, cachedName);
-                    document.getElementById('qrOverlay').style.display = 'none';
-                    doLogin(true, true);
-                }, 500);
-            } else {
-                doLogin(true, false);
-            }
-            return;
-        }
-        if (lockStatus === 'LOCKED') { showExitLocked(); return; }
-        if (activeSession && loginMethod === 'QR') {
-            const cachedName = localStorage.getItem('shop_cache_' + activeSession);
-            masukDashboard(activeSession, activeSession, cachedName || "Memuat...");
-            doLogin(true, true);
-            return;
-        }
-        localStorage.setItem('login_method', 'MANUAL');
-        document.getElementById('loginScreen').style.display = 'flex';
-    });
 
     function logout() { 
         const method = localStorage.getItem('login_method');
@@ -733,6 +740,7 @@
         showConfirm("Konfirmasi Laporan", msg, false, function() { processSubmit(); });
     }
 
+    
     function processSubmit() {
         const btn = document.getElementById('btn-submit');
         const status = document.getElementById('status');
@@ -748,34 +756,51 @@
             tgl_input: document.getElementById('tgl').value, // yyyy-mm-dd
             total_sales: getCleanNumber(document.getElementById('total_sales').value),
             
+           
             setor_sore: getCleanNumber(document.getElementById('h_setor_sore').value),
             setor_malam: getCleanNumber(document.getElementById('h_setor_malam').value),
             setor_pagi: getCleanNumber(document.getElementById('h_setor_pagi').value),
             ekor_sales: getCleanNumber(document.getElementById('h_ekor_sales').value),
             
+            
             pot_ba: getCleanNumber(document.getElementById('h_pot_ba').value),
             pot_lebih: getCleanNumber(document.getElementById('h_pot_lebih').value),
             pot_virtual: getCleanNumber(document.getElementById('h_pot_virtual').value),
             
+            
             ket_ekor: document.getElementById('val_nama_ekor').value,
             info_perangkat: document.getElementById('info_perangkat').value,
             pengirim: document.getElementById('nomor_pengirim').value,
+            
             
             raw_rincian: JSON.stringify(dataStore),
             
             timestamp: firebase.database.ServerValue.TIMESTAMP
         };
 
-        const newPostRef = db.ref('antrian_sales').push();
         
+        if(!db) { 
+            showAlert("Error", "Koneksi Firebase gagal (Script belum termuat). Coba refresh."); 
+            btn.disabled = false;
+            return;
+        }
+
+        
+        const newPostRef = db.ref('antrian_sales').push();
         newPostRef.set(dataKirim, (error) => {
             if (error) {
                 console.error(error);
-                showAlert("Gagal", "Koneksi Cloud Error: " + error.message);
+                showAlert("Gagal", "Koneksi Firebase Error: " + error.message);
                 btn.disabled = false;
                 btn.innerText = "Coba Lagi";
             } else {
                 status.innerText = "✅ Terkirim ke Cloud!";
+                
+                
+                const syncData = new FormData();
+                syncData.append('action', 'sync_now'); 
+                fetch(scriptURL, { method: 'POST', body: syncData, mode: 'no-cors' });
+
                 
                 const delData = new FormData(); 
                 delData.append('action', 'delete_draft'); 
@@ -812,7 +837,7 @@
         }
         if(getNum('pot_virtual') > 0) potongTxt += `\n3. Virtual: ${getVal('pot_virtual')}`;
         if(potongTxt === "") potongTxt = "\n(Tidak ada)";
-        let txt = `*LAPORAN SETOR SALES*\n*${kode} - ${nama}*\n*Tgl Sales:* ${tglIndo}\n*Total Sales:* Rp ${document.getElementById('total_sales').value}\n------------------\n*Fisik Setor:*\n1. Sore: ${getVal('setor_sore')}\n2. Malam: ${getVal('setor_malam')}\n3. Pagi: ${getVal('setor_pagi')}\n4. Ekor: ${ekorTxt}\n------------------ (+)\n*Total Setor: ${document.getElementById('disp_total_fisik').innerText}*\n\n*Potongan:*${potongTxt}\n------------------ (+)\n*Total Potong: ${document.getElementById('disp_total_potong').innerText}*\n\n------------------\n*${statusTxt}*\n\n👤 *Pengirim:* ${pengirim}\n\nNote : untuk bukti ekor dan bukti potong email dilampirkan`;
+        let txt = `*LAPORAN SETOR SALES*\n*${kode} - ${nama}*\n*Tgl Sales:* ${tglIndo}\n*Total Sales:* Rp ${document.getElementById('total_sales').value}\n------------------\n*Fisik Setor:*\n1. Sore: ${getVal('setor_sore')}\n2. Malam: ${getVal('setor_malam')}\n3. Pagi: ${getVal('setor_pagi')}\n4. Ekor: ${ekorTxt}\n------------------ (+)\\n*Total Setor: ${document.getElementById('disp_total_fisik').innerText}*\n\n*Potongan:*${potongTxt}\n------------------ (+)\n*Total Potong: ${document.getElementById('disp_total_potong').innerText}*\n\n------------------\n*${statusTxt}*\n\n👤 *Pengirim:* ${pengirim}\n\nNote : untuk bukti ekor dan bukti potong email dilampirkan`;
         window.open(`https://wa.me/6285183347653?text=${encodeURIComponent(txt)}`, '_blank');
         setTimeout(() => logout(), 1000); 
     }
