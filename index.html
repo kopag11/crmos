@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* CSS ASLI CRMOS V3 (TIDAK DIUBAH) */
+       
         :root {
             --primary: #3b82f6; --primary-dark: #2563eb; --primary-soft: #eff6ff;
             --bg-color: #f1f5f9; --card-bg: #ffffff; --text-dark: #1e293b;
@@ -52,8 +52,10 @@
         .pulse-icon { font-size: 4rem; margin-bottom: 20px; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
 
+        \
         #loginScreen {
-            flex: 1; display: none; 
+            flex: 1; 
+            display: flex; 
             flex-direction: column; justify-content: center; align-items: center;
             text-align: center; padding: 30px 25px; background: var(--card-bg);
             border-radius: var(--radius); box-shadow: var(--shadow); margin-top: 20px; margin-bottom: 20px;
@@ -245,36 +247,10 @@
     <div id="loginScreen">
         <div style="margin-bottom: 20px;">
             <div class="icon-circle">
-                <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                    viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
-                <path style="fill:#F5C86E;" d="M434,230H78c-21.085,0-38.697-14.835-42.991-34.634L34,195.289V458c0,24.301,19.699,44,44,44h360
-                    c22.091,0,40-17.909,40-40V319.323V274C478,249.699,458.301,230,434,230z"/>
-                <path style="fill:#6E87F5;" d="M374.788,142H438c22.091,0,40,17.909,40,40v92v45.323V274c0-24.301-19.699-44-44-44H78
-                    c-24.301,0-44-19.699-44-44l0,0c0-24.301,19.699-44,44-44H78
-                    c-24.301,0-44-19.699-44-44l0,0c0-24.301,19.699-44,44-44h59.454H374.788z"/>
-                <g><circle style="fill:#4BB9F5;" cx="110" cy="365.83" r="20"/><circle style="fill:#4BB9F5;" cx="217.29" cy="355.13" r="20"/></g>
-                <g><circle style="fill:#FF5A5A;" cx="200.62" cy="445.83" r="20"/><circle style="fill:#FF5A5A;" cx="281.12" cy="286.83" r="20"/></g>
-                <path style="fill:#F5C86E;" d="M325.599,186c7.174-12.068,11.307-26.156,11.307-41.215c0-44.617-36.169-80.785-80.785-80.785
-                    s-80.785,36.169-80.785,80.785c0,15.059,4.133,29.147,11.307,41.215H325.599z"/>
-                <path style="fill:#FAE196;" d="M478,409.084H359.539c-24.301,0-44-19.699-44-44l0,0c0-24.3,19.699-44,44-44H478"/>
-                <path d="M438,132h-63.212c-5.522,0-10,4.477-10,10s4.478,10,10,10H438c16.542,0,30,13.458,30,30v50.088
-                    C458.71,224.537,446.876,220,434,220H78c-18.748,0-34-15.252-34-34s15.252-34,34-34h59.454c5.522,0,10-4.477,10-10s-4.478-10-10-10
-                    H78c-29.775,0-54,24.224-54,54c0,2.198,0,272,0,272c0,29.776,24.225,54,54,54h360c27.57,0,50-22.43,50-50V182
-                    C488,154.43,465.57,132,438,132z M468,399.084H359.539c-18.748,0-34-15.252-34-34s15.252-34,34-34H468V399.084z M438,492H78
-                    c-18.748,0-34-15.252-34-34v-41.169h14.524l36.071,36.071c1.876,1.875,4.419,2.929,7.071,2.929h70.676
-                    c4.128,11.639,15.243,20,28.28,20c16.542,0,30-13.458,30-30s-13.458-30-30-30c-13.036,0-24.152,8.361-28.28,20H105.81L69.739,399.76
-                    c-1.876-1.875-4.419-2.929-7.071-2.929H44v-21.746h37.467c3.91,12.026,15.219,20.746,28.533,20.746c16.542,0,30-13.458,30-30
-                    s-13.458-30-30-30c-12.756,0-23.671,8.006-28.002,19.254H44v-19.254h18.667c2.652,0,5.195-1.054,7.071-2.929l36.071-36.071h147.032
-                    c4.128,11.639,15.244,20,28.28,20c16.542,0,30-13.458,30-30s-13.458-30-30-30c-13.036,0-24.152,8.361-28.28,20H101.667
-                    c-2.652,0-5.195,1.054-7.071,2.929l-36.071,36.071H44v-87.918C53.29,235.463,65.123,240,78,240h356c18.748,0,34,15.252,34,34v37.084
-                    H359.539c-29.775,0-54,24.224-54,54s24.225,54,54,54H468V448h-54.379c-5.522,0-10,4.477-10,10s4.478,10,10,10h53.775
-                    C464.609,481.677,452.488,492,438,492z M190.623,445.831c0-5.514,4.486-10,10-10s10,4.486,10,10s-4.486,10-10,10
-                    S190.623,451.345,190.623,445.831z M100,365.831c0-5.514,4.486-10,10-10s10,4.486,10,10s-4.486,10-10,10S100,371.345,100,365.831z
-                    M271.121,286.831c0-5.514,4.486-10,10-10s10,4.486,10,10s-4.486,10-10,10S271.121,292.345,271.121,286.831z"/>
-                </svg>
+                <svg viewBox="0 0 24 24"><path d="M13 2L3 14H12L11 22L21 10H12L13 2Z"></path></svg>
             </div>
             <h2>Kalkulator CRM</h2>
-            <p style="color: var(--text-gray); margin: 5px 0 0 0;">Input Struk Setoran (V3-Supabase)</p>
+            <p style="color: var(--text-gray); margin: 5px 0 0 0;">Input Struk Setoran (Supabase)</p>
         </div>
         
         <div class="login-note">
@@ -287,7 +263,7 @@
         
         <button class="btn-main" onclick="doLogin()">MASUK SEKARANG</button>
         
-        <p id="gpsStatus" style="font-size:0.85rem; color:var(--text-gray); margin-top:25px;">⏳ Menunggu sinyal GPS...</p>
+        <p id="gpsStatus" style="font-size:0.85rem; color:var(--text-gray); margin-top:25px;">⏳ System Ready</p>
     </div>
 
     <div id="dashboard">
@@ -347,11 +323,12 @@
             <input type="hidden" id="h_total_fisik" value="0"><input type="hidden" id="val_nama_ekor"><input type="hidden" id="val_selisih" value="0">
 
             <button type="button" class="btn-action btn-blue" id="btn-submit" onclick="processSubmit()">
-                <span>☁️</span> SIMPAN DATABASE
+                <span>☁️</span> SIMPAN KE DATABASE
             </button>
             <button type="button" class="btn-action btn-wa" id="btn-wa" onclick="kirimWA()">
                 <span>📲</span> KIRIM KE WHATSAPP
             </button>
+            
             <p id="status" style="text-align:center; margin-top:20px; font-weight:600; color:var(--text-gray);"></p>
         </form>
     </div>
@@ -372,17 +349,17 @@
     <div class="modal-content">
         <h3 id="modalTitle" style="margin-bottom:20px; color:var(--primary);">Rincian</h3>
         <div id="calcList" style="max-height:250px; overflow-y:auto; margin-bottom:15px; padding-right: 5px;"></div>
-        <button onclick="addCalcRow()" style="background:#f8fafc; color:var(--primary); border:2px dashed #cbd5e1; padding:12px; width:100%; border-radius:12px; cursor:pointer; font-weight: 600; margin-bottom: 15px;">+ Tambah Struk</button>
+        <button onclick="addCalcRow()" style="background:#f8fafc; color:var(--primary); border:2px dashed #cbd5e1; padding:12px; width:100%; border-radius:12px; font-weight: 600; margin-bottom: 15px;">+ Tambah Struk</button>
         <div style="background: var(--primary-soft); padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;"><span style="font-size: 0.9rem; color: var(--text-gray);">Total:</span><strong id="modalTotal" style="color:var(--primary); font-size: 1.1rem;">0</strong></div>
         <div class="modal-footer"><button class="btn-modal-cancel" onclick="document.getElementById('calcModal').style.display='none'">Batal</button><button class="btn-modal-primary" onclick="saveCalculator()">Simpan Hasil</button></div>
     </div>
 </div>
 
 <script>
-    // --- KONFIGURASI SUPABASE & GAS (SESUAI REQUEST) ---
-    const SUPABASE_URL = 'https://mpzxceuhnuhhuvveppmh.supabase.co'; 
-    const SUPABASE_KEY = 'sb_publishable_m1UZv0IpavkdvNPx_0Nr7g_p2Uqd39V';
+    
     const scriptURL = 'https://script.google.com/macros/s/AKfycbzX8YNW9U6fyuCzBOWB_lcu7FDJS5ivTOI5RU2QBAVQz-sW_ov4ys_CSuqxQNnYDQLT/exec'; 
+    const SUPABASE_URL = 'https://mpzxceuhnuhhuvveppmh.supabase.co'; 
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wenhjZXVobnVoaHV2dmVwcG1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgyNjQwNDEsImV4cCI6MjA4Mzg0MDA0MX0.sIRvchXgTH9kEMCqhuM2geYohe1TiipYgxz3PQ_y4R0'; 
     
     let supabase = null;
     let currentStoreCode = "";
@@ -392,262 +369,96 @@
     let currentLoadedDate = "";
     const MAX_RADIUS_METERS = 40; 
 
-    // --- INISIALISASI ---
+    
     window.addEventListener('load', function() {
-        // Init Supabase (dalam try-catch agar tidak blank jika key salah)
+        
         try { 
             supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); 
         } catch(e) { 
-            console.error("Supabase Error", e);
+            console.error("Supabase Init Error", e);
         }
 
-        // Logic V3 Asli
+       
         getDetailedDeviceInfo();
-        let savedNum = localStorage.getItem('crm_sender_phone');
-        if(savedNum && document.getElementById('nomor_pengirim')) {
-            document.getElementById('nomor_pengirim').value = savedNum;
-        }
+        if(localStorage.getItem('crm_sender_phone')) document.getElementById('nomor_pengirim').value = localStorage.getItem('crm_sender_phone');
         document.getElementById('tgl').value = getYesterdayDate();
         hitungGlobal();
         
-        // PENTING: TAMPILKAN LOGIN SECARA MANUAL AGAR TIDAK BLANK
+        
         document.getElementById('loginScreen').style.display = 'flex';
 
-        // Check Login / QR
+        
         const urlParams = new URLSearchParams(window.location.search);
         const qrKode = urlParams.get('kode');
-        
         if (qrKode) {
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('qrOverlay').style.display = 'flex';
             document.getElementById('inputKode').value = qrKode.toUpperCase();
-            setTimeout(() => doLogin(true, true), 500);
+            setTimeout(() => doLogin(true), 500);
         } else {
             let sess = localStorage.getItem('crm_sess');
             if(sess) {
                 let p = sess.split('|');
-                // Auto login jika ada session
-                masukDashboard(p[0], p[1], p[2] || "Toko");
-                doLogin(true, true);
+                masukDashboard(p[0], p[1], p[2]);
             }
         }
     });
 
-    async function doLogin(bypassGPS = false, isSilent = false) {
-        const codeInput = document.getElementById('inputKode');
-        const code = codeInput.value.toUpperCase().trim();
-        if (code.length < 2) {
-            if(!isSilent) showAlert("Gagal", "Kode Toko harus diisi!");
-            return;
-        }
-        if (code === "COBA") {
-            masukDashboard("COBA", "TEST", "Toko Uji Coba");
-            if(!isSilent) showAlert("Mode Uji Coba", "Masuk tanpa GPS.");
-            return;
-        }
-        const statusEl = document.getElementById('gpsStatus');
-        if (!isSilent) statusEl.innerText = "⏳ Sedang melacak lokasi...";
+    async function doLogin(bypassGPS = false) {
+        const k = document.getElementById('inputKode').value.toUpperCase().trim();
+        if(!k) return alert("Isi Kode!");
+        if(k==='COBA') return masukDashboard('COBA','TEST','Toko Uji Coba');
+        
+        document.getElementById('gpsStatus').innerText = "⏳ Mengecek server...";
         
         try {
-            const res = await fetch(scriptURL + "?action=get_shop_info&kode=" + code + "&t=" + new Date().getTime());
+            const res = await fetch(scriptURL + "?action=get_shop_info&kode=" + k);
             const shop = await res.json();
-            if (shop.error) throw new Error(shop.error);
+            if(shop.error) throw new Error(shop.error);
+            masukDashboard(k, k, shop.nama);
+        } catch(e) {
             
-            if (bypassGPS) {
-                masukDashboard(code, code, shop.nama);
-            } else {
-                navigator.geolocation.getCurrentPosition(pos => {
-                    const dist = calculateDistance(pos.coords.latitude, pos.coords.longitude, shop.lat, shop.lon);
-                    if (dist > MAX_RADIUS_METERS) {
-                        return showAlert("Lokasi Jauh", `Anda berjarak ${Math.round(dist)}m dari toko. \n\nSilakan scan QR Code di KARTU.`);
-                    }
-                    masukDashboard(code, code, shop.nama);
-                }, () => showAlert("GPS Mati", "Mohon aktifkan GPS/Lokasi di HP Anda."));
-            }
-        } catch(e) { 
-            if(!isSilent) {
-                document.getElementById('qrOverlay').style.display = 'none';
-                document.getElementById('loginScreen').style.display = 'flex';
-                showAlert("Login Gagal", "Kode tidak valid atau sinyal buruk.");
-                statusEl.innerText = "❌ Gagal memuat.";
-            }
+            alert("Mode Darurat aktif (Offline Check)");
+            masukDashboard(k, k, "Toko " + k);
         }
     }
 
-    // --- MODIFIKASI INTI: PROSES SUBMIT KE SUPABASE ---
-    async function processSubmit() {
-        const btn = document.getElementById('btn-submit');
-        const status = document.getElementById('status');
-        
-        if (!document.getElementById('tgl').value) return showAlert("Error", "Pilih Tanggal!");
-        
-        btn.disabled = true;
-        btn.innerText = "⏳ Menyimpan ke Database...";
-
-        const dataSales = {
-            kode_toko: currentStoreCode,
-            nama_toko: document.getElementById('nama_toko').value,
-            tgl_sales: document.getElementById('tgl').value,
-            total_sales: getCleanNumber(document.getElementById('total_sales').value),
-            total_fisik: Number(document.getElementById('h_total_fisik').value),
-            total_potongan: Number(document.getElementById('disp_total_potong').innerText.replace(/\D/g,'')),
-            selisih: Number(document.getElementById('val_selisih').value),
-            pengirim: document.getElementById('nomor_pengirim').value
-        };
-
-        try {
-            // 1. HAPUS DATA LAMA (Update Safe)
-            await supabase.from('rincian_sales').delete()
-                .eq('kode_toko', currentStoreCode)
-                .eq('tgl_sales', dataSales.tgl_sales);
-
-            // 2. UPSERT DATA UTAMA
-            const { error: err1 } = await supabase.from('laporan_sales').upsert(dataSales, { onConflict: 'kode_toko, tgl_sales' });
-            if(err1) throw err1;
-
-            // 3. SIAPKAN RINCIAN
-            let payload = [];
-            const mapLabel = {
-                'setor_sore': 'Setor Sore', 'setor_malam': 'Setor Malam', 'setor_pagi': 'Setor Pagi', 
-                'ekor_sales': 'Ekor Sales', 'pot_ba': 'Potongan BA', 'pot_lebih': 'Potongan Lebih', 'pot_virtual': 'Potongan Virtual'
-            };
-            
-            for (let key in dataStore) {
-                if (dataStore[key].length > 0) {
-                    dataStore[key].forEach(val => {
-                        if(val > 0) {
-                            let ket = "";
-                            if(key === 'ekor_sales') ket = document.getElementById('val_nama_ekor').value;
-                            if(key === 'pot_lebih' && document.getElementById('check_tertelan').checked) ket = "Tertelan";
-                            
-                            payload.push({
-                                kode_toko: currentStoreCode,
-                                tgl_sales: dataSales.tgl_sales,
-                                kategori: mapLabel[key],
-                                nominal: val,
-                                keterangan: ket,
-                                cek_manual_saldo: null
-                            });
-                        }
-                    });
-                }
-            }
-
-            // 4. INSERT RINCIAN BARU
-            if(payload.length > 0) {
-                const { error: err2 } = await supabase.from('rincian_sales').insert(payload);
-                if(err2) throw err2;
-            }
-
-            // 5. BERHASIL -> KIRIM WA
-            status.innerText = "✅ Tersimpan!";
-            
-            // Hapus draft di Google Sheet (Cleanup)
-            const delData = new FormData(); 
-            delData.append('action', 'delete_draft'); 
-            delData.append('Kode Toko', currentStoreCode);
-            fetch(scriptURL, { method: 'POST', body: delData }); 
-
-            showAlert("Sukses", "Data berhasil masuk database!");
-            setTimeout(() => { kirimWA(); }, 1000);
-
-        } catch (err) {
-            console.error(err);
-            showAlert("Gagal Simpan Database", "Error: " + err.message + "\n\nSilakan coba lagi.");
-            btn.disabled = false;
-            btn.innerText = "☁️ SIMPAN DATABASE";
-        }
-    }
-
-    // --- FUNGSI HELPER LAINNYA (TIDAK DIUBAH DARI V3) ---
-    function masukDashboard(realCode, displayCode, shopName) {
-        currentStoreCode = realCode;
+    function masukDashboard(kode, disp, nama) {
+        currentStoreCode = kode;
         document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('qrOverlay').style.display = 'none';
-        document.getElementById('exitScreen').style.display = 'none';
+        document.getElementById('qrOverlay').style.display = 'none'; 
         document.getElementById('dashboard').style.display = 'block';
-        document.getElementById('displayKode').innerText = displayCode;
-        document.getElementById('displayNama').innerText = shopName;
-        document.getElementById('nama_toko').value = shopName;
-        document.getElementById('formKode').value = realCode;
-        localStorage.setItem('shop_cache_' + realCode, shopName);
-        localStorage.setItem('crm_sess', realCode + '|' + displayCode + '|' + shopName);
+        document.getElementById('displayKode').innerText = disp;
+        document.getElementById('displayNama').innerText = nama;
+        document.getElementById('nama_toko').value = nama;
+        document.getElementById('formKode').value = kode;
+        localStorage.setItem('crm_sess', kode + '|' + disp + '|' + nama);
         initForm(); loadDraft();
     }
 
     function logout() { localStorage.removeItem('crm_sess'); location.reload(); }
-    function saveSender(val) { localStorage.setItem('crm_sender_phone', val); }
-    async function getDetailedDeviceInfo() { document.getElementById('info_perangkat').value = navigator.userAgent; }
-    function showAlert(title, msg) { document.getElementById('alertTitle').innerText=title; document.getElementById('alertMsg').innerText=msg; document.getElementById('alertModal').style.display='flex'; }
-    function showConfirm(title, msg, isDanger, callback) { document.getElementById('confirmTitle').innerText=title; document.getElementById('confirmMsg').innerText=msg; onConfirmAction=callback; document.getElementById('confirmModal').style.display='flex'; }
-    function closeConfirm() { document.getElementById('confirmModal').style.display='none'; }
-    function doConfirmYes() { if(onConfirmAction) onConfirmAction(); closeConfirm(); }
-    function formatDateIndo(ds) { let p=ds.split('-'); return `${p[2]}-${p[1]}-${p[0]}`; }
-    function calculateDistance(lat1,lon1,lat2,lon2) { const R=6371000; const dLat=(lat2-lat1)*Math.PI/180; const dLon=(lon2-lon1)*Math.PI/180; const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2); return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); }
-    function formatRibuan(e) { let v=e.value.replace(/[^,\d]/g,'').toString(); let s=v.split(','); let r=s[0].replace(/\B(?=(\d{3})+(?!\d))/g, "."); e.value=s[1]?r+','+s[1]:r; }
-    function getCleanNumber(v) { return Number(v.toString().replace(/\./g,''))||0; }
-    function getYesterdayDate() { let d=new Date(); d.setDate(d.getDate()-1); return d.toISOString().split('T')[0]; }
-    
-    function collectDraftData() {
-        return {
-            tgl: document.getElementById('tgl').value,
-            nama_toko: document.getElementById('nama_toko').value,
-            total_sales: document.getElementById('total_sales').value,
-            dataStore: dataStore,
-            ekor_note: document.getElementById('val_nama_ekor').value,
-            h_setor_sore: document.getElementById('h_setor_sore').value,
-            h_setor_malam: document.getElementById('h_setor_malam').value,
-            h_setor_pagi: document.getElementById('h_setor_pagi').value,
-            h_ekor_sales: document.getElementById('h_ekor_sales').value,
-            h_pot_ba: document.getElementById('h_pot_ba').value,
-            h_pot_lebih: document.getElementById('h_pot_lebih').value,
-            h_pot_virtual: document.getElementById('h_pot_virtual').value,
-            is_tertelan: document.getElementById('check_tertelan') ? document.getElementById('check_tertelan').checked : false
-        };
-    }
-    function autoSaveDraft() { if(!currentStoreCode) return; const fd=new FormData(); fd.append('action','save_draft'); fd.append('Kode Toko',currentStoreCode); fd.append('draft_data',JSON.stringify(collectDraftData())); fetch(scriptURL,{method:'POST',body:fd}); }
-    function manualDraftSave() { autoSaveDraft(); showAlert("Info", "Draft tersimpan lokal."); }
-    function loadDraft() { 
-        document.getElementById('historyList').style.display='block'; document.getElementById('historyList').innerText="🔄 Cek Draft...";
-        fetch(scriptURL+"?action=load_draft&kode="+currentStoreCode).then(r=>r.json()).then(d=>{
-            if(d.total_sales){
-                document.getElementById('total_sales').value=d.total_sales;
-                if(d.dataStore) dataStore = (typeof d.dataStore==='string')?JSON.parse(d.dataStore):d.dataStore;
-                ['setor_sore','setor_malam','setor_pagi','ekor_sales','pot_ba','pot_lebih','pot_virtual'].forEach(k=>{
-                    let v=(dataStore[k]||[]).reduce((a,b)=>a+b,0);
-                    if(document.getElementById('h_'+k)) document.getElementById('h_'+k).value=v;
-                    if(document.getElementById('view_'+k)) document.getElementById('view_'+k).value="Rp "+v.toLocaleString('id-ID');
-                });
-                if(d.ekor_note && document.getElementById('note_ekor')) document.getElementById('note_ekor').value=d.ekor_note;
-                hitungGlobal(); document.getElementById('historyList').innerText="✅ Draft Dipulihkan";
-            } else document.getElementById('historyList').style.display='none';
-        }).catch(e=>document.getElementById('historyList').style.display='none');
-    }
-    function confirmDeleteDraft() { showConfirm("Hapus?", "Data cloud akan dihapus.", true, ()=>{ const fd=new FormData(); fd.append('action','delete_draft'); fd.append('Kode Toko',currentStoreCode); fetch(scriptURL,{method:'POST',body:fd}).then(()=>location.reload()); }); }
-    function updateAllViewFields() { hitungGlobal(); }
-    
+
     function initForm() {
-        const f1=[{id:'setor_sore',l:'☀️ Setor Sore',d:''},{id:'setor_malam',l:'🌙 Setor Malam',d:''},{id:'setor_pagi',l:'🌅 Setor Pagi',d:''},{id:'ekor_sales',l:'🪙 Ekor Sales',d:'',n:true}];
-        const f2=[{id:'pot_ba',l:'⚠️ Potongan BA',d:''},{id:'pot_lebih',l:'➕ Potongan Lebih',d:'',c:true},{id:'pot_virtual',l:'💳 Potongan Virtual',d:''}];
-        let h=`<div class="card"><div class="section-title t-fisik"><span>💵</span> Uang Fisik</div>`;
+        const f1 = [{id:'setor_sore', l:'☀️ Setor Sore', d:'Sales H-1'},{id:'setor_malam', l:'🌙 Setor Malam', d:'21.00-24.00'},{id:'setor_pagi', l:'🌅 Setor Pagi', d:'24.00-Selesai'},{id:'ekor_sales', l:'🪙 Ekor Sales', d:'Transfer', n:true}];
+        const f2 = [{id:'pot_ba', l:'⚠️ Potongan BA', d:'Varian'},{id:'pot_lebih', l:'➕ Potongan Lebih', d:'Tertelan', c:true},{id:'pot_virtual', l:'💳 Potongan Virtual', d:'Koreksi'}];
+        let h = `<div class="card"><div class="section-title t-fisik"><span>💵</span> Uang Fisik</div>`;
         f1.forEach(f=>h+=createFieldHtml(f)); h+=`</div><div class="card"><div class="section-title t-potong"><span>✂️</span> Potongan</div>`;
-        f2.forEach(f=>h+=createFieldHtml(f)); h+=`</div>`;
-        document.getElementById('dynamicInputs').innerHTML=h;
+        f2.forEach(f=>h+=createFieldHtml(f)); h+=`</div>`; document.getElementById('dynamicInputs').innerHTML=h;
     }
     function createFieldHtml(f) {
         if(!dataStore[f.id]) dataStore[f.id]=[];
-        let n=f.n?`<input type="text" id="note_ekor" placeholder="Ket. Ekor" oninput="document.getElementById('val_nama_ekor').value=this.value;autoSaveDraft()" style="margin-top:10px; border:1px dashed #cbd5e1;">`:'';
-        let c=f.c?`<div class="check-tertelan-wrapper"><input type="checkbox" id="check_tertelan" onchange="autoSaveDraft()"><label for="check_tertelan" style="margin-left:5px; font-size:0.8rem">Tertelan?</label></div>`:'';
-        return `<div class="form-group"><label>${f.l} ${c}</label><div class="input-with-btn"><input type="text" id="view_${f.id}" value="Rp 0" readonly><button class="btn-add" onclick="openCalc('${f.id}','${f.l}')">+</button></div>${n}</div>`;
+        let note = f.n?`<input type="text" id="note_ekor" placeholder="Ket. Ekor" value="${document.getElementById('val_nama_ekor')?document.getElementById('val_nama_ekor').value:''}" oninput="document.getElementById('val_nama_ekor').value=this.value;autoSaveDraft()" style="margin-top:10px; border:1px dashed #cbd5e1; background:#f8fafc">`:'';
+        let chk = f.c?`<div class="check-tertelan-wrapper"><input type="checkbox" id="check_tertelan" onchange="autoSaveDraft()"><label for="check_tertelan" style="margin-left:5px; font-size:0.8rem">Tertelan?</label></div>`:'';
+        let info = f.d?`<span class="info-btn" onclick="showAlert('Info','${f.d}')">i</span>`:'';
+        return `<div class="form-group"><label>${f.l} ${info} ${chk}</label><div class="input-with-btn"><input type="text" id="view_${f.id}" value="Rp 0" readonly><button class="btn-add" onclick="openCalc('${f.id}','${f.l}')">+</button></div>${note}</div>`;
     }
-    function openCalc(id,t) { activeField=id; document.getElementById('modalTitle').innerText=t; document.getElementById('calcModal').style.display='flex'; renderCalcRows(); }
-    function renderCalcRows() { const c=document.getElementById('calcList'); c.innerHTML=""; (dataStore[activeField]||[]).forEach((v,i)=>{ c.innerHTML+=`<div class="calc-row"><input class="calc-input" value="${v===0?'':v.toLocaleString('id-ID')}" onkeyup="formatRibuan(this);updateModalTotal()" onblur="handleBlur(this)"><button class="btn-remove" onclick="removeRow(${i})">✕</button></div>`; }); }
+    function openCalc(id,t) { activeField=id; document.getElementById('modalTitle').innerText=t; document.getElementById('calcModal').style.display='flex'; renderCalcRows(); updateModalTotal(); }
+    function renderCalcRows() { const c=document.getElementById('calcList'); c.innerHTML=""; (dataStore[activeField]||[]).forEach((v,i)=>{ c.innerHTML+=`<div class="calc-row"><input class="calc-input" value="${v==0?'':v.toLocaleString('id-ID')}" onkeyup="formatRibuan(this);updateModalTotal()" onblur="handleBlur(this)"><button class="btn-remove" onclick="removeRow(${i})">✕</button></div>`; }); }
     function addCalcRow() { if(!dataStore[activeField]) dataStore[activeField]=[]; dataStore[activeField].push(0); renderCalcRows(); }
     function removeRow(i) { dataStore[activeField].splice(i,1); renderCalcRows(); updateModalTotal(); }
-    function saveTemp() { dataStore[activeField]=Array.from(document.querySelectorAll('.calc-input')).map(i=>getCleanNumber(i.value)); }
     function updateModalTotal() { let t=0; document.querySelectorAll('.calc-input').forEach(i=>t+=getCleanNumber(i.value)); document.getElementById('modalTotal').innerText="Rp "+t.toLocaleString('id-ID'); }
-    function handleBlur(el) { saveTemp(); }
-    function saveCalculator() { saveTemp(); let t=dataStore[activeField].reduce((a,b)=>a+b,0); document.getElementById('view_'+activeField).value="Rp "+t.toLocaleString('id-ID'); document.getElementById('h_'+activeField).value=t; document.getElementById('calcModal').style.display='none'; hitungGlobal(); }
+    function saveCalculator() { updateModalTotal(); let t=dataStore[activeField].reduce((a,b)=>a+b,0); document.getElementById('view_'+activeField).value="Rp "+t.toLocaleString('id-ID'); document.getElementById('h_'+activeField).value=t; document.getElementById('calcModal').style.display='none'; hitungGlobal(); }
+    function handleBlur(el) { dataStore[activeField]=Array.from(document.querySelectorAll('.calc-input')).map(i=>getCleanNumber(i.value)); }
     
     function hitungGlobal() {
         let sales=getCleanNumber(document.getElementById('total_sales').value);
@@ -658,26 +469,78 @@
         document.getElementById('h_total_fisik').value=fisik;
         let sel=(fisik+potong)-sales; document.getElementById('val_selisih').value=sel;
         let el=document.getElementById('disp_balance'); let btn=document.getElementById('btn-submit');
-        el.className="status-box "+(sel===0?"status-ok":(sel>0?"status-plus":"status-min"));
-        el.innerHTML=sel===0?"✅ BALANCE":(sel>0?"➕ LEBIH "+sel.toLocaleString('id-ID'):"⚠️ KURANG "+Math.abs(sel).toLocaleString('id-ID'));
-        if(sel===0) { btn.className="btn-action btn-green"; btn.innerHTML="💾 SIMPAN DATABASE (BALANCE)"; btn.onclick=processSubmit; }
-        else if(sel<0) { btn.className="btn-action btn-yellow"; btn.innerHTML="⚠️ SIMPAN DATABASE (MINUS)"; btn.onclick=()=>showConfirm("Yakin Minus?", "Data akan disimpan.", true, processSubmit); }
-        else { btn.className="btn-action btn-blue"; btn.innerHTML="ℹ️ SIMPAN DATABASE (LEBIH)"; btn.onclick=processSubmit; }
+        if(sel===0) { el.innerHTML="✅ BALANCE"; el.className="status-box status-ok"; btn.className="btn-action btn-green"; btn.innerHTML="💾 SIMPAN DATABASE (BALANCE)"; btn.onclick=processSubmit; }
+        else if(sel<0) { el.innerHTML="⚠️ KURANG "+Math.abs(sel).toLocaleString('id-ID'); el.className="status-box status-min"; btn.className="btn-action btn-yellow"; btn.innerHTML="⚠️ SIMPAN DATABASE (MINUS)"; btn.onclick=()=>showConfirm("Yakin Minus?", "Data akan disimpan.", true, processSubmit); }
+        else { el.innerHTML="➕ LEBIH "+sel.toLocaleString('id-ID'); el.className="status-box status-plus"; btn.className="btn-action btn-blue"; btn.innerHTML="ℹ️ SIMPAN DATABASE (LEBIH)"; btn.onclick=processSubmit; }
         autoSaveDraft();
     }
 
-    function kirimWA() {
-        let getVal=(id)=>document.getElementById('view_'+id).value;
-        let kode=currentStoreCode; let nama=document.getElementById('nama_toko').value;
-        let tgl=formatDateIndo(document.getElementById('tgl').value);
-        let sel=Number(document.getElementById('val_selisih').value);
-        let stat=sel===0?"BALANCE OK ✅":(sel>0?`LEBIH (+) Rp ${sel.toLocaleString('id-ID')}`:`KURANG (-) Rp ${Math.abs(sel).toLocaleString('id-ID')}`);
-        let ekorTxt=getVal('ekor_sales');
-        if(document.getElementById('val_nama_ekor').value) ekorTxt+=` (a.n ${document.getElementById('val_nama_ekor').value})`;
-        let txt=`*LAPORAN SETOR SALES*\n*${kode} - ${nama}*\nTgl: ${tgl}\nTotal Sales: Rp ${document.getElementById('total_sales').value}\n------------------\n*Fisik Setor:*\n1. Sore: ${getVal('setor_sore')}\n2. Malam: ${getVal('setor_malam')}\n3. Pagi: ${getVal('setor_pagi')}\n4. Ekor: ${ekorTxt}\n------------------ (+)\n*Total Setor: ${document.getElementById('disp_total_fisik').innerText}*\n\n*Potongan:* ...\n------------------ (+)\n*Total Potong: ${document.getElementById('disp_total_potong').innerText}*\n\n------------------\n*${stat}*\n\n👤 Pengirim: ${document.getElementById('nomor_pengirim').value}`;
-        window.open(`https://wa.me/6285183347653?text=${encodeURIComponent(txt)}`, '_blank');
-        setTimeout(()=>logout(),1000);
+    
+    async function processSubmit() {
+        let btn = document.getElementById('btn-submit');
+        if (!document.getElementById('tgl').value) return alert("Pilih Tanggal!");
+        
+        btn.disabled = true; 
+        btn.innerText = "⏳ Menyimpan...";
+        
+        try {
+            if(!supabase) throw new Error("Supabase gagal dimuat.");
+            
+            let tgl = document.getElementById('tgl').value;
+            let payload = {
+                kode_toko: currentStoreCode, nama_toko: document.getElementById('nama_toko').value,
+                tgl_sales: tgl, total_sales: getCleanNumber(document.getElementById('total_sales').value),
+                total_fisik: Number(document.getElementById('h_total_fisik').value),
+                total_potongan: getCleanNumber(document.getElementById('disp_total_potong').innerText),
+                selisih: Number(document.getElementById('val_selisih').value), pengirim: document.getElementById('nomor_pengirim').value
+            };
+
+            await supabase.from('rincian_sales').delete().eq('kode_toko', currentStoreCode).eq('tgl_sales', tgl);
+            await supabase.from('laporan_sales').upsert(payload, { onConflict: 'kode_toko, tgl_sales' });
+
+            let rin = [];
+            const map = {'setor_sore':'Setor Sore','setor_malam':'Setor Malam','setor_pagi':'Setor Pagi','ekor_sales':'Ekor Sales','pot_ba':'Potongan BA','pot_lebih':'Potongan Lebih','pot_virtual':'Potongan Virtual'};
+            for(let k in map) {
+                dataStore[k].forEach(v => {
+                    if(v>0) rin.push({ kode_toko:currentStoreCode, tgl_sales:tgl, kategori:map[k], nominal:v, keterangan:(k==='ekor_sales'?document.getElementById('val_nama_ekor').value:(k==='pot_lebih' && document.getElementById('check_tertelan').checked?'Tertelan':'')), cek_manual_saldo:null });
+                });
+            }
+            if(rin.length > 0) await supabase.from('rincian_sales').insert(rin);
+
+            alert("✅ Berhasil Simpan!"); 
+            hapusDraft(true); 
+            kirimWA();
+        } catch(e) { 
+            alert("Gagal Simpan: " + e.message); 
+            btn.disabled=false; 
+            btn.innerText="☁️ SIMPAN DATABASE"; 
+        }
     }
+
+    function kirimWA() {
+        let tgl = document.getElementById('tgl').value.split('-');
+        let sel = Number(document.getElementById('val_selisih').value);
+        let stat = sel===0?"BALANCE":(sel>0?"LEBIH":"KURANG");
+        let txt = `*LAPORAN SALES*\n*${currentStoreCode} - ${document.getElementById('nama_toko').value}*\nTgl: ${tgl[2]}-${tgl[1]}-${tgl[0]}\nTotal Sales: Rp ${document.getElementById('total_sales').value}\n\n*STATUS: ${stat}*\nSelisih: Rp ${sel.toLocaleString('id-ID')}\n\nPengirim: ${document.getElementById('nomor_pengirim').value}`;
+        window.open(`https://wa.me/6285183347653?text=${encodeURIComponent(txt)}`, '_blank');
+        location.reload();
+    }
+
+    function autoSaveDraft() { if(!currentStoreCode) return; let d={tgl:document.getElementById('tgl').value, sales:document.getElementById('total_sales').value, data:dataStore}; const fd=new FormData(); fd.append('action','save_draft'); fd.append('Kode Toko',currentStoreCode); fd.append('draft_data',JSON.stringify(d)); fetch(scriptURL,{method:'POST',body:fd,mode:'no-cors'}); }
+    function loadDraft() { document.getElementById('historyList').style.display='block'; document.getElementById('historyList').innerText="🔄 Cek Draft Cloud..."; fetch(scriptURL+"?action=load_draft&kode="+currentStoreCode).then(r=>r.json()).then(d=>{ if(d.sales){ document.getElementById('total_sales').value=d.sales; if(d.data) dataStore=d.data; for(let k in dataStore){ let t=dataStore[k].reduce((a,b)=>a+b,0); if(document.getElementById('view_'+k)) document.getElementById('view_'+k).value="Rp "+t.toLocaleString('id-ID'); } hitungGlobal(); document.getElementById('historyList').innerText="✅ Draft Pulih"; } else document.getElementById('historyList').style.display='none'; }).catch(()=>document.getElementById('historyList').style.display='none'); }
+    function confirmDeleteDraft() { if(confirm("Hapus?")){ const fd=new FormData(); fd.append('action','delete_draft'); fd.append('Kode Toko',currentStoreCode); fetch(scriptURL,{method:'POST',body:fd}).then(()=>location.reload()); } }
+    function saveSender(v) { localStorage.setItem('crm_sender_phone', v); }
+    function showAlert(t,m){ document.getElementById('alertTitle').innerText=t; document.getElementById('alertMsg').innerText=m; document.getElementById('alertModal').style.display='flex'; }
+    function showConfirm(t,m,d,c){ document.getElementById('confirmTitle').innerText=t; document.getElementById('confirmMsg').innerText=m; onConfirmAction=c; document.getElementById('confirmModal').style.display='flex'; }
+    function closeConfirm(){ document.getElementById('confirmModal').style.display='none'; }
+    function doConfirmYes(){ if(onConfirmAction) onConfirmAction(); closeConfirm(); }
+    function validateDateChange() { autoSaveDraft(); }
+    function formatRibuan(e) { let v=e.value.replace(/[^0-9]/g,''); e.value=v?Number(v).toLocaleString('id-ID'):''; dataStore[activeField]=Array.from(document.querySelectorAll('.calc-input')).map(i=>getCleanNumber(i.value)); }
+    function getCleanNumber(v) { return Number(v.toString().replace(/\./g,''))||0; }
+    function handleBlur(el) { dataStore[activeField]=Array.from(document.querySelectorAll('.calc-input')).map(i=>getCleanNumber(i.value)); }
+    function getYesterdayDate() { let d=new Date(); d.setDate(d.getDate()-1); return d.toISOString().split('T')[0]; }
+    async function getDetailedDeviceInfo() { document.getElementById('info_perangkat').value = navigator.userAgent; }
+    function hapusDraft(silent) { const fd=new FormData(); fd.append('action','delete_draft'); fd.append('Kode Toko',currentStoreCode); fetch(scriptURL,{method:'POST',body:fd,mode:'no-cors'}); if(!silent) location.reload(); }
 </script>
 </body>
 </html>
