@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Kalkulator CRM Hybrid (iOS Support)</title>
-
+    <title>Kalkulator CRM (Supabase V5)</title>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
@@ -114,8 +114,8 @@
                 <path style="fill:#FAE196;" d="M478,409.084H359.539c-24.301,0-44-19.699-44-44l0,0c0-24.3,19.699-44,44-44H478"/>
                 </svg>
             </div>
-            <h2>Kalkulator CRM</h2>
-            <p style="color: var(--text-gray); margin: 5px 0 0 0;">Input Struk Setoran</p>
+            <h2>CRM Supabase</h2>
+            <p style="color: var(--text-gray); margin: 5px 0 0 0;">Input Struk Setoran (V5)</p>
         </div>
         <div class="login-note"><span>📍</span> Wajib berada di lokasi toko</div>
         <div class="pin-wrapper"><input type="text" id="inputKode" maxlength="4" placeholder="KODE" inputmode="text"></div>
@@ -168,7 +168,7 @@
             <input type="hidden" name="Potongan BA" id="h_pot_ba" value="0"><input type="hidden" name="Potongan Lebih" id="h_pot_lebih" value="0"><input type="hidden" name="Potongan Virtual" id="h_pot_virtual" value="0">
             <input type="hidden" name="Total Setor Fisik" id="h_total_fisik" value="0"><input type="hidden" name="Ket Ekor" id="val_nama_ekor"><input type="hidden" id="val_selisih" value="0">
 
-            <button type="button" class="btn-action btn-blue" id="btn-submit" onclick="processSubmit()"><span>☁️</span> SIMPAN DRAFT</button>
+            <button type="button" class="btn-action btn-blue" id="btn-submit" onclick="processSubmit()"><span>☁️</span> SIMPAN KE DATABASE</button>
             <button type="button" class="btn-action btn-wa" id="btn-wa" onclick="kirimWA()"><span>📲</span> KIRIM KE WHATSAPP</button>
             
             <p id="status" style="text-align:center; margin-top:20px; font-weight:600; color:var(--text-gray);"></p>
@@ -206,33 +206,29 @@
     </div>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
+    const SUPABASE_URL = 'https://mpzxceuhnuhuhuveppmh.supabase.co'; 
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wenhjZXVobnVoaHV2dmVwcG1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgyNjQwNDEsImV4cCI6MjA4Mzg0MDA0MX0.sIRvchXgTH9kEMCqhuM2geYohe1TiipYgxz3PQ_y4R0';
     const scriptURL = 'https://script.google.com/macros/s/AKfycbzX8YNW9U6fyuCzBOWB_lcu7FDJS5ivTOI5RU2QBAVQz-sW_ov4ys_CSuqxQNnYDQLT/exec'; 
+    
+    let supabase = null;
+
     const MAX_RADIUS_METERS = 40; 
     let currentStoreCode = "";
     let dataStore = {}; 
     let activeField = "";
     let onConfirmAction = null;
     let currentLoadedDate = "";
-    let db; 
 
-    
-    const firebaseConfig = {
-      databaseURL: "https://crmos-hybrid-default-rtdb.firebaseio.com/"
-    };
-    
-    
     window.addEventListener('load', function() {
+        
         try {
-            firebase.initializeApp(firebaseConfig);
-            db = firebase.database();
-            console.log("Firebase Ready");
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            console.log("Supabase Ready");
         } catch(e) {
-            console.log("Firebase Init Error", e);
-            db = null;
+            console.error("Supabase Init Error", e);
         }
 
         getDetailedDeviceInfo();
@@ -242,7 +238,6 @@
         }
         document.getElementById('tgl').value = getYesterdayDate();
         hitungGlobal();
-        
         
         const urlParams = new URLSearchParams(window.location.search);
         const qrKode = urlParams.get('kode');
@@ -740,82 +735,86 @@
         showConfirm("Konfirmasi Laporan", msg, false, function() { processSubmit(); });
     }
 
-    
-    function processSubmit() {
+
+    async function processSubmit() {
         const btn = document.getElementById('btn-submit');
         const status = document.getElementById('status');
         
         if (!document.getElementById('tgl').value) { showAlert("Error", "Tanggal wajib diisi!"); return; }
 
         btn.disabled = true;
-        btn.innerText = "🚀 Mengirim Kilat...";
+        btn.innerText = "🚀 Membuat teks laporan"
 
-        const dataKirim = {
+        const dataSales = {
             kode_toko: document.getElementById('formKode').value || currentStoreCode,
             nama_toko: document.getElementById('nama_toko').value,
-            tgl_input: document.getElementById('tgl').value, // yyyy-mm-dd
+            tgl_sales: document.getElementById('tgl').value,
             total_sales: getCleanNumber(document.getElementById('total_sales').value),
-            
-           
-            setor_sore: getCleanNumber(document.getElementById('h_setor_sore').value),
-            setor_malam: getCleanNumber(document.getElementById('h_setor_malam').value),
-            setor_pagi: getCleanNumber(document.getElementById('h_setor_pagi').value),
-            ekor_sales: getCleanNumber(document.getElementById('h_ekor_sales').value),
-            
-            
-            pot_ba: getCleanNumber(document.getElementById('h_pot_ba').value),
-            pot_lebih: getCleanNumber(document.getElementById('h_pot_lebih').value),
-            pot_virtual: getCleanNumber(document.getElementById('h_pot_virtual').value),
-            
-            
-            ket_ekor: document.getElementById('val_nama_ekor').value,
-            info_perangkat: document.getElementById('info_perangkat').value,
-            pengirim: document.getElementById('nomor_pengirim').value,
-            
-            
-            raw_rincian: JSON.stringify(dataStore),
-            
-            timestamp: firebase.database.ServerValue.TIMESTAMP
+            total_fisik: Number(document.getElementById('h_total_fisik').value),
+            total_potongan: Number(document.getElementById('disp_total_potong').innerText.replace(/\D/g,'')),
+            selisih: Number(document.getElementById('val_selisih').value),
+            pengirim: document.getElementById('nomor_pengirim').value
         };
 
-        
-        if(!db) { 
-            showAlert("Error", "Koneksi Firebase gagal (Script belum termuat). Coba refresh."); 
-            btn.disabled = false;
-            return;
-        }
+        try {
+            
+            const { error: err1 } = await supabase.from('laporan_sales').insert(dataSales);
+            if(err1) throw err1;
 
-        
-        const newPostRef = db.ref('antrian_sales').push();
-        newPostRef.set(dataKirim, (error) => {
-            if (error) {
-                console.error(error);
-                showAlert("Gagal", "Koneksi Firebase Error: " + error.message);
-                btn.disabled = false;
-                btn.innerText = "Coba Lagi";
-            } else {
-                status.innerText = "✅ Terkirim ke Cloud!";
-                
-                
-                const syncData = new FormData();
-                syncData.append('action', 'sync_now'); 
-                fetch(scriptURL, { method: 'POST', body: syncData, mode: 'no-cors' });
-
-                
-                const delData = new FormData(); 
-                delData.append('action', 'delete_draft'); 
-                delData.append('Kode Toko', currentStoreCode);
-                fetch(scriptURL, { method: 'POST', body: delData }); 
-
-                showAlert("Sukses", "Data tersimpan instan! Membuka WhatsApp...");
-                setTimeout(() => {
-                    kirimWA();
-                }, 1000);
+            
+            let rincianPayload = [];
+            const mapLabel = {
+                'setor_sore': 'Setor Sore', 'setor_malam': 'Setor Malam', 'setor_pagi': 'Setor Pagi', 
+                'ekor_sales': 'Ekor Sales', 'pot_ba': 'Potongan BA', 'pot_lebih': 'Potongan Lebih', 'pot_virtual': 'Potongan Virtual'
+            };
+            
+            
+            for (let key in dataStore) {
+                if (dataStore[key].length > 0) {
+                    dataStore[key].forEach(val => {
+                        if(val > 0) {
+                            let ket = "";
+                            if(key === 'ekor_sales') ket = document.getElementById('val_nama_ekor').value;
+                            if(key === 'pot_lebih' && document.getElementById('check_tertelan').checked) ket = "Tertelan";
+                            
+                            rincianPayload.push({
+                                kode_toko: dataSales.kode_toko,
+                                tgl_sales: dataSales.tgl_sales,
+                                kategori: mapLabel[key],
+                                nominal: val,
+                                keterangan: ket
+                            });
+                        }
+                    });
+                }
             }
-        });
-    }
 
-    function kirimWA() {
+            
+            if(rincianPayload.length > 0) {
+                const { error: err2 } = await supabase.from('rincian_sales').insert(rincianPayload);
+                if(err2) throw err2;
+            }
+
+          
+            status.innerText = "✅ Data Terbentuk";
+            
+            
+            try {
+                const fd = new FormData(); fd.append('action', 'delete_draft'); 
+                fd.append('Kode Toko', currentStoreCode);
+                fetch(scriptURL, { method: 'POST', body: fd, mode: 'no-cors' });
+            } catch(e) {}
+
+            showAlert("Sukses", "Data tersimpan instan di Database!");
+            setTimeout(() => { kirimWA(); }, 800);
+
+        } catch (err) {
+            console.error("Supabase Error:", err);
+            showAlert("Gagal Simpan", "Database Error: " + err.message);
+            btn.disabled = false; btn.innerText = "Coba Lagi";
+        }
+    }
+function kirimWA() {
         let getVal = (id) => document.getElementById('view_'+id).value;
         let getNum = (id) => Number(document.getElementById('h_'+id).value) || 0;
         let selisih = Number(document.getElementById('val_selisih').value);
@@ -824,10 +823,14 @@
         let pengirim = document.getElementById('nomor_pengirim').value || "-"; 
         let rawTgl = document.getElementById('tgl').value;
         let tglIndo = formatDateIndo(rawTgl); 
+        
         saveSender(pengirim);
+        
         let statusTxt = selisih === 0 ? "BALANCE OK ✅" : (selisih > 0 ? `LEBIH (+) Rp ${selisih.toLocaleString('id-ID')}⚠️` : `KURANG (-) Rp ${Math.abs(selisih).toLocaleString('id-ID')}⚠️`);
+        
         let ekorTxt = getVal('ekor_sales');
         if(document.getElementById('val_nama_ekor').value) ekorTxt += ` (a.n ${document.getElementById('val_nama_ekor').value})`;
+        
         let potongTxt = "";
         if(getNum('pot_ba') > 0) potongTxt += `\n1. BA Var: ${getVal('pot_ba')}`;
         if(getNum('pot_lebih') > 0) {
@@ -837,9 +840,11 @@
         }
         if(getNum('pot_virtual') > 0) potongTxt += `\n3. Virtual: ${getVal('pot_virtual')}`;
         if(potongTxt === "") potongTxt = "\n(Tidak ada)";
-        let txt = `*LAPORAN SETOR SALES*\n*${kode} - ${nama}*\n*Tgl Sales:* ${tglIndo}\n*Total Sales:* Rp ${document.getElementById('total_sales').value}\n------------------\n*Fisik Setor:*\n1. Sore: ${getVal('setor_sore')}\n2. Malam: ${getVal('setor_malam')}\n3. Pagi: ${getVal('setor_pagi')}\n4. Ekor: ${ekorTxt}\n------------------ (+)\\n*Total Setor: ${document.getElementById('disp_total_fisik').innerText}*\n\n*Potongan:*${potongTxt}\n------------------ (+)\n*Total Potong: ${document.getElementById('disp_total_potong').innerText}*\n\n------------------\n*${statusTxt}*\n\n👤 *Pengirim:* ${pengirim}\n\nNote : untuk bukti ekor dan bukti potong email dilampirkan`;
-        window.open(`https://wa.me/6285183347653?text=${encodeURIComponent(txt)}`, '_blank');
-        setTimeout(() => logout(), 1000); 
+        
+        let txt = `*LAPORAN SALES SUPABASE V5*\n*${kode} - ${nama}*\n*Tgl Sales:* ${tglIndo}\n*Total Sales:* Rp ${document.getElementById('total_sales').value}\n------------------\n*Fisik Setor:*\n1. Sore: ${getVal('setor_sore')}\n2. Malam: ${getVal('setor_malam')}\n3. Pagi: ${getVal('setor_pagi')}\n4. Ekor: ${ekorTxt}\n------------------ (+)\n*Total Setor: ${document.getElementById('disp_total_fisik').innerText}*\n\n*Potongan:*${potongTxt}\n------------------ (+)\n*Total Potong: ${document.getElementById('disp_total_potong').innerText}*\n\n------------------\n*${statusTxt}*\n\n👤 *Pengirim:* ${pengirim}\n\nNote : untuk bukti ekor dan bukti potong email dilampirkan`;
+
+        localStorage.clear(); 
+        window.location.href = `https://wa.me/6285183347653?text=${encodeURIComponent(txt)}`;
     }
 </script>
 </body>
