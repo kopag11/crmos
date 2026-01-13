@@ -12,6 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
 
     <style>
+        /* CSS ASLI DARI FILE ANDA (TIDAK DIUBAH SAMA SEKALI) */
         :root {
             --primary: #3b82f6; --primary-dark: #2563eb; --primary-soft: #eff6ff;
             --bg-color: #f1f5f9; --card-bg: #ffffff; --text-dark: #1e293b;
@@ -225,8 +226,9 @@
 <body>
 
 <div id="qrOverlay">
-    <div class="pulse">⏳</div>
-    <h3 style="color:var(--primary); margin-bottom:5px;">Memproses QR Login...</h3>
+    <div class="pulse-icon">⏳</div>
+    <h3 style="color:var(--primary); margin-bottom:5px;">Sedang Memverifikasi...</h3>
+    <p style="color:var(--text-gray); font-size:0.9rem;">Mohon tunggu sebentar</p>
 </div>
 
 <div id="exitScreen">
@@ -243,24 +245,49 @@
     <div id="loginScreen">
         <div style="margin-bottom: 20px;">
             <div class="icon-circle">
-                <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
-                <path style="fill:#F5C86E;" d="M434,230H78c-21.085,0-38.697-14.835-42.991-34.634L34,195.289V458c0,24.301,19.699,44,44,44h360 c22.091,0,40-17.909,40-40V319.323V274C478,249.699,458.301,230,434,230z"/>
-                <path style="fill:#6E87F5;" d="M374.788,142H438c22.091,0,40,17.909,40,40v92v45.323V274c0-24.301-19.699-44-44-44H78 c-24.301,0-44-19.699-44-44l0,0c0-24.301,19.699-44,44-44H78 c-24.301,0-44-19.699-44-44l0,0c0-24.301,19.699-44,44-44h59.454H374.788z"/>
+                <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                    viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
+                <path style="fill:#F5C86E;" d="M434,230H78c-21.085,0-38.697-14.835-42.991-34.634L34,195.289V458c0,24.301,19.699,44,44,44h360
+                    c22.091,0,40-17.909,40-40V319.323V274C478,249.699,458.301,230,434,230z"/>
+                <path style="fill:#6E87F5;" d="M374.788,142H438c22.091,0,40,17.909,40,40v92v45.323V274c0-24.301-19.699-44-44-44H78
+                    c-24.301,0-44-19.699-44-44l0,0c0-24.301,19.699-44,44-44H78
+                    c-24.301,0-44-19.699-44-44l0,0c0-24.301,19.699-44,44-44h59.454H374.788z"/>
                 <g><circle style="fill:#4BB9F5;" cx="110" cy="365.83" r="20"/><circle style="fill:#4BB9F5;" cx="217.29" cy="355.13" r="20"/></g>
                 <g><circle style="fill:#FF5A5A;" cx="200.62" cy="445.83" r="20"/><circle style="fill:#FF5A5A;" cx="281.12" cy="286.83" r="20"/></g>
-                <path style="fill:#F5C86E;" d="M325.599,186c7.174-12.068,11.307-26.156,11.307-41.215c0-44.617-36.169-80.785-80.785-80.785 s-80.785,36.169-80.785,80.785c0,15.059,4.133,29.147,11.307,41.215H325.599z"/>
+                <path style="fill:#F5C86E;" d="M325.599,186c7.174-12.068,11.307-26.156,11.307-41.215c0-44.617-36.169-80.785-80.785-80.785
+                    s-80.785,36.169-80.785,80.785c0,15.059,4.133,29.147,11.307,41.215H325.599z"/>
                 <path style="fill:#FAE196;" d="M478,409.084H359.539c-24.301,0-44-19.699-44-44l0,0c0-24.3,19.699-44,44-44H478"/>
-                <path d="M438,132h-63.212c-5.522,0-10,4.477-10,10s4.478,10,10,10H438c16.542,0,30,13.458,30,30v50.088 C458.71,224.537,446.876,220,434,220H78c-18.748,0-34-15.252-34-34s15.252-34,34-34h59.454c5.522,0,10-4.477,10-10s-4.478-10-10-10 H78c-29.775,0-54,24.224-54,54c0,2.198,0,272,0,272c0,29.776,24.225,54,54,54h360c27.57,0,50-22.43,50-50V182 C488,154.43,465.57,132,438,132z M468,399.084H359.539c-18.748,0-34-15.252-34-34s15.252-34,34-34H468V399.084z M438,492H78 c-18.748,0-34-15.252-34-34v-41.169h14.524l36.071,36.071c1.876,1.875,4.419,2.929,7.071,2.929h70.676 c4.128,11.639,15.243,20,28.28,20c16.542,0,30-13.458,30-30s-13.458-30-30-30c-13.036,0-24.152,8.361-28.28,20H105.81L69.739,399.76 c-1.876-1.875-4.419-2.929-7.071-2.929H44v-21.746h37.467c3.91,12.026,15.219,20.746,28.533,20.746c16.542,0,30-13.458,30-30 s-13.458-30-30-30c-12.756,0-23.671,8.006-28.002,19.254H44v-19.254h18.667c2.652,0,5.195-1.054,7.071-2.929l36.071-36.071h147.032 c4.128,11.639,15.244,20,28.28,20c16.542,0,30-13.458,30-30s-13.458-30-30-30c-13.036,0-24.152,8.361-28.28,20H101.667 c-2.652,0-5.195,1.054-7.071,2.929l-36.071,36.071H44v-87.918C53.29,235.463,65.123,240,78,240h356c18.748,0,34,15.252,34,34v37.084 H359.539c-29.775,0-54,24.224-54,54s24.225,54,54,54H468V448h-54.379c-5.522,0-10,4.477-10,10s4.478,10,10,10h53.775 C464.609,481.677,452.488,492,438,492z"/>
+                <path d="M438,132h-63.212c-5.522,0-10,4.477-10,10s4.478,10,10,10H438c16.542,0,30,13.458,30,30v50.088
+                    C458.71,224.537,446.876,220,434,220H78c-18.748,0-34-15.252-34-34s15.252-34,34-34h59.454c5.522,0,10-4.477,10-10s-4.478-10-10-10
+                    H78c-29.775,0-54,24.224-54,54c0,2.198,0,272,0,272c0,29.776,24.225,54,54,54h360c27.57,0,50-22.43,50-50V182
+                    C488,154.43,465.57,132,438,132z M468,399.084H359.539c-18.748,0-34-15.252-34-34s15.252-34,34-34H468V399.084z M438,492H78
+                    c-18.748,0-34-15.252-34-34v-41.169h14.524l36.071,36.071c1.876,1.875,4.419,2.929,7.071,2.929h70.676
+                    c4.128,11.639,15.243,20,28.28,20c16.542,0,30-13.458,30-30s-13.458-30-30-30c-13.036,0-24.152,8.361-28.28,20H105.81L69.739,399.76
+                    c-1.876-1.875-4.419-2.929-7.071-2.929H44v-21.746h37.467c3.91,12.026,15.219,20.746,28.533,20.746c16.542,0,30-13.458,30-30
+                    s-13.458-30-30-30c-12.756,0-23.671,8.006-28.002,19.254H44v-19.254h18.667c2.652,0,5.195-1.054,7.071-2.929l36.071-36.071h147.032
+                    c4.128,11.639,15.244,20,28.28,20c16.542,0,30-13.458,30-30s-13.458-30-30-30c-13.036,0-24.152,8.361-28.28,20H101.667
+                    c-2.652,0-5.195,1.054-7.071,2.929l-36.071,36.071H44v-87.918C53.29,235.463,65.123,240,78,240h356c18.748,0,34,15.252,34,34v37.084
+                    H359.539c-29.775,0-54,24.224-54,54s24.225,54,54,54H468V448h-54.379c-5.522,0-10,4.477-10,10s4.478,10,10,10h53.775
+                    C464.609,481.677,452.488,492,438,492z M190.623,445.831c0-5.514,4.486-10,10-10s10,4.486,10,10s-4.486,10-10,10
+                    S190.623,451.345,190.623,445.831z M100,365.831c0-5.514,4.486-10,10-10s10,4.486,10,10s-4.486,10-10,10S100,371.345,100,365.831z
+                    M271.121,286.831c0-5.514,4.486-10,10-10s10,4.486,10,10s-4.486,10-10,10S271.121,292.345,271.121,286.831z"/>
                 </svg>
             </div>
             <h2>Kalkulator CRM</h2>
-            <p style="color: var(--text-gray); margin: 5px 0 0 0;">Input Struk Setoran (V3-S)</p>
+            <p style="color: var(--text-gray); margin: 5px 0 0 0;">Input Struk Setoran (Supabase)</p>
         </div>
         
-        <div class="login-note"><span>📍</span> Wajib berada di lokasi toko</div>
-        <div class="pin-wrapper"><input type="text" id="inputKode" maxlength="4" placeholder="KODE" inputmode="text"></div>
-        <button class="btn-main" onclick="attemptLogin()">MASUK SEKARANG</button>
-        <p id="gpsStatus" style="font-size:0.85rem; color:var(--text-gray); margin-top:25px;">⏳ Siap.</p>
+        <div class="login-note">
+            <span>📍</span> Wajib berada di lokasi toko
+        </div>
+        
+        <div class="pin-wrapper">
+            <input type="text" id="inputKode" maxlength="4" placeholder="KODE" inputmode="text">
+        </div>
+        
+        <button class="btn-main" onclick="doLogin()">MASUK SEKARANG</button>
+        
+        <p id="gpsStatus" style="font-size:0.85rem; color:var(--text-gray); margin-top:25px;">⏳ Menunggu sinyal GPS...</p>
     </div>
 
     <div id="dashboard">
@@ -315,19 +342,27 @@
                 </div>
             </div>
 
-            <input type="hidden" id="h_setor_sore" value="0"><input type="hidden" id="h_setor_malam" value="0">
-            <input type="hidden" id="h_setor_pagi" value="0"><input type="hidden" id="h_ekor_sales" value="0">
-            <input type="hidden" id="h_pot_ba" value="0"><input type="hidden" id="h_pot_lebih" value="0"> 
-            <input type="hidden" id="h_pot_virtual" value="0">
-            <input type="hidden" id="h_total_fisik" value="0"><input type="hidden" id="val_nama_ekor"> 
+            <input type="hidden" name="Setor Sore" id="h_setor_sore" value="0">
+            <input type="hidden" name="Setor Malam" id="h_setor_malam" value="0">
+            <input type="hidden" name="Setor Pagi" id="h_setor_pagi" value="0">
+            <input type="hidden" name="Ekor Sales" id="h_ekor_sales" value="0">
+            
+            <input type="hidden" name="Potongan BA" id="h_pot_ba" value="0">
+            <input type="hidden" name="Potongan Lebih" id="h_pot_lebih" value="0"> 
+            <input type="hidden" name="Potongan Virtual" id="h_pot_virtual" value="0">
+
+            <input type="hidden" name="Total Setor Fisik" id="h_total_fisik" value="0">
+            <input type="hidden" name="Ket Ekor" id="val_nama_ekor"> 
             <input type="hidden" id="val_selisih" value="0">
 
             <button type="button" class="btn-action btn-blue" id="btn-submit" onclick="processSubmit()">
-                <span>☁️</span> SIMPAN KE DATABASE
+                <span>☁️</span> SIMPAN DATABASE
             </button>
+            
             <button type="button" class="btn-action btn-wa" id="btn-wa" onclick="kirimWA()">
                 <span>📲</span> KIRIM KE WHATSAPP
             </button>
+            
             <p id="status" style="text-align:center; margin-top:20px; font-weight:600; color:var(--text-gray);"></p>
         </form>
     </div>
@@ -338,9 +373,13 @@
         <span id="confirmIcon" class="modal-icon">⚠️</span>
         <div id="confirmTitle" class="modal-title">Konfirmasi</div>
         <div id="confirmMsg" class="modal-text">Pesan konfirmasi...</div>
-        <div class="modal-footer"><button class="btn-modal-cancel" onclick="closeConfirm()">Batal</button><button id="btnConfirmYes" class="btn-modal-primary" onclick="doConfirmYes()">Ya, Lanjutkan</button></div>
+        <div class="modal-footer">
+            <button class="btn-modal-cancel" onclick="closeConfirm()">Batal</button>
+            <button id="btnConfirmYes" class="btn-modal-primary" onclick="doConfirmYes()">Ya, Lanjutkan</button>
+        </div>
     </div>
 </div>
+
 <div id="alertModal" class="modal">
     <div class="modal-content">
         <span class="modal-icon">ℹ️</span>
@@ -349,223 +388,656 @@
         <button class="btn-modal-primary" style="width:100%" onclick="document.getElementById('alertModal').style.display='none'">OK, Mengerti</button>
     </div>
 </div>
+
 <div id="calcModal" class="modal">
     <div class="modal-content">
         <h3 id="modalTitle" style="margin-bottom:20px; color:var(--primary); font-family: 'Poppins', sans-serif;">Rincian</h3>
         <div id="calcList" style="max-height:250px; overflow-y:auto; margin-bottom:15px; padding-right: 5px;"></div>
-        <button onclick="addCalcRow()" style="background:#f8fafc; color:var(--primary); border:2px dashed #cbd5e1; padding:12px; width:100%; border-radius:12px; cursor:pointer; font-weight: 600; margin-bottom: 15px;">+ Tambah Struk ATM</button>
-        <div style="background: var(--primary-soft); padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;"><span style="font-size: 0.9rem; color: var(--text-gray);">Total Sementara:</span><strong id="modalTotal" style="color:var(--primary); font-size: 1.1rem;">0</strong></div>
-        <div class="modal-footer"><button class="btn-modal-cancel" onclick="document.getElementById('calcModal').style.display='none'">Batal</button><button class="btn-modal-primary" onclick="saveCalculator()">Simpan</button></div>
+        <button onclick="addCalcRow()" style="background:#f8fafc; color:var(--primary); border:2px dashed #cbd5e1; padding:12px; width:100%; border-radius:12px; cursor:pointer; font-weight: 600; margin-bottom: 15px;">
+            + Tambah Struk ATM
+        </button>
+        <div style="background: var(--primary-soft); padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <span style="font-size: 0.9rem; color: var(--text-gray);">Total Sementara:</span>
+            <strong id="modalTotal" style="color:var(--primary); font-size: 1.1rem;">0</strong>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-modal-cancel" onclick="document.getElementById('calcModal').style.display='none'">Batal</button>
+            <button class="btn-modal-primary" onclick="saveCalculator()">Simpan Hasil</button>
+        </div>
     </div>
 </div>
 
 <script>
-    // --- SUPABASE CONFIG ---
+    // 2. KONFIGURASI SUPABASE (DITAMBAHKAN DI SINI)
     const SUPABASE_URL = 'https://mpzxceuhnuhuhuveppmh.supabase.co'; 
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wenhjZXVobnVoaHV2dmVwcG1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgyNjQwNDEsImV4cCI6MjA4Mzg0MDA0MX0.sIRvchXgTH9kEMCqhuM2geYohe1TiipYgxz3PQ_y4R0';
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbzX8YNW9U6fyuCzBOWB_lcu7FDJS5ivTOI5RU2QBAVQz-sW_ov4ys_CSuqxQNnYDQLT/exec';
-    
     let supabase = null;
+
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzX8YNW9U6fyuCzBOWB_lcu7FDJS5ivTOI5RU2QBAVQz-sW_ov4ys_CSuqxQNnYDQLT/exec'; 
+    const MAX_RADIUS_METERS = 40; 
+	//SEPTA GANTENG
     let currentStoreCode = "";
     let dataStore = {}; 
     let activeField = "";
     let onConfirmAction = null;
     let currentLoadedDate = "";
-    const MAX_RADIUS_METERS = 40;
 
-    window.onload = function() {
-        try { supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) { console.error("Lib Load Fail"); }
+    function getTodayDate() {
+        let today = new Date();
+        let y = today.getFullYear();
+        let m = String(today.getMonth() + 1).padStart(2, '0');
+        let d = String(today.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    }
+
+    function getYesterdayDate() {
+        let today = new Date();
+        let yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+        let y = yesterday.getFullYear();
+        let m = String(yesterday.getMonth() + 1).padStart(2, '0');
+        let d = String(yesterday.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    }
+
+    function validateDateChange(input) {
+        let selectedDate = input.value;
+        let today = getTodayDate();
+        let hMin1 = getYesterdayDate();
+        if (selectedDate === today) {
+            if (currentLoadedDate === hMin1) {
+                let sales = getCleanNumber(document.getElementById('total_sales').value);
+                let fisik = Number(document.getElementById('h_total_fisik').value);
+                if (sales > 0 || fisik > 0) {
+                    showAlert("⚠️ Laporan Belum Selesai!", "Selesaikan & Kirim WA dulu laporan H-1 sebelum input hari ini.");
+                    input.value = hMin1; 
+                    return; 
+                }
+            }
+        }
+        autoSaveDraft();
+    }
+
+    window.addEventListener('load', function() {
+        // Init Supabase
+        try { supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) { console.error("Supabase Error", e); }
+
         getDetailedDeviceInfo();
-        if(localStorage.getItem('crm_sender_phone')) document.getElementById('nomor_pengirim').value = localStorage.getItem('crm_sender_phone');
+        let savedNum = localStorage.getItem('crm_sender_phone');
+        if(savedNum && document.getElementById('nomor_pengirim')) {
+            document.getElementById('nomor_pengirim').value = savedNum;
+        }
         document.getElementById('tgl').value = getYesterdayDate();
         hitungGlobal();
-        
-        // --- QR LOGIN LOGIC ---
         const urlParams = new URLSearchParams(window.location.search);
         const qrKode = urlParams.get('kode');
+        const lockStatus = localStorage.getItem('lock_status');
+        const activeSession = localStorage.getItem('active_session_code');
+        const loginMethod = localStorage.getItem('login_method');
         if (qrKode) {
+            localStorage.setItem('lock_status', 'OPEN');
+            localStorage.setItem('login_method', 'QR');
+            localStorage.setItem('active_session_code', qrKode.toUpperCase()); 
             document.getElementById('qrOverlay').style.display = 'flex';
-            document.getElementById('inputKode').value = qrKode.toUpperCase();
-            setTimeout(() => attemptLogin(true), 500);
-        } else {
-            let sess = localStorage.getItem('crm_sess_code');
-            if(sess) { masukDashboard(sess, sess, localStorage.getItem('crm_sess_name')||"Toko"); attemptLogin(true); }
-            else { document.getElementById('loginScreen').style.display = 'flex'; }
-        }
-    };
-
-    async function attemptLogin(isSilent = false) {
-        let k = document.getElementById('inputKode').value.toUpperCase().trim();
-        if(!k) return alert("Isi Kode!");
-        if(k==='COBA') return masukDashboard('COBA','TEST','Toko Uji Coba');
-        
-        if(!isSilent) document.getElementById('gpsStatus').innerText = "⏳ Mengecek server...";
-        
-        let isDone = false;
-        let timer = setTimeout(() => { if(!isDone) { isDone = true; masukDashboard(k, k, "Toko " + k); } }, 4000);
-
-        fetch(scriptURL + "?action=get_shop_info&kode=" + k)
-        .then(r => r.json()).then(d => {
-            if(!isDone) {
-                isDone = true; clearTimeout(timer);
-                if(d.error) { if(!isSilent) alert(d.error); document.getElementById('loginScreen').style.display='flex'; document.getElementById('qrOverlay').style.display='none'; }
-                else { masukDashboard(k, k, d.nama); }
+            document.getElementById('exitScreen').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'none';
+            const cleanCode = qrKode.toUpperCase();
+            document.getElementById('inputKode').value = cleanCode;
+            window.history.replaceState({}, document.title, window.location.pathname);
+            const cachedName = localStorage.getItem('shop_cache_' + cleanCode);
+            if (cachedName) {
+                setTimeout(() => {
+                    masukDashboard(cleanCode, cleanCode, cachedName);
+                    document.getElementById('qrOverlay').style.display = 'none';
+                    doLogin(true, true);
+                }, 500);
+            } else {
+                doLogin(true, false);
             }
-        }).catch(e => { if(!isDone) { isDone = true; masukDashboard(k, k, "Offline Mode"); } });
+            return;
+        }
+        if (lockStatus === 'LOCKED') { showExitLocked(); return; }
+        if (activeSession && loginMethod === 'QR') {
+            const cachedName = localStorage.getItem('shop_cache_' + activeSession);
+            masukDashboard(activeSession, activeSession, cachedName || "Memuat...");
+            doLogin(true, true);
+            return;
+        }
+        localStorage.setItem('login_method', 'MANUAL');
+        document.getElementById('loginScreen').style.display = 'flex';
+    });
+
+    function logout() { 
+        const method = localStorage.getItem('login_method');
+        localStorage.removeItem('active_session_code');
+        if (method === 'QR') {
+            localStorage.setItem('lock_status', 'LOCKED');
+            showExitLocked();
+            window.close(); 
+        } else {
+            localStorage.removeItem('login_method');
+            location.reload(); 
+        }
     }
 
-    function masukDashboard(kode, disp, nama) {
-        currentStoreCode = kode;
+    function showExitLocked() {
+        document.getElementById('dashboard').style.display = 'none';
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('qrOverlay').style.display = 'none';
+        document.getElementById('exitScreen').style.display = 'flex';
+    }
+
+    function masukDashboard(realCode, displayCode, shopName) {
+        currentStoreCode = realCode;
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('qrOverlay').style.display = 'none'; 
+        document.getElementById('exitScreen').style.display = 'none';
         document.getElementById('dashboard').style.display = 'block';
-        document.getElementById('displayKode').innerText = disp;
-        document.getElementById('displayNama').innerText = nama;
-        document.getElementById('nama_toko').value = nama;
-        document.getElementById('formKode').value = kode;
-        localStorage.setItem('crm_sess_code', kode);
-        localStorage.setItem('crm_sess_name', nama);
-        initForm(); loadDraft();
+        document.getElementById('displayKode').innerText = displayCode;
+        document.getElementById('displayNama').innerText = shopName;
+        document.getElementById('nama_toko').value = shopName;
+        document.getElementById('formKode').value = realCode;
+        localStorage.setItem('shop_cache_' + realCode, shopName);
+        loadDraft();
     }
 
-    function logout() { if(confirm("Keluar?")) { localStorage.removeItem('crm_sess_code'); location.reload(); } }
+    async function doLogin(bypassGPS = false, isSilent = false) {
+        const codeInput = document.getElementById('inputKode');
+        const code = codeInput.value.toUpperCase().trim();
+        if (code.length < 2) {
+            if(!isSilent) showAlert("Gagal", "Kode Toko harus diisi!");
+            return;
+        }
+        if (code === "COBA") {
+            masukDashboard("COBA", "TEST", "Toko Uji Coba");
+            if(!isSilent) showAlert("Mode Uji Coba", "Masuk tanpa GPS.");
+            return;
+        }
+        const statusEl = document.getElementById('gpsStatus');
+        if (!isSilent && !bypassGPS) statusEl.innerText = "⏳ Sedang melacak lokasi...";
+        try {
+            const res = await fetch(scriptURL + "?action=get_shop_info&kode=" + code + "&t=" + new Date().getTime());
+            const shop = await res.json();
+            if (shop.error) throw new Error(shop.error);
+            if (isSilent) {
+                document.getElementById('displayNama').innerText = shop.nama;
+                document.getElementById('nama_toko').value = shop.nama;
+                localStorage.setItem('shop_cache_' + code, shop.nama);
+                return;
+            }
+            if (bypassGPS) {
+                masukDashboard(code, code, shop.nama);
+            } else {
+                navigator.geolocation.getCurrentPosition(pos => {
+                    const dist = calculateDistance(pos.coords.latitude, pos.coords.longitude, shop.lat, shop.lon);
+                    if (dist > MAX_RADIUS_METERS) {
+                        return showAlert("Lokasi Jauh", `Anda berjarak ${Math.round(dist)}m dari toko. \n\nSilakan scan QR Code di KARTU.`);
+                    }
+                    masukDashboard(code, code, shop.nama);
+                }, () => showAlert("GPS Mati", "Mohon aktifkan GPS/Lokasi di HP Anda."));
+            }
+        } catch(e) { 
+            if(!isSilent) {
+                document.getElementById('qrOverlay').style.display = 'none';
+                localStorage.removeItem('lock_status'); 
+                document.getElementById('loginScreen').style.display = 'flex';
+                showAlert("Login Gagal", "Kode tidak valid atau sinyal buruk.");
+                statusEl.innerText = "❌ Gagal memuat.";
+            }
+            console.error(e);
+        }
+    }
 
-    function renderForm() {
-        const fields = [
-            {id:'setor_sore', l:'☀️ Setor Sore', g:'fisik'}, {id:'setor_malam', l:'🌙 Setor Malam', g:'fisik'},
-            {id:'setor_pagi', l:'🌅 Setor Pagi', g:'fisik'}, {id:'ekor_sales', l:'🪙 Ekor Sales', g:'fisik', n:true},
-            {id:'pot_ba', l:'⚠️ Potongan BA', g:'potong'}, {id:'pot_lebih', l:'➕ Pot. Lebih', g:'potong', c:true},
-            {id:'pot_virtual', l:'💳 Potongan Virtual', g:'potong'}
-        ];
-        let h1 = `<div class="card"><div class="section-title t-fisik"><span>💵</span> Uang Fisik</div>`;
-        let h2 = `<div class="card"><div class="section-title t-potong"><span>✂️</span> Potongan</div>`;
-        fields.forEach(f => {
-            if(!dataStore[f.id]) dataStore[f.id] = [];
-            let note = f.n ? `<input type="text" id="note_ekor" placeholder="Ket. Ekor" oninput="document.getElementById('val_nama_ekor').value=this.value; autoSaveDraft();" style="width:100%; padding:10px; margin-top:10px; border:1px dashed #ddd; border-radius:10px;">` : '';
-            let chk = f.c ? `<span class="check-tertelan-wrapper"><input type="checkbox" id="check_tertelan" onchange="autoSaveDraft()"> Tertelan?</span>` : '';
-            let html = `<div class="form-group"><label>${f.l} ${chk}</label><div class="input-with-btn"><input type="text" id="view_${f.id}" value="Rp 0" readonly onclick="openCalc('${f.id}','${f.l}')"><button class="btn-add" onclick="openCalc('${f.id}','${f.l}')">+</button></div>${note}</div>`;
-            if(f.g === 'fisik') h1 += html; else h2 += html;
+    function saveSender(val) { localStorage.setItem('crm_sender_phone', val); }
+
+    async function getDetailedDeviceInfo() {
+        var info = "";
+        var ua = navigator.userAgent;
+        var screenRes = window.screen.width + "x" + window.screen.height;
+        var gl = document.createElement('canvas').getContext('webgl');
+        var gpu = "Unknown GPU";
+        if (gl) {
+            var debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+            if (debugInfo) gpu = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+        }
+        if (navigator.userAgentData) {
+            try {
+                const uaData = await navigator.userAgentData.getHighEntropyValues(["model", "platform", "platformVersion"]);
+                info = `${uaData.platform||""} ${uaData.model||""} (v${uaData.platformVersion||""}) | ${gpu}`;
+            } catch (e) { info = `${ua} | ${gpu}`; }
+        } else { info = `${ua} | ${gpu} | ${screenRes}`; }
+        document.getElementById('info_perangkat').value = info;
+    }
+
+    function showAlert(title, msg) {
+        document.getElementById('alertTitle').innerText = title;
+        document.getElementById('alertMsg').innerText = msg;
+        document.getElementById('alertModal').style.display = 'flex';
+    }
+
+    function showConfirm(title, msg, isDanger, callback) {
+        document.getElementById('confirmTitle').innerText = title;
+        document.getElementById('confirmMsg').innerText = msg;
+        let btn = document.getElementById('btnConfirmYes');
+        if (isDanger) {
+            btn.className = "btn-modal-danger";
+            btn.innerText = "Ya, Hapus";
+            document.getElementById('confirmIcon').innerText = "🗑️";
+        } else {
+            btn.className = "btn-modal-primary";
+            btn.innerText = "Ya, Simpan";
+            document.getElementById('confirmIcon').innerText = "💾";
+        }
+        onConfirmAction = callback;
+        document.getElementById('confirmModal').style.display = 'flex';
+    }
+
+    function closeConfirm() {
+        document.getElementById('confirmModal').style.display = 'none';
+        onConfirmAction = null;
+    }
+    function doConfirmYes() { if (onConfirmAction) onConfirmAction(); closeConfirm(); }
+
+    function formatDateIndo(dateString) {
+        if (!dateString) return "";
+        let parts = dateString.split('-'); 
+        if (parts.length !== 3) return dateString;
+        return `${parts[2]}-${parts[1]}-${parts[0]}`; 
+    }
+
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371000; const toRad = (x) => x * Math.PI / 180;
+        const dLat = toRad(lat2 - lat1); const dLon = toRad(lon2 - lon1);
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); return R * c; 
+    }
+
+    function formatRibuan(element) {
+        let val = element.value.replace(/[^,\d]/g, '').toString();
+        let split = val.split(',');
+        let sisa = split[0].length % 3;
+        let rupiah = split[0].substr(0, sisa);
+        let ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+        if (ribuan) { let separator = sisa ? '.' : ''; rupiah += separator + ribuan.join('.'); }
+        rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+        element.value = rupiah;
+    }
+
+    function getCleanNumber(val) {
+        if (!val) return 0;
+        return Number(val.toString().replace(/\./g, '')) || 0; 
+    }
+    
+    function collectDraftData() {
+        return {
+            tgl: document.getElementById('tgl').value,
+            nama_toko: document.getElementById('nama_toko').value,
+            total_sales: document.getElementById('total_sales').value,
+            dataStore: dataStore,
+            ekor_note: document.getElementById('val_nama_ekor').value,
+            h_setor_sore: document.getElementById('h_setor_sore').value,
+            h_setor_malam: document.getElementById('h_setor_malam').value,
+            h_setor_pagi: document.getElementById('h_setor_pagi').value,
+            h_ekor_sales: document.getElementById('h_ekor_sales').value,
+            h_pot_ba: document.getElementById('h_pot_ba').value,
+            h_pot_lebih: document.getElementById('h_pot_lebih').value,
+            h_pot_virtual: document.getElementById('h_pot_virtual').value,
+            is_tertelan: document.getElementById('check_tertelan') ? document.getElementById('check_tertelan').checked : false
+        };
+    }
+
+    function autoSaveDraft() {
+        if (!currentStoreCode) return;
+        const formData = new FormData();
+        formData.append('action', 'save_draft');
+        formData.append('Kode Toko', currentStoreCode);
+        formData.append('draft_data', JSON.stringify(collectDraftData()));
+        fetch(scriptURL, { method: 'POST', body: formData }).catch(e => console.log("Autosave err"));
+    }
+
+    function manualDraftSave() {
+        let tgl = document.getElementById('tgl').value;
+        if (!tgl) { showAlert("Info", "Mohon isi TANGGAL SALES dulu."); return; }
+        const btn = document.getElementById('btn-submit');
+        const oriText = btn.innerHTML;
+        btn.innerHTML = "⏳ Menyimpan...";
+        btn.disabled = true;
+        autoSaveDraft();
+        setTimeout(() => {
+            btn.innerHTML = "✅ Tersimpan!";
+            setTimeout(() => {
+                btn.innerHTML = oriText;
+                btn.disabled = false;
+            }, 1000);
+        }, 800);
+    }
+
+    function loadDraft() {
+        const historyList = document.getElementById('historyList');
+        document.getElementById('historyList').style.display = 'block';
+        historyList.innerHTML = `🔄 Mengecek draf cloud...`;
+        const timestamp = new Date().getTime();
+        fetch(scriptURL + "?action=load_draft&kode=" + currentStoreCode + "&tmp=" + timestamp)
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    historyList.style.display = 'none';
+                    dataStore = {}; initForm();
+                } else {
+                    const draft = data;
+                    let draftDate = draft.tgl;
+                    const hMin1 = getYesterdayDate();
+                    if (draftDate < hMin1) draftDate = hMin1; 
+                    currentLoadedDate = draftDate; 
+                    document.getElementById('tgl').value = draftDate;
+                    document.getElementById('total_sales').value = draft.total_sales || '';
+                    document.getElementById('val_nama_ekor').value = draft.ekor_note || '';
+                    if (typeof draft.dataStore === 'string') {
+                        try { dataStore = JSON.parse(draft.dataStore); } catch(e) { dataStore = {}; }
+                    } else { dataStore = draft.dataStore || {}; }
+                    ['setor_sore', 'setor_malam', 'setor_pagi', 'ekor_sales', 'pot_ba', 'pot_lebih', 'pot_virtual'].forEach(key => {
+                        let el = document.getElementById('h_' + key);
+                        if(el) el.value = draft['h_' + key] || 0;
+                    });
+                    initForm(); 
+                    if(document.getElementById('note_ekor')) document.getElementById('note_ekor').value = draft.ekor_note || '';
+                    if(document.getElementById('check_tertelan') && draft.is_tertelan) document.getElementById('check_tertelan').checked = true;
+                    updateAllViewFields(); 
+                    let tglIndo = formatDateIndo(draftDate);
+                    historyList.style.display = 'block';
+                    historyList.innerHTML = `<span style="color:green; font-weight:bold;">✅ Data Dipulihkan dari Cloud (${tglIndo})</span>`;
+                }
+            }).catch(e => { historyList.style.display = 'none'; initForm(); });
+    }
+
+    function confirmDeleteDraft() {
+        showConfirm("Hapus Draf?", "Data draf di cloud akan dihapus permanen.", true, function() {
+            const form = new FormData(); form.append('action', 'delete_draft'); form.append('Kode Toko', currentStoreCode);
+            fetch(scriptURL, { method: 'POST', body: form }).then(() => location.reload());
         });
-        document.getElementById('dynamicInputs').innerHTML = h1 + "</div>" + h2 + "</div>";
     }
 
-    // --- LOGIKA SIMPAN SUPABASE ---
+    function updateAllViewFields() {
+        ['setor_sore', 'setor_malam', 'setor_pagi', 'ekor_sales', 'pot_ba', 'pot_lebih', 'pot_virtual'].forEach(id => {
+            let val = Number(document.getElementById('h_' + id).value) || 0;
+            if(document.getElementById('view_'+id)) document.getElementById('view_'+id).value = "Rp " + val.toLocaleString('id-ID');
+        });
+        hitungGlobal();
+    }
+
+    function initForm() {
+        const fieldsFisik = [
+            {id:'setor_sore', label:'☀️ Setor Sore', desc:'Setoran yang dilakukan setelah sales kemarin sudah selesai (ORI)'},
+            {id:'setor_malam', label:'🌙 Setor Malam', desc:'Setoran yang dilakukan saat jam 21.00 sampai jam 24.00'},
+            {id:'setor_pagi', label:'🌅 Setor Pagi (H+1)', desc:'Setoran yang dilakukan dari jam 24.00 sampai setoran sales kemarin selesai'},
+            {id:'ekor_sales', label:'🪙 Ekor Sales', hasNote: true, desc:'Transferan yang menggunakan mobile banking untuk ekor, dan buktinya dikirim ke WA'}
+        ];
+        const fieldsPotong = [
+            {id:'pot_ba', label:'⚠️ Potongan BA Var', desc:'Klaim varian, harus ada email dari finance'},
+            {id:'pot_lebih', label:'➕ Potongan Lebih / Tertelan', isTertelanOption: true, desc:'Kelebihan setoran atau uang tertelan'},
+            {id:'pot_virtual', label:'💳 Potongan Virtual', desc:'Email virtual koreksi sales'}
+        ];
+        let html = "";
+        html += `<div class="card"><div class="section-title t-fisik"><span>💵</span> Uang Fisik</div>`;
+        fieldsFisik.forEach(f => html += createFieldHtml(f));
+        html += `</div>`;
+        html += `<div class="card"><div class="section-title t-potong"><span>✂️</span> Potongan</div>`;
+        fieldsPotong.forEach(f => html += createFieldHtml(f));
+        html += `</div>`;
+        document.getElementById('dynamicInputs').innerHTML = html;
+    }
+
+    function createFieldHtml(f) {
+        if (!dataStore[f.id]) dataStore[f.id] = [];
+        let ekorVal = document.getElementById('val_nama_ekor') ? document.getElementById('val_nama_ekor').value : '';
+        let noteInput = f.hasNote 
+            ? `<input type="text" id="note_ekor" placeholder="Ket. Ekor (Misal: BCA Budi)" value="${ekorVal}" oninput="document.getElementById('val_nama_ekor').value=this.value; autoSaveDraft();" style="margin-top:10px; border:1px dashed #cbd5e1; background: #f8fafc;">` 
+            : '';
+        let infoHtml = f.desc ? `<span class="info-btn" onclick="showAlert('Informasi', '${f.desc}')">i</span>` : '';
+        let checkboxHtml = '';
+        if (f.isTertelanOption) {
+            checkboxHtml = `<div class="check-tertelan-wrapper"><input type="checkbox" id="check_tertelan" onchange="autoSaveDraft()"><label for="check_tertelan" style="margin:0 0 0 5px; font-size:0.8rem; font-weight:normal; color:#475569; cursor:pointer;">Tertelan?</label></div>`;
+        }
+        return `<div class="form-group">
+                    <label>${f.label} ${infoHtml} ${checkboxHtml}</label>
+                    <div class="input-with-btn">
+                        <input type="text" id="view_${f.id}" value="Rp 0" readonly style="background:white; cursor: default;">
+                        <button type="button" class="btn-add" onclick="openCalc('${f.id}', '${f.label}')">+</button>
+                    </div>
+                    ${noteInput}
+                </div>`;
+    }
+
+    function openCalc(id, title) { activeField=id; document.getElementById('modalTitle').innerText=title; document.getElementById('calcModal').style.display='flex'; renderCalcRows(); updateModalTotal(); }
+    
+    function renderCalcRows() {
+        const c = document.getElementById('calcList'); c.innerHTML="";
+        let vals = dataStore[activeField]||[]; if(vals.length===0) vals.push(0);
+        vals.forEach((v,i) => {
+            c.innerHTML += `<div class="calc-row"><input type="text" inputmode="numeric" class="calc-input" value="${v===0?'':v.toLocaleString('id-ID')}" onkeyup="formatRibuan(this);updateModalTotal()" onblur="handleBlur(this)"><button class="btn-remove" onclick="removeRow(${i})">✕</button></div>`;
+        });
+    }
+
+    function addCalcRow() { saveTemp(); dataStore[activeField].push(0); renderCalcRows(); }
+    function removeRow(i) { saveTemp(); dataStore[activeField].splice(i,1); renderCalcRows(); updateModalTotal(); }
+    function saveTemp() { dataStore[activeField] = Array.from(document.querySelectorAll('.calc-input')).map(i=>getCleanNumber(i.value)); }
+    function updateModalTotal() { 
+        let t=0; document.querySelectorAll('.calc-input').forEach(i=>t+=getCleanNumber(i.value)); 
+        document.getElementById('modalTotal').innerText="Rp "+t.toLocaleString('id-ID'); 
+    }
+    
+    function handleBlur(el) {
+        let val = getCleanNumber(el.value);
+        const listAutoRibuan = ['setor_sore', 'setor_malam', 'setor_pagi'];
+        if (listAutoRibuan.includes(activeField) && val > 0 && val < 100000) {
+            val = val * 1000;
+            el.value = val.toLocaleString('id-ID');
+        }
+        const wajibKelipatan = ['setor_sore', 'setor_malam', 'setor_pagi'];
+        if (wajibKelipatan.includes(activeField) && val > 0) {
+            if (val % 50000 !== 0) {
+                showAlert("⚠️ INPUT SALAH!", "Struk ATM harus kelipatan Rp 50.000 (Misal: 50.000, 300.000, 1.050.000, dst).");
+                el.value = "";
+                el.focus();
+            }
+        }
+        updateModalTotal();
+        saveTemp();
+    }
+
+    function saveCalculator() {
+        saveTemp(); 
+        let rows = document.querySelectorAll('.calc-input');
+        let isAllValid = true;
+        const wajibKelipatan = ['setor_sore', 'setor_malam', 'setor_pagi'];
+        if (wajibKelipatan.includes(activeField)) {
+            rows.forEach(input => {
+                let v = getCleanNumber(input.value);
+                if (v > 0 && v % 50000 !== 0) isAllValid = false;
+            });
+        }
+        if (!isAllValid) {
+            showAlert("Gagal Simpan", "Masih ada Struk ATM yang bukan kelipatan 50.000.");
+            return;
+        }
+        let t = dataStore[activeField].reduce((a,b)=>a+b,0);
+        document.getElementById('view_'+activeField).value="Rp "+t.toLocaleString('id-ID');
+        document.getElementById('h_'+activeField).value=t;
+        document.getElementById('calcModal').style.display='none'; 
+        hitungGlobal();
+    }
+
+    function hitungGlobal() {
+        let rawSales = document.getElementById('total_sales').value;
+        let sales = getCleanNumber(rawSales);
+        let fisik = Number(document.getElementById('h_setor_sore').value) + 
+                    Number(document.getElementById('h_setor_malam').value) + 
+                    Number(document.getElementById('h_setor_pagi').value) + 
+                    Number(document.getElementById('h_ekor_sales').value);
+        let potong = Number(document.getElementById('h_pot_ba').value) + 
+                     Number(document.getElementById('h_pot_lebih').value) + 
+                     Number(document.getElementById('h_pot_virtual').value);
+        document.getElementById('disp_total_fisik').innerText = "Rp " + fisik.toLocaleString('id-ID');
+        document.getElementById('disp_total_potong').innerText = "Rp " + potong.toLocaleString('id-ID');
+        document.getElementById('h_total_fisik').value = fisik;
+        let selisih = (fisik + potong) - sales;
+        document.getElementById('val_selisih').value = selisih;
+        let elBal = document.getElementById('disp_balance');
+        let btn = document.getElementById('btn-submit');
+        elBal.classList.remove('status-ok', 'status-plus', 'status-min', 'status-draft');
+        btn.classList.remove('btn-green', 'btn-yellow', 'btn-blue');
+        if (sales === 0) {
+            elBal.innerHTML = `<span>📝</span> PENGISIAN DATA`;
+            elBal.classList.add('status-draft');
+            btn.innerHTML = `<span>☁️</span> SIMPAN DRAFT`;
+            btn.className = "btn-action btn-blue";
+            btn.onclick = manualDraftSave;
+        } else {
+            btn.onclick = trySubmitForm; 
+            if (selisih < 0) {
+                elBal.innerHTML = `<span>⚠️</span> KURANG (-) Rp ` + Math.abs(selisih).toLocaleString('id-ID');
+                elBal.classList.add('status-min');
+                btn.innerHTML = `<span>⚠️</span> SIMPAN DRAFT (MINUS)`; 
+                btn.className = "btn-action btn-yellow";
+            } else {
+                if (selisih === 0) {
+                    elBal.innerHTML = `<span>✅</span> BALANCE (PAS)`; 
+                    elBal.classList.add('status-ok');
+                } else {
+                    elBal.innerHTML = `<span>➕</span> LEBIH (+) Rp ` + selisih.toLocaleString('id-ID');
+                    elBal.classList.add('status-plus');
+                }
+                btn.innerHTML = `<span>💾</span> SIMPAN (Bentuk Laporan WA)`;
+                btn.className = "btn-action btn-green";
+            }
+        }
+        autoSaveDraft();
+    }
+
+    function trySubmitForm() {
+        let tgl = document.getElementById('tgl').value;
+        if (!tgl) { showAlert("Data Kosong", "Isi TANGGAL dulu!"); return; }
+        let selisih = Number(document.getElementById('val_selisih').value);
+        let msg = "";
+        if (selisih < 0) {
+            autoSaveDraft(); 
+            showAlert("Data Kurang", `Data masih MINUS Rp ${Math.abs(selisih).toLocaleString('id-ID')}.\n\nData tersimpan sebagai DRAFT.`);
+            return; 
+        } else if (selisih > 0) msg = `ℹ️ Ada KELEBIHAN uang Rp ${selisih.toLocaleString('id-ID')}.\n\nSimpan laporan?`;
+        else msg = "✅ Data BALANCE (PAS).\n\nSimpan laporan final?";
+        showConfirm("Konfirmasi Laporan", msg, false, function() { processSubmit(); });
+    }
+
+    // --- 3. MODIFIKASI: FUNGSI SUBMIT KE SUPABASE ---
     async function processSubmit() {
         const btn = document.getElementById('btn-submit');
         const status = document.getElementById('status');
-        if (!document.getElementById('tgl').value) return alert("Pilih Tanggal!");
+        btn.disabled = true; 
         
-        btn.disabled = true; btn.innerText = "🚀 Menyimpan ke Cloud...";
-        
+        btn.innerText = "⏳ Menyimpan ke Database...";
+
+        // A. SIAPKAN DATA UTAMA
         const dataSales = {
-            kode_toko: currentStoreCode, nama_toko: document.getElementById('nama_toko').value,
+            kode_toko: currentStoreCode,
+            nama_toko: document.getElementById('nama_toko').value,
             tgl_sales: document.getElementById('tgl').value,
             total_sales: getCleanNumber(document.getElementById('total_sales').value),
             total_fisik: Number(document.getElementById('h_total_fisik').value),
-            total_potongan: getCleanNumber(document.getElementById('disp_total_potong').innerText),
+            total_potongan: Number(document.getElementById('disp_total_potong').innerText.replace(/\D/g,'')),
             selisih: Number(document.getElementById('val_selisih').value),
             pengirim: document.getElementById('nomor_pengirim').value
         };
 
         try {
-            // 1. Hapus rincian lama (upsert safety)
-            await supabase.from('rincian_sales').delete().eq('kode_toko', currentStoreCode).eq('tgl_sales', dataSales.tgl_sales);
-            // 2. Upsert Induk
+            // 1. HAPUS RINCIAN LAMA (Supaya tidak double saat revisi)
+            await supabase.from('rincian_sales').delete()
+                .eq('kode_toko', currentStoreCode)
+                .eq('tgl_sales', dataSales.tgl_sales);
+
+            // 2. UPSERT DATA INDUK (Update jika ada, Insert jika baru)
             const { error: err1 } = await supabase.from('laporan_sales').upsert(dataSales, { onConflict: 'kode_toko, tgl_sales' });
             if(err1) throw err1;
-            // 3. Insert Rincian
-            let payload = [];
-            const mapLabel = {'setor_sore':'Setor Sore','setor_malam':'Setor Malam','setor_pagi':'Setor Pagi','ekor_sales':'Ekor Sales','pot_ba':'Potongan BA','pot_lebih':'Potongan Lebih','pot_virtual':'Potongan Virtual'};
-            for(let key in dataStore) {
-                (dataStore[key]||[]).forEach(val => {
-                    if(val > 0) payload.push({
-                        kode_toko: currentStoreCode, tgl_sales: dataSales.tgl_sales, kategori: mapLabel[key],
-                        nominal: val, keterangan: (key==='ekor_sales'?document.getElementById('val_nama_ekor').value:(key==='pot_lebih' && document.getElementById('check_tertelan').checked ? 'Tertelan' : '')),
-                        cek_manual_saldo: null
+
+            // 3. SIAPKAN RINCIAN BARU
+            let rincianPayload = [];
+            const mapLabel = {
+                'setor_sore': 'Setor Sore', 'setor_malam': 'Setor Malam', 'setor_pagi': 'Setor Pagi', 
+                'ekor_sales': 'Ekor Sales', 'pot_ba': 'Potongan BA', 'pot_lebih': 'Potongan Lebih', 'pot_virtual': 'Potongan Virtual'
+            };
+            
+            for (let key in dataStore) {
+                if (dataStore[key].length > 0) {
+                    dataStore[key].forEach(val => {
+                        if(val > 0) {
+                            let ket = "";
+                            if(key === 'ekor_sales') ket = document.getElementById('val_nama_ekor').value;
+                            if(key === 'pot_lebih' && document.getElementById('check_tertelan').checked) ket = "Tertelan";
+                            
+                            rincianPayload.push({
+                                kode_toko: currentStoreCode,
+                                tgl_sales: dataSales.tgl_sales,
+                                kategori: mapLabel[key],
+                                nominal: val,
+                                keterangan: ket,
+                                cek_manual_saldo: null // Supabase logic (null)
+                            });
+                        }
                     });
-                });
+                }
             }
-            if(payload.length > 0) { const { error: err2 } = await supabase.from('rincian_sales').insert(payload); if(err2) throw err2; }
 
-            status.innerText = "✅ Tersimpan!";
-            hapusDraftServer();
-            alert("Berhasil Simpan!");
-            setTimeout(() => kirimWA(), 500);
-        } catch (e) { alert("Gagal: " + e.message); btn.disabled = false; btn.innerText = "☁️ SIMPAN DATABASE"; }
+            // 4. INSERT RINCIAN
+            if(rincianPayload.length > 0) {
+                const { error: err2 } = await supabase.from('rincian_sales').insert(rincianPayload);
+                if(err2) throw err2;
+            }
+
+            // SUKSES -> LANJUT KE PROSES WA
+            status.innerText = "✅ Tersimpan di Database!";
+            
+            // Hapus Draft di Google Sheet
+            const delData = new FormData(); 
+            delData.append('action', 'delete_draft'); 
+            delData.append('Kode Toko', currentStoreCode);
+            fetch(scriptURL, { method: 'POST', body: delData }); 
+
+            // Kirim WA
+            setTimeout(() => { kirimWA(); }, 800);
+
+        } catch (err) {
+            console.error("Supabase Error:", err);
+            showAlert("Gagal Simpan Database", "Data gagal masuk database, tapi Anda bisa lanjut kirim WA manual.\nError: " + err.message);
+            btn.disabled = false;
+            btn.innerText = "Coba Lagi";
+        }
     }
 
-    // --- HELPER ASLI V3 ---
-    function openCalc(id, t) { activeField = id; document.getElementById('modalTitle').innerText = t; document.getElementById('calcModal').style.display = 'flex'; renderCalcRows(); }
-    function renderCalcRows() {
-        const c = document.getElementById('calcList'); c.innerHTML="";
-        (dataStore[activeField]||[0]).forEach((v,i) => {
-            c.innerHTML += `<div class="calc-row"><input type="text" inputmode="numeric" class="calc-input" value="${v===0?'':v.toLocaleString('id-ID')}" onkeyup="formatRibuan(this);updateModalTotal()"><button class="btn-remove" onclick="removeRow(${i})">✕</button></div>`;
-        });
-        updateModalTotal();
-    }
-    function removeRow(i) { saveTemp(); dataStore[activeField].splice(i,1); renderCalcRows(); }
-    function addCalcRow() { saveTemp(); dataStore[activeField].push(0); renderCalcRows(); }
-    function saveTemp() { dataStore[activeField] = Array.from(document.querySelectorAll('.calc-input')).map(i=>getCleanNumber(i.value)); }
-    function updateModalTotal() { let t=0; document.querySelectorAll('.calc-input').forEach(i=>t+=getCleanNumber(i.value)); document.getElementById('modalTotal').innerText="Rp "+t.toLocaleString('id-ID'); }
-    function saveCalculator() {
-        saveTemp(); let t = dataStore[activeField].reduce((a,b)=>a+b,0);
-        document.getElementById('view_'+activeField).value="Rp "+t.toLocaleString('id-ID');
-        document.getElementById('h_'+activeField).value=t;
-        document.getElementById('calcModal').style.display='none'; hitungGlobal();
-    }
-    function hitungGlobal() {
-        let sales = getCleanNumber(document.getElementById('total_sales').value);
-        let fisik = Number(document.getElementById('h_setor_sore').value) + Number(document.getElementById('h_setor_malam').value) + Number(document.getElementById('h_setor_pagi').value) + Number(document.getElementById('h_ekor_sales').value);
-        let potong = Number(document.getElementById('h_pot_ba').value) + Number(document.getElementById('h_pot_lebih').value) + Number(document.getElementById('h_pot_virtual').value);
-        document.getElementById('disp_total_fisik').innerText = "Rp " + fisik.toLocaleString('id-ID');
-        document.getElementById('disp_total_potong').innerText = "Rp " + potong.toLocaleString('id-ID');
-        document.getElementById('h_total_fisik').value = fisik;
-        let selisih = (fisik + potong) - sales; document.getElementById('val_selisih').value = selisih;
-        let el = document.getElementById('disp_balance');
-        let btn = document.getElementById('btn-submit');
-        el.className = "status-box " + (selisih === 0 ? "status-ok" : (selisih > 0 ? "status-plus" : "status-min"));
-        el.innerHTML = selisih === 0 ? "✅ BALANCE" : (selisih > 0 ? "➕ LEBIH Rp "+selisih.toLocaleString('id-ID') : "⚠️ KURANG Rp "+Math.abs(selisih).toLocaleString('id-ID'));
-        if(selisih===0) { btn.className="btn-action btn-green"; btn.innerHTML="💾 SIMPAN (BALANCE)"; }
-        else if(selisih < 0) { btn.className="btn-action btn-yellow"; btn.innerHTML="⚠️ SIMPAN DRAFT (MINUS)"; }
-        else { btn.className="btn-action btn-blue"; btn.innerHTML="ℹ️ SIMPAN (LEBIH)"; }
-        autoSaveDraft();
-    }
     function kirimWA() {
-        let tgl = formatDateIndo(document.getElementById('tgl').value);
+        let getVal = (id) => document.getElementById('view_'+id).value;
+        let getNum = (id) => Number(document.getElementById('h_'+id).value) || 0;
         let selisih = Number(document.getElementById('val_selisih').value);
-        let stat = selisih===0 ? "BALANCE OK ✅" : (selisih>0 ? "LEBIH (+) ⚠️" : "KURANG (-) ⚠️");
-        let txt = `*LAPORAN SALES V3-S*\n*${currentStoreCode} - ${document.getElementById('nama_toko').value}*\nTgl: ${tgl}\nSales: Rp ${document.getElementById('total_sales').value}\n\n*STATUS: ${stat}*\nSelisih: Rp ${selisih.toLocaleString('id-ID')}\n\nPengirim: ${document.getElementById('nomor_pengirim').value}`;
+        let kode = document.getElementById('formKode').value || currentStoreCode;
+        let nama = document.getElementById('nama_toko').value;
+        let pengirim = document.getElementById('nomor_pengirim').value || "-"; 
+        let rawTgl = document.getElementById('tgl').value;
+        let tglIndo = formatDateIndo(rawTgl); 
+        saveSender(pengirim);
+        let statusTxt = selisih === 0 ? "BALANCE OK ✅" : (selisih > 0 ? `LEBIH (+) Rp ${selisih.toLocaleString('id-ID')}⚠️` : `KURANG (-) Rp ${Math.abs(selisih).toLocaleString('id-ID')}⚠️`);
+        let ekorTxt = getVal('ekor_sales');
+        if(document.getElementById('val_nama_ekor').value) ekorTxt += ` (a.n ${document.getElementById('val_nama_ekor').value})`;
+        let potongTxt = "";
+        if(getNum('pot_ba') > 0) potongTxt += `\n1. BA Var: ${getVal('pot_ba')}`;
+        if(getNum('pot_lebih') > 0) {
+            let isTertelan = document.getElementById('check_tertelan').checked;
+            let labelPot = isTertelan ? "Tertelan" : "Lebih";
+            potongTxt += `\n2. ${labelPot}: ${getVal('pot_lebih')}`;
+        }
+        if(getNum('pot_virtual') > 0) potongTxt += `\n3. Virtual: ${getVal('pot_virtual')}`;
+        if(potongTxt === "") potongTxt = "\n(Tidak ada)";
+        let txt = `*LAPORAN SETOR SALES*\n*${kode} - ${nama}*\n*Tgl Sales:* ${tglIndo}\n*Total Sales:* Rp ${document.getElementById('total_sales').value}\n------------------\n*Fisik Setor:*\n1. Sore: ${getVal('setor_sore')}\n2. Malam: ${getVal('setor_malam')}\n3. Pagi: ${getVal('setor_pagi')}\n4. Ekor: ${ekorTxt}\n------------------ (+)\n*Total Setor: ${document.getElementById('disp_total_fisik').innerText}*\n\n*Potongan:*${potongTxt}\n------------------ (+)\n*Total Potong: ${document.getElementById('disp_total_potong').innerText}*\n\n------------------\n*${statusTxt}*\n\n👤 *Pengirim:* ${pengirim}\n\nNote : untuk bukti ekor dan bukti potong email dilampirkan`;
         window.open(`https://wa.me/6285183347653?text=${encodeURIComponent(txt)}`, '_blank');
-        logout();
+        setTimeout(() => logout(), 1000); 
     }
-    function formatRibuan(e) { e.value = getCleanNumber(e.value).toLocaleString('id-ID'); }
-    function getCleanNumber(v) { return Number(v.toString().replace(/\./g,'').replace(/\D/g,'')) || 0; }
-    function getYesterdayDate() { let d = new Date(); d.setDate(d.getDate()-1); return d.toISOString().split('T')[0]; }
-    function formatDateIndo(ds) { let p = ds.split('-'); return p[2]+'-'+p[1]+'-'+p[0]; }
-    function saveSender(v) { localStorage.setItem('crm_sender_phone', v); }
-    function autoSaveDraft() { if(!currentStoreCode) return; const fd = new FormData(); fd.append('action','save_draft'); fd.append('Kode Toko',currentStoreCode); fd.append('draft_data',JSON.stringify(collectDraftData())); fetch(scriptURL,{method:'POST',body:fd}); }
-    function loadDraft() {
-        document.getElementById('historyList').style.display='block'; document.getElementById('historyList').innerText="🔄 Cek Draf...";
-        fetch(scriptURL+"?action=load_draft&kode="+currentStoreCode).then(r=>r.json()).then(d=>{
-            if(d.total_sales) {
-                document.getElementById('tgl').value=d.tgl; document.getElementById('total_sales').value=d.total_sales;
-                dataStore = d.dataStore||{}; 
-                ['setor_sore','setor_malam','setor_pagi','ekor_sales','pot_ba','pot_lebih','pot_virtual'].forEach(k=>{
-                    let v = (dataStore[k]||[]).reduce((a,b)=>a+b,0);
-                    document.getElementById('h_'+k).value = v;
-                    document.getElementById('view_'+k).value = "Rp " + v.toLocaleString('id-ID');
-                });
-                hitungGlobal(); document.getElementById('historyList').innerHTML="<span style='color:green'>✅ Draf Pulih</span>";
-            } else document.getElementById('historyList').style.display='none';
-        }).catch(e=>document.getElementById('historyList').style.display='none');
-    }
-    function confirmDeleteDraft() { if(confirm("Hapus draf cloud?")) hapusDraftServer(); }
-    function hapusDraftServer() { const fd=new FormData(); fd.append('action','delete_draft'); fd.append('Kode Toko',currentStoreCode); fetch(scriptURL,{method:'POST',body:fd}).then(()=>location.reload()); }
-    function getDetailedDeviceInfo() { document.getElementById('info_perangkat').value = navigator.userAgent; }
-    function showAlert(t,m){ document.getElementById('alertTitle').innerText=t; document.getElementById('alertMsg').innerText=m; document.getElementById('alertModal').style.display='flex'; }
-    function showConfirm(t,m,d,c){ document.getElementById('confirmTitle').innerText=t; document.getElementById('confirmMsg').innerText=m; onConfirmAction=c; document.getElementById('confirmModal').style.display='flex'; }
-    function closeConfirm(){ document.getElementById('confirmModal').style.display='none'; }
-    function doConfirmYes(){ if(onConfirmAction) onConfirmAction(); closeConfirm(); }
 </script>
 </body>
 </html>
