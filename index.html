@@ -310,7 +310,7 @@
 				<div class="card">
 					<div class="form-group">
 						<label>📅 Tanggal Sales</label>
-						<input type="date" name="Tanggal" id="tgl" required onchange="validateDateChange(this)"> </div>
+						<input type="date" name="Tanggal" id="tgl" required> </div>
 					<div class="form-group">
 						<label>🏪 Nama Toko</label>
 						<input type="text" name="Nama Toko" id="nama_toko" readonly style="background:#f1f5f9; color:#64748b; font-weight: 500;"> 
@@ -1092,6 +1092,37 @@ await simpanSetoranRawBatch(dataFinal.kode_toko, dataFinal.tanggal_sales, 'Ekor'
 function formatNumberDisplay(num) {
     return (Number(num) || 0).toLocaleString('id-ID');
 }
+let lastLoadedDate = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+    const tglInput = document.getElementById('tgl');
+    if (!tglInput) return;
+
+    tglInput.addEventListener('change', async () => {
+        if (!currentStoreCode) return;
+
+        const tgl = tglInput.value;
+        if (!tgl) return;
+
+        if (lastLoadedDate === tgl) return;
+        lastLoadedDate = tgl;
+
+        dataStore = {};
+        currentLoadedDate = "";
+
+        [
+            'setor_sore','setor_malam','setor_pagi',
+            'ekor_sales','pot_ba','pot_lebih','pot_virtual'
+        ].forEach(id => {
+            const el = document.getElementById('h_' + id);
+            if (el) el.value = 0;
+        });
+
+        document.getElementById('total_sales').value = "";
+
+        await loadDraft();
+    });
+});
 
 	</script>
 	</body>
